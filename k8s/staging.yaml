@@ -1,0 +1,75 @@
+redis:
+  enabled: true
+  extraLabels:
+    tier: redis
+
+ingress:
+  enabled: false
+  # Commenting this for now as current hera-be on the cluster still uses GCE ingress
+  # annotations:
+  #  kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: staging-affiliate-api.konga.com
+      paths:
+        - /
+  tls:
+    - secretName: ingress-tls
+      hosts:
+        - staging-affiliate-api.konga.com
+
+image:
+  name: hera-be
+  repository: acrkongastage.azurecr.io/hera-be:latest
+
+strategy:
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+
+  # Applications
+env:
+  - name: NODE_PATH
+    value: .
+  - name: NODE_ENV
+    value: staging
+  - name: PORT
+    value: "80"
+  - name: APP_PORT
+    value: "80"
+  - name: APP_NAME
+    value: hera-be
+  - name: ENV
+    value: staging
+
+     # Redis
+  - name: REDIS_HOST
+    value: "hera-be-redis.default.svc.cluster.local."
+  - name: REDIS_PORT
+    value: "6379"
+
+   # Logging
+  - name: LOGGING_LEVEL
+    value: debug
+  - name: LOGGING_CONSOLE
+    value: "true"
+
+   # Database
+  - name: DATABASE_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: hera-be-secret
+        key: database-username
+  - name: DATABASE_HOST
+    valueFrom:
+      secretKeyRef:
+        name: hera-be-secret
+        key: database-host
+  - name: DATABASE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: hera-be-secret
+        key: database-password
+  - name: DATABASE_POOL_MAX
+    value: "10"
+  - name: DATABASE_POOL_MIN
+    value: "2"

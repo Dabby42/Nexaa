@@ -1,0 +1,71 @@
+redis:
+  enabled: true
+  extraLabels:
+    tier: redis
+
+replicaCount: 4
+
+image:
+  name: hera-be
+  repository: acrkongaproduction.azurecr.io/hera-be:latest
+
+nodeSelector:
+  kubernetes.azure.com/agentpool: backend
+
+minReadySeconds: 60
+revisionHistoryLimit: 5
+
+resources:
+  requests:
+    memory: "1024Mi"
+    cpu: "1000m"
+
+env:
+  - name: NODE_PATH
+    value: .
+  - name: NODE_ENV
+    value: production
+  - name: PORT
+    value: "80"
+  - name: WEB_PORT
+    value: "80"
+  - name: APP_PORT
+    value: "80"
+  - name: APP_NAME
+    value: hera-be
+  - name: ENV
+    value: production
+    # Redis
+  - name: REDIS_HOST
+    value: "hera-be-redis.default.svc.cluster.local."
+  - name: REDIS_PORT
+    value: "6379"
+
+   # Logging
+  - name: LOGGING_LEVEL
+    value: debug
+  - name: LOGGING_CONSOLE
+    value: "true"
+
+   # Database
+  - name: DATABASE_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: hera-be-secret
+        key: database-username
+  - name: DATABASE_HOST
+    valueFrom:
+      secretKeyRef:
+        name: hera-be-secret
+        key: database-host
+  - name: DATABASE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: hera-be-secret
+        key: database-password
+  - name: DATABASE_NAME
+    value: hera
+  - name: DATABASE_POOL_MAX
+    value: "10"
+  - name: DATABASE_POOL_MIN
+    value: "2"
