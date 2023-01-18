@@ -1,0 +1,7 @@
+variables:
+  SERVICE_NAME: hera_be
+
+include:
+  - project: 'DevOps/ci-template'
+    ref: 'master'
+    file: .nodejs-template.yaml
