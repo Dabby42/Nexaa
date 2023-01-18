@@ -5,12 +5,12 @@
 
 echo " ----- Starting ALL Docker Containers -----"
 
-docker-compose -p hera_be_ -f docker-compose.yml -f docker-compose.web_app.yml up -d
+docker-compose -p hera-be_ -f docker-compose.yml -f docker-compose.web_app.yml up -d
 
 echo " ----- The Following Docker Containers Are Running -----"
 
 # Just in case there are MANY other docker containers running, grep on the specific ones we have started via the
 # docker-compose file. These names match those in the compose file (or they should).
 
-docker ps | grep hera_be_web_app
+docker ps | grep hera-be_web_app
 

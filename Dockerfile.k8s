@@ -2,7 +2,7 @@
 FROM node:18.13.0
 
 # create the log directory
-RUN mkdir -p /var/log/applications/hera_be
+RUN mkdir -p /var/log/applications/hera-be
 
 # Creating base "src" directory where the source repo will reside in our container.
 # Code is copied from the host machine to this "src" folder in the container as a last step.
@@ -25,7 +25,7 @@ RUN yarn
 RUN yarn build
 
 # Map a volume for the log files and add a volume to override the code
-VOLUME ["/src", "/var/log/applications/hera_be"]
+VOLUME ["/src", "/var/log/applications/hera-be"]
 
 # Expose web service and nodejs debug port
 EXPOSE 80

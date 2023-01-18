@@ -1,5 +1,5 @@
 variables:
-  SERVICE_NAME: hera_be
+  SERVICE_NAME: hera-be
 
 include:
   - project: 'DevOps/ci-template'

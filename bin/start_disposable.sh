@@ -2,7 +2,7 @@
 
 # This script will start a single "disposable" instance and connect the caller to it.
 # The instance will link to all infrastructure, including the service containers (if it exists)
-IMAGE_NAME="hera_be_web_app"
+IMAGE_NAME="hera-be_web_app"
 
 # Unfortunately, because we are mapping our current source code over the docker images source code, we will lose
 # the node_modules. Run npm install locally before we try anything else. This will install the node modules and ensure
@@ -11,10 +11,10 @@ IMAGE_NAME="hera_be_web_app"
 # 'BASH_SOURCE[0]' gives the file path e.g. './bin/start_disposable.sh'
 # 'dirname' then extracts the directory of the file e.g. './bin'
 # 'cd' changes the directory to that of 'bin' e.g. 'cd ./bin'
-# 'pwd' extracts the path of the current working directory e.g. '/Users/admin/hera_be/bin'
+# 'pwd' extracts the path of the current working directory e.g. '/Users/admin/hera-be/bin'
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# 'dirname' then extracts the directory of the project e.g. '/Users/admin/hera_be/'
+# 'dirname' then extracts the directory of the project e.g. '/Users/admin/hera-be/'
 ROOT="$(dirname "${SCRIPT_DIR}")"
 
 # First check if our image has been built. If not, build it.
@@ -25,7 +25,7 @@ else
     echo " ----- Web App Image Available for Use. -----"
 fi
 
-PROJECT_NAME="hera_be"
+PROJECT_NAME="hera-be"
 
 CURRENT_DOCKER_COMPOSE_VERSION=$( docker-compose -v | grep -o '[0-9]*[.][0-9]*[.][0-9]' | sed -e 's/[.]//g' )
 BREAKING_DOCKER_COMPOSE_VERSION=1210
@@ -53,7 +53,7 @@ docker run \
     -p 5858 \
     -v ${ROOT}:/src \
     --env-file=${ROOT}/.env \
-    --network=hera_be_main_network \
+    --network=hera-be_main_network \
     ${IMAGE_NAME} \
     bash
 

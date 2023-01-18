@@ -6,8 +6,8 @@ redis:
 replicaCount: 4
 
 image:
-  name: hera_be
-  repository: acrkongaproduction.azurecr.io/hera_be:latest
+  name: hera-be
+  repository: acrkongaproduction.azurecr.io/hera-be:latest
 
 nodeSelector:
   kubernetes.azure.com/agentpool: backend
@@ -32,12 +32,12 @@ env:
   - name: APP_PORT
     value: "80"
   - name: APP_NAME
-    value: hera_be
+    value: hera-be
   - name: ENV
     value: production
     # Redis
   - name: REDIS_HOST
-    value: "hera_be-redis.default.svc.cluster.local."
+    value: "hera-be-redis.default.svc.cluster.local."
   - name: REDIS_PORT
     value: "6379"
 
@@ -51,17 +51,17 @@ env:
   - name: DATABASE_USERNAME
     valueFrom:
       secretKeyRef:
-        name: hera_be-secret
+        name: hera-be-secret
         key: database-username
   - name: DATABASE_HOST
     valueFrom:
       secretKeyRef:
-        name: hera_be-secret
+        name: hera-be-secret
         key: database-host
   - name: DATABASE_PASSWORD
     valueFrom:
       secretKeyRef:
-        name: hera_be-secret
+        name: hera-be-secret
         key: database-password
   - name: DATABASE_NAME
     value: hera

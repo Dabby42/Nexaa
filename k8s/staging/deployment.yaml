@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hera_be
+  name: hera-be
   labels:
-    app: hera_be
+    app: hera-be
 spec:
   selector:
     matchLabels:
-      app: hera_be
+      app: hera-be
   template:
     metadata:
       labels:
-        app: hera_be
+        app: hera-be
     spec:
       containers:
-        - image: acrkongastage.azurecr.io/hera_be:latest
-          name: hera_be
+        - image: acrkongastage.azurecr.io/hera-be:latest
+          name: hera-be
           ports:
             - containerPort: 80
               protocol: TCP
@@ -31,13 +31,13 @@ spec:
             - name: APP_PORT
               value: "80"
             - name: APP_NAME
-              value: hera_be
+              value: hera-be
             - name: ENV
               value: staging
 
               # Redis
             - name: REDIS_HOST
-              value: "hera_be-redis.default.svc.cluster.local."
+              value: "hera-be-redis.default.svc.cluster.local."
             - name: REDIS_PORT
               value: "6379"
 
@@ -51,20 +51,20 @@ spec:
             - name: DATABASE_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: hera_be-secret
+                  name: hera-be-secret
                   key: database-username
             - name: DATABASE_HOST
               valueFrom:
                 secretKeyRef:
-                  name: hera_be-secret
+                  name: hera-be-secret
                   key: database-host
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: hera_be-secret
+                  name: hera-be-secret
                   key: database-password
             - name: DATABASE_NAME
-              value: hera_be
+              value: hera-be
             - name: DATABASE_POOL_MAX
               value: "10"
             - name: DATABASE_POOL_MIN

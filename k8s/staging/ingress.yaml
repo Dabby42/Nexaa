@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: hera_be-ingress
+  name: hera-be-ingress
 spec:
   annotations:
     kubernetes.io/ingress.class: nginx
@@ -17,6 +17,6 @@ spec:
             pathType: ImplementationSpecific
             backend:
               service:
-                name: hera_be
+                name: hera-be
                 port:
                   number: 80

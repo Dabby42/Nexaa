@@ -1,6 +1,6 @@
 'use strict';
 
-const appName = 'hera_be';
+const appName = 'hera-be';
 
 export const config = {
   appName,

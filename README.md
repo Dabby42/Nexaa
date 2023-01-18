@@ -4,7 +4,7 @@
 This application is responsible for managing konga's affiliate data.
 
 ## Running the application
-This application depends on a couple of services to run fully. The command below would build and start all dependent containers and take you into the bash temrinal of the main (`hera_be`) container:
+This application depends on a couple of services to run fully. The command below would build and start all dependent containers and take you into the bash temrinal of the main (`hera-be`) container:
 
 $ ./bin/start_disposable.sh
 

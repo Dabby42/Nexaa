@@ -3,21 +3,21 @@
 version: '2'
 services:
   redis:
-    container_name: hera_be_redis
+    container_name: hera-be_redis
     image: redis
     ports:
       - "6379"
     networks:
       - main_network
   database:
-    container_name: hera_be_mysql
+    container_name: hera-be_mysql
     image: mysql:5.7
     ports:
       - "3306"
     environment:
-      MYSQL_USER: "hera_be"
-      MYSQL_PASSWORD: "hera_be"
-      MYSQL_DATABASE: "hera_be"
+      MYSQL_USER: "hera-be"
+      MYSQL_PASSWORD: "hera-be"
+      MYSQL_DATABASE: "hera-be"
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     networks:
       - main_network
