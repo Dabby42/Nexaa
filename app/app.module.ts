@@ -5,7 +5,9 @@ import type { ClientOpts } from 'redis';
 import * as redisStore from 'cache-manager-redis-store';
 import { config } from 'app/config/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-
+import { UserModule } from './user/user.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { dataSourceOptions } from './db/data-source';
 @Module({
   imports: [
     CacheModule.register<ClientOpts>({
@@ -16,6 +18,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       ttl: 172800,
       max: 300000,
     }),
+    TypeOrmModule.forRoot(dataSourceOptions),
+    UserModule,
   ],
   controllers: [AppController],
   providers: [
