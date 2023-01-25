@@ -7,17 +7,21 @@ import {
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { config } from 'app/config/config';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter({logger: true})
+    new FastifyAdapter({ logger: true }),
   );
 
-  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'staging') {
+  if (
+    process.env.NODE_ENV === 'development' ||
+    process.env.NODE_ENV === 'staging'
+  ) {
     const documentOptions = new DocumentBuilder()
-      .setTitle('Hera')
-      .setDescription('Konga hera service')
+      .setTitle('Hera Docs')
+      .setDescription('Konga Hera service for Affiliate')
       .setVersion('v1')
       .build();
     const document = SwaggerModule.createDocument(app, documentOptions);
@@ -25,10 +29,11 @@ async function bootstrap() {
   }
 
   app.enableCors({
-    origin: ['127.0.0.1', '*', '/\.konga\.com$/', '/\.igbimo\.com$/']},
-  );
+    origin: ['127.0.0.1', '*', '/.konga.com$/', '/.igbimo.com$/'],
+  });
   app.use(helmet());
   app.setGlobalPrefix('v1');
+  app.useGlobalPipes(new ValidationPipe());
 
   const PORT: any = config.web.port;
 
