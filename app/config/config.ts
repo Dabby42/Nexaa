@@ -13,6 +13,7 @@ export const config = {
     level: process.env.LOG_LEVEL,
     console: process.env.LOG_ENABLE_CONSOLE || true,
   },
+  salt: Number(process.env.SALT_WORK_FACTOR),
   mysql: {
     connection: {
       host: process.env.DATABASE_HOST,

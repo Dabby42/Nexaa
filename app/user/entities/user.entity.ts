@@ -48,7 +48,7 @@ export class User {
   @Column()
   phone_number: string;
 
-  @Column()
+  @Column({nullable: true})
   website_url: string;
 
   @Column({
@@ -73,7 +73,7 @@ export class User {
 
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'verified_by' })
-  public verfied_by: User;
+  public verified_by: User;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   public created_at: Date;
