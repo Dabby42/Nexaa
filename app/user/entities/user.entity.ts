@@ -6,6 +6,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+import { compare } from 'bcryptjs';
 
 export enum UserStatusEnum {
   PENDING = 0,
@@ -67,6 +68,10 @@ export class User {
 
   @Column()
   password: string;
+
+  static async comparePasswords(password: string, hashedPassword: string) {
+    return await compare(password, hashedPassword);
+  }
 
   @Column({ type: 'timestamp', nullable: true })
   public verified_at: Date;

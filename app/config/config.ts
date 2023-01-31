@@ -36,4 +36,8 @@ export const config = {
     port: Number(process.env.REDIS_PORT) || 6379,
     db: Number(process.env.REDIS_DB) || 0,
   },
+  jwt: {
+    secret: process.env.JWT_SECRET || 'SECRET',
+    expiry: process.env.JWT_EXPIRY || '1h',
+  },
 };
