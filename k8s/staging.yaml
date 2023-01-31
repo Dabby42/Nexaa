@@ -73,3 +73,10 @@ env:
     value: "10"
   - name: DATABASE_POOL_MIN
     value: "2"
+  - name: JWT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: hera-be-secret
+        key: jwt-secret
+  - name: JWT_EXPIRY
+    value: "1h"
