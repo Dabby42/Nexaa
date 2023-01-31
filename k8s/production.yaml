@@ -64,7 +64,7 @@ env:
         name: hera-be-secret
         key: database-password
   - name: DATABASE_NAME
-    value: hera
+    value: hera_db
   - name: DATABASE_POOL_MAX
     value: "10"
   - name: DATABASE_POOL_MIN
