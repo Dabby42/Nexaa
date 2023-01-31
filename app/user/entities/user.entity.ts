@@ -1,4 +1,5 @@
 import { CountryRegion } from 'app/country_region/entities/country_region.entity';
+
 import {
   Entity,
   Column,
@@ -6,6 +7,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+import * as bcrypt from "bcrypt";
+import {config} from "../../config/config";
 
 export enum UserStatusEnum {
   PENDING = 0,
@@ -84,4 +87,9 @@ export class User {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   public updated_at: Date;
+
+  static async hashPassword(password){
+    const salt = await bcrypt.genSalt(config.salt);
+    return await bcrypt.hash(password, salt);
+  }
 }

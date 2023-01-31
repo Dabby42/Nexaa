@@ -1,42 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import {BadRequestException, Injectable, UnprocessableEntityException} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {User} from "./entities/user.entity";
-import * as bcrypt from "bcrypt";
-import {config} from "../config/config";
+
 
 @Injectable()
 export class UserService {
 
   constructor(
-      @InjectRepository(User) private userRepository: Repository<any>
+      @InjectRepository(User) private userRepository: Repository<User>
   ){}
 
-  async createUser(createUserDto: CreateUserDto): Promise<any> {
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+
+    let user = await this.userRepository.findOne({ where:
+          [
+            {email: createUserDto.email},
+            {username : createUserDto.username}
+          ]
+      }
+    );
+    if (user){
+      if(createUserDto.username === user.username) throw new BadRequestException("A user with this username already exist")
+      else if(createUserDto.email === user.email) throw new BadRequestException("A user with this email already exist");
+    }
 
     const newUser = this.userRepository.create(createUserDto);
+    newUser.password = await User.hashPassword(createUserDto.password);
 
-    const salt = await bcrypt.genSalt(config.salt);
-    newUser.password = await bcrypt.hash(createUserDto.password, salt);
+    try {
+      return await this.userRepository.save(newUser);
+    } catch(err) {
+      console.log(err)
+      throw new UnprocessableEntityException('An unknown error occurred')
+    }
 
-    return this.userRepository.save(newUser);
   }
 
-  findAllUsers() {
-    return `This action returns all user`;
-  }
-
-  findUser(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  updateUser(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  deleteUser(id: number) {
-    return `This action removes a #${id} user`;
-  }
 }

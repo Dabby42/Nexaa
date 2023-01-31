@@ -1,4 +1,5 @@
 import {IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber} from "class-validator";
+import {CountryRegion} from "../../country_region/entities/country_region.entity";
 
 export class CreateUserDto {
     @IsNotEmpty()
@@ -20,7 +21,7 @@ export class CreateUserDto {
     readonly address: string;
 
     @IsNotEmpty()
-    readonly state: string;
+    readonly state: CountryRegion;
 
     @IsNotEmpty()
     readonly country: string;
