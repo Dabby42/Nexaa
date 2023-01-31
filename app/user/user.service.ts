@@ -32,7 +32,6 @@ export class UserService {
     try {
       return await this.userRepository.save(newUser);
     } catch(err) {
-      console.log(err)
       throw new UnprocessableEntityException('An unknown error occurred')
     }
 

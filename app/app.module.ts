@@ -8,6 +8,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSourceOptions } from './db/data-source';
+import { AuthModule } from "./auth/auth.module";
+
 @Module({
   imports: [
     CacheModule.register<ClientOpts>({
@@ -20,6 +22,7 @@ import { dataSourceOptions } from './db/data-source';
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
     UserModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [

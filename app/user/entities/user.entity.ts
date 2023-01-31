@@ -1,5 +1,4 @@
 import { CountryRegion } from 'app/country_region/entities/country_region.entity';
-
 import {
   Entity,
   Column,
@@ -7,8 +6,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import * as bcrypt from "bcrypt";
 import {config} from "../../config/config";
+import * as bcrypt from 'bcryptjs';
 
 export enum UserStatusEnum {
   PENDING = 0,
@@ -70,6 +69,10 @@ export class User {
 
   @Column()
   password: string;
+
+  static async comparePasswords(password: string, hashedPassword: string) {
+    return await bcrypt.compare(password, hashedPassword);
+  }
 
   @Column({ type: 'timestamp', nullable: true })
   public verified_at: Date;
