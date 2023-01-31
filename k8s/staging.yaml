@@ -40,6 +40,8 @@ env:
     value: hera-be
   - name: ENV
     value: staging
+  - name: SALT_WORK_FACTOR
+    value: "10"
 
      # Redis
   - name: REDIS_HOST
