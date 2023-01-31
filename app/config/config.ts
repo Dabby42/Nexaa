@@ -41,5 +41,9 @@ export const config = {
       client_id: process.env.GOOGLE_CLIENT_ID,
       client_secret: process.env.GOOGLE_CLIENT_SECRET
     }
-  }
+  },
+  jwt: {
+    secret: process.env.JWT_SECRET || 'SECRET',
+    expiry: process.env.JWT_EXPIRY || '1h',
+  },
 };
