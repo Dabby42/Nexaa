@@ -6,7 +6,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { compare } from 'bcryptjs';
+import {config} from "../../config/config";
+import * as bcrypt from 'bcryptjs';
 
 export enum UserStatusEnum {
   PENDING = 0,
@@ -49,7 +50,7 @@ export class User {
   @Column()
   phone_number: string;
 
-  @Column()
+  @Column({nullable: true})
   website_url: string;
 
   @Column({
@@ -70,7 +71,7 @@ export class User {
   password: string;
 
   static async comparePasswords(password: string, hashedPassword: string) {
-    return await compare(password, hashedPassword);
+    return await bcrypt.compare(password, hashedPassword);
   }
 
   @Column({ type: 'timestamp', nullable: true })
@@ -78,7 +79,7 @@ export class User {
 
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'verified_by' })
-  public verfied_by: User;
+  public verified_by: User;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   public created_at: Date;
@@ -89,4 +90,9 @@ export class User {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   public updated_at: Date;
+
+  static async hashPassword(password){
+    const salt = await bcrypt.genSalt(config.salt);
+    return await bcrypt.hash(password, salt);
+  }
 }

@@ -55,6 +55,8 @@ spec:
               value: "hera-be-redis.default.svc.cluster.local."
             - name: REDIS_PORT
               value: "6379"
+            - name: SALT_WORK_FACTOR
+              value: "10"
 
             # Logging
             - name: LOGGING_LEVEL
