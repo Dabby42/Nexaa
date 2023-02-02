@@ -7,10 +7,11 @@ import { JwtModule } from "@nestjs/jwt";
 import { config } from "app/config/config";
 import { JwtStrategy } from "./auth.jwt.strategy";
 import { UserModule } from "../user/user.module";
+import { GoogleAuthService } from "./google-auth.service";
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, GoogleAuthService],
   imports: [
     TypeOrmModule.forFeature([User]),
     JwtModule.register({
