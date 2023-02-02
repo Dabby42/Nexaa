@@ -87,7 +87,7 @@ spec:
             - name: DATABASE_POOL_MIN
               value: "2"
 
-             #JWT
+              #JWT
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:

@@ -7,7 +7,6 @@
   "license": "ISC",
   "scripts": {
     "build": "nest build",
-    "format": "prettier --write \"app/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -21,7 +20,12 @@
     "typeorm": "yarn build && npx typeorm -d dist/app/db/data-source.js",
     "migration:generate": "yarn run typeorm -- migration:generate",
     "migration:run": "yarn run typeorm -- migration:run",
-    "migration:revert": "yarn run typeorm --migration:revert"
+    "migration:revert": "yarn run typeorm --migration:revert",
+    "check-format": "prettier --check .",
+    "check-lint": "eslint . --ext ts --ext tsx --ext js",
+    "format": "prettier --write .",
+    "prepare": "husky install",
+    "test-all": "yarn run format && yarn run check-format && yarn run check-lint && yarn run test"
   },
   "dependencies": {
     "@fastify/static": "^6.6.1",
@@ -71,7 +75,8 @@
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "4.1.1",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "husky": "^8.0.0"
   },
   "jest": {
     "moduleFileExtensions": [

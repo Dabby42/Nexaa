@@ -1,9 +1,11 @@
 # Affiliate Platform API
 
 ## Description
+
 This application is responsible for managing konga's affiliate data.
 
 ## Running the application
+
 This application depends on a couple of services to run fully. The command below would build and start all dependent containers and take you into the bash temrinal of the main (`hera-be`) container:
 
 $ ./bin/start_disposable.sh
@@ -15,11 +17,12 @@ $ yarn install
 ```
 
 ## Starting this application
+
 you will need to change the server listening part of the application to use:
+
 ```
 app.listen(8000, '0.0.0.0')
 ```
-
 
 ```bash
 # development
@@ -31,7 +34,9 @@ $ yarn run start:dev
 # production mode
 $ yarn run start:prod
 ```
+
 ## Technology used
+
 [Fastify] (https://www.fastify.io/docs/)
 
 [NestJS] (https://docs.nestjs.com/)
@@ -40,7 +45,8 @@ $ yarn run start:prod
 ## Test
 
 ### Framework Used
-* [Jest] (https://jestjs.io/docs/en/getting-started)
+
+- [Jest] (https://jestjs.io/docs/en/getting-started)
 
 You can run the test by using the following command:
 
