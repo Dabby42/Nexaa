@@ -8,10 +8,9 @@ import { sendSuccess } from "app/utils/helpers/response.helpers";
 import { GoogleLoginDto } from "./dto/google-login.dto";
 import { GoogleAuthService } from "./google-auth.service";
 
-
 @Injectable()
 export class AuthService {
-  constructor(@InjectRepository(User) private userRepository: Repository<User>, private jwtService: JwtService, private googleAuthService : GoogleAuthService) {}
+  constructor(@InjectRepository(User) private userRepository: Repository<User>, private jwtService: JwtService, private googleAuthService: GoogleAuthService) {}
 
   async loginUser(loginUserDto: LoginUserDto, isSocial = false) {
     const user = await this.userRepository.findOne({
@@ -40,7 +39,7 @@ export class AuthService {
     return sendSuccess({ token }, "Login Success");
   }
 
-  async loginWithGoogle(googleLoginDto : GoogleLoginDto) {
+  async loginWithGoogle(googleLoginDto: GoogleLoginDto) {
     const email = await this.googleAuthService.authenticate(googleLoginDto.token);
     //Login user without password
     return await this.loginUser({ email, password: "" }, true);

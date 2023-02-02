@@ -23,8 +23,8 @@ describe("AuthController", () => {
   };
 
   const mockGoogleAuthService = {
-    authenticate: jest.fn().mockImplementation(() => userRepositoryMock.email)
-  }
+    authenticate: jest.fn().mockImplementation(() => userRepositoryMock.email),
+  };
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
@@ -45,8 +45,8 @@ describe("AuthController", () => {
         },
         {
           provide: GoogleAuthService,
-          useValue: mockGoogleAuthService
-        }
+          useValue: mockGoogleAuthService,
+        },
       ],
     }).compile();
 
@@ -63,7 +63,6 @@ describe("AuthController", () => {
     });
 
     it("it should return an error when no user is found", async () => {
-
       const email = "olamide.aboyyeji@konga.com";
       const password = "olamide";
       userRepository.findOne.mockImplementationOnce(() => Promise.resolve(null));
@@ -79,16 +78,15 @@ describe("AuthController", () => {
   });
 
   describe("login a user with google", () => {
-    it('should return the user token when google login is successful', async () => {
-
-      expect(await controller.loginUserWithGoogle({ token : "valid_token"})).toStrictEqual(loginUserSuccessMockData);
+    it("should return the user token when google login is successful", async () => {
+      expect(await controller.loginUserWithGoogle({ token: "valid_token" })).toStrictEqual(loginUserSuccessMockData);
     });
 
-    it('should return an unauthorized error if google token is invalid', async () => {
+    it("should return an unauthorized error if google token is invalid", async () => {
       googleAuthService.authenticate.mockImplementationOnce(() => {
         throw new UnauthorizedException();
-      })
-      await expect(controller.loginUserWithGoogle({token : "invalid_token"})).rejects.toThrowError(UnauthorizedException);
+      });
+      await expect(controller.loginUserWithGoogle({ token: "invalid_token" })).rejects.toThrowError(UnauthorizedException);
     });
-  })
+  });
 });
