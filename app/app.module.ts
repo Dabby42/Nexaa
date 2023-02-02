@@ -1,13 +1,13 @@
-import { Module, CacheModule, CacheInterceptor } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import type { ClientOpts } from 'redis';
-import * as redisStore from 'cache-manager-redis-store';
-import { config } from 'app/config/config';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { UserModule } from './user/user.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { dataSourceOptions } from './db/data-source';
+import { Module, CacheModule, CacheInterceptor } from "@nestjs/common";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
+import type { ClientOpts } from "redis";
+import * as redisStore from "cache-manager-redis-store";
+import { config } from "app/config/config";
+import { APP_INTERCEPTOR } from "@nestjs/core";
+import { UserModule } from "./user/user.module";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { dataSourceOptions } from "./db/data-source";
 import { AuthModule } from "./auth/auth.module";
 
 @Module({
@@ -22,7 +22,7 @@ import { AuthModule } from "./auth/auth.module";
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
     UserModule,
-    AuthModule
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,6 +1,6 @@
 # Base Docker Compose File. We assume usage of redis by most (all) APIs due to usage of OAuth by all services
 # We also assume MySQL usage in our code.
-version: '2'
+version: "2"
 services:
   redis:
     container_name: hera-be_redis
@@ -24,5 +24,3 @@ services:
 networks:
   main_network:
     driver: bridge
-
-

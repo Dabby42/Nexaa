@@ -4,20 +4,15 @@
   "sourceRoot": "app",
   "compilerOptions": {
     "deleteOutDir": true,
-    "plugins":[
+    "plugins": [
       {
         "name": "@nestjs/swagger/plugin",
         "options": {
-          "controllerFileNameSuffix" : [
-            ".controller.ts"
-          ],
-          "dtoFileNameSuffix" : [
-            ".dto.ts", ".entity.ts"
-          ]
+          "controllerFileNameSuffix": [".controller.ts"],
+          "dtoFileNameSuffix": [".dto.ts", ".entity.ts"]
         }
       }
     ]
   },
   "entryFile": "server"
 }
-

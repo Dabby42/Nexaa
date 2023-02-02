@@ -6,9 +6,9 @@ metadata:
     kubernetes.io/ingress.class: nginx
 spec:
   tls:
-  - hosts:
-       - staging-affiliate-api.konga.com
-    secretName: ingress-tls
+    - hosts:
+        - staging-affiliate-api.konga.com
+      secretName: ingress-tls
   rules:
     - host: staging-affiliate-api.konga.com
       http:

@@ -41,21 +41,22 @@ env:
   - name: ENV
     value: staging
   - name: SALT_WORK_FACTOR
-    value: "10"
+    value:
+      "10"
 
-     # Redis
+      # Redis
   - name: REDIS_HOST
     value: "hera-be-redis.default.svc.cluster.local."
   - name: REDIS_PORT
     value: "6379"
 
-   # Logging
+    # Logging
   - name: LOGGING_LEVEL
     value: debug
   - name: LOGGING_CONSOLE
     value: "true"
 
-   # Database
+    # Database
   - name: DATABASE_USERNAME
     valueFrom:
       secretKeyRef:

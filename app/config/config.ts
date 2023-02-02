@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-const appName = 'hera-be';
+const appName = "hera-be";
 
 export const config = {
   appName,
@@ -24,12 +24,8 @@ export const config = {
       debug: process.env.DATABASE_DEBUG || false,
     },
     pool: {
-      min: process.env.DATABASE_POOL_MIN
-        ? Number(process.env.DATABASE_POOL_MIN)
-        : 2,
-      max: process.env.DATABASE_POOL_MAX
-        ? Number(process.env.DATABASE_POOL_MAX)
-        : 2,
+      min: process.env.DATABASE_POOL_MIN ? Number(process.env.DATABASE_POOL_MIN) : 2,
+      max: process.env.DATABASE_POOL_MAX ? Number(process.env.DATABASE_POOL_MAX) : 2,
     },
   },
   redis: {
@@ -40,11 +36,11 @@ export const config = {
   social_login: {
     google: {
       client_id: process.env.GOOGLE_CLIENT_ID,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET
-    }
+      client_secret: process.env.GOOGLE_CLIENT_SECRET,
+    },
   },
   jwt: {
     secret: process.env.JWT_SECRET,
-    expiry: process.env.JWT_EXPIRY
+    expiry: process.env.JWT_EXPIRY,
   },
 };

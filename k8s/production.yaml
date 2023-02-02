@@ -43,13 +43,13 @@ env:
   - name: SALT_WORK_FACTOR
     value: "10"
 
-   # Logging
+    # Logging
   - name: LOGGING_LEVEL
     value: debug
   - name: LOGGING_CONSOLE
     value: "true"
 
-   # Database
+    # Database
   - name: DATABASE_USERNAME
     valueFrom:
       secretKeyRef:

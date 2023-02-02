@@ -3,7 +3,7 @@
 
 # However, to also create and run this service in the background (for API testing) you must run:
 # docker-compose -f docker-compose.yml -f docker-compose.web_app.yml up -d
-version: '2'
+version: "2"
 services:
   web_app:
     build: .

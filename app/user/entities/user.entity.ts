@@ -1,13 +1,7 @@
-import { CountryRegion } from 'app/country_region/entities/country_region.entity';
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
-import {config} from "../../config/config";
-import * as bcrypt from 'bcryptjs';
+import { CountryRegion } from "app/country_region/entities/country_region.entity";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
+import { config } from "../../config/config";
+import * as bcrypt from "bcryptjs";
 
 export enum UserStatusEnum {
   PENDING = 0,
@@ -41,7 +35,7 @@ export class User {
   address: string;
 
   @ManyToOne(() => CountryRegion)
-  @JoinColumn({ name: 'state' })
+  @JoinColumn({ name: "state" })
   state: CountryRegion;
 
   @Column()
@@ -50,18 +44,18 @@ export class User {
   @Column()
   phone_number: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   website_url: string;
 
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: UserStatusEnum,
     default: UserStatusEnum.PENDING,
   })
   status: number;
 
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: RoleEnum,
     default: RoleEnum.AFFILIATE,
   })
@@ -74,24 +68,24 @@ export class User {
     return await bcrypt.compare(password, hashedPassword);
   }
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: "timestamp", nullable: true })
   public verified_at: Date;
 
   @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: 'verified_by' })
+  @JoinColumn({ name: "verified_by" })
   public verified_by: User;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   public created_at: Date;
 
   @Column({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
+    onUpdate: "CURRENT_TIMESTAMP",
   })
   public updated_at: Date;
 
-  static async hashPassword(password){
+  static async hashPassword(password) {
     const salt = await bcrypt.genSalt(config.salt);
     return await bcrypt.hash(password, salt);
   }
