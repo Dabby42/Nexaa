@@ -63,7 +63,7 @@ export class AuthService {
 
     if (existingUser) {
       const token = crypto.randomBytes(20).toString("hex");
-      console.log(token);
+
       this.cacheManager.set(token, existingUser.id, 60 * 10);
 
       //Send reset link as a mail to user
@@ -94,6 +94,10 @@ export class AuthService {
     const { newPassword, token } = resetPasswordDto;
 
     const userId = await this.cacheManager.get(token);
+
+    if (!userId) {
+      throw new BadRequestException("Token is not valid");
+    }
 
     const user = await this.userRepository.findOneBy({ id: userId });
 
