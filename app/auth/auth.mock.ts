@@ -34,4 +34,24 @@ export const userRepositoryMock = {
   updated_at: "2023-02-02T12:47:26.000Z",
 };
 
+export const userDataMock: any = {
+  first_name: "Olamide",
+  last_name: "Aboyeji",
+  email: "olamide.aboyeji@konga.com",
+  username: "olamide",
+  address: "3B Cocoa Road",
+  country: "Nigeria",
+  phone_number: "08000000000",
+  status: 0,
+  state: 1,
+  website_url: "https://olamide.affliate.com",
+  password: "password",
+};
+
+export const registerUserSuccessMock: any = {
+  status: "success",
+  message: "Account created successfully",
+  data: null,
+};
+
 export const noUserMock = null;
