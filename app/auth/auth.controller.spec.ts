@@ -1,12 +1,13 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
-import { loginUserSuccessMockData, userRepositoryMock } from "./auth.mock";
+import { loginUserSuccessMockData, registerUserSuccessMock, userDataMock, userRepositoryMock } from "./auth.mock";
 import { JwtService } from "@nestjs/jwt";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { User } from "app/user/entities/user.entity";
 import { UserService } from "app/user/user.service";
-import { UnauthorizedException } from "@nestjs/common";
+import { Cache } from "cache-manager";
+import { CACHE_MANAGER, ConflictException, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
 import { GoogleAuthService } from "./google-auth.service";
 
 describe("AuthController", () => {
@@ -16,6 +17,13 @@ describe("AuthController", () => {
   let googleAuthService;
   const mockUserRepository = {
     findOne: jest.fn().mockImplementation(() => Promise.resolve(userRepositoryMock)),
+    create: jest.fn().mockImplementation((dto) => dto),
+    insert: jest.fn().mockImplementation((userData) =>
+      Promise.resolve({
+        id: 1,
+        ...userData,
+      })
+    ),
   };
 
   const mockJWTService = {
@@ -26,11 +34,17 @@ describe("AuthController", () => {
     authenticate: jest.fn().mockImplementation(() => userRepositoryMock.email),
   };
 
+  const mockCache: Cache = {
+    get: jest.fn().mockImplementation(() => userRepositoryMock.id),
+    set: jest.fn(),
+  };
+
   beforeEach(async () => {
     module = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
         AuthService,
+        UserService,
         {
           provide: getRepositoryToken(User),
           useValue: mockUserRepository,
@@ -40,12 +54,12 @@ describe("AuthController", () => {
           useValue: mockJWTService,
         },
         {
-          provide: UserService,
-          useValue: jest.fn(),
-        },
-        {
           provide: GoogleAuthService,
           useValue: mockGoogleAuthService,
+        },
+        {
+          provide: CACHE_MANAGER,
+          useValue: mockCache,
         },
       ],
     }).compile();
@@ -55,21 +69,42 @@ describe("AuthController", () => {
     googleAuthService = module.get<GoogleAuthService>(GoogleAuthService);
   });
 
+  describe("sign up a new user", function () {
+    it("should return a success response", async () => {
+      userRepository.findOne.mockImplementationOnce(() => Promise.resolve(null));
+
+      expect(await controller.createUser(userDataMock)).toEqual(registerUserSuccessMock);
+    });
+
+    it("should return a conflict if user already exists", async () => {
+      await expect(controller.createUser(userDataMock)).rejects.toThrowError(ConflictException);
+    });
+
+    it("should return an error if insert method throws", async () => {
+      userRepository.findOne.mockImplementationOnce(() => Promise.resolve(null));
+      userRepository.insert.mockImplementationOnce(() => {
+        throw new Error();
+      });
+
+      await expect(controller.createUser(userDataMock)).rejects.toThrowError(UnprocessableEntityException);
+    });
+  });
+
   describe("login a user", () => {
-    it("it should return the user token when login is successful", async () => {
+    it("should return the user token when login is successful", async () => {
       const email = "olamide.aboyeji@konga.com";
       const password = "olamide";
       expect(await controller.loginUser({ email, password })).toStrictEqual(loginUserSuccessMockData);
     });
 
-    it("it should return an error when no user is found", async () => {
+    it("should return an error when no user is found", async () => {
       const email = "olamide.aboyyeji@konga.com";
       const password = "olamide";
       userRepository.findOne.mockImplementationOnce(() => Promise.resolve(null));
       await expect(controller.loginUser({ email, password })).rejects.toThrowError(UnauthorizedException);
     });
 
-    it("it should return an error when password does not match", async () => {
+    it("should return an error when password does not match", async () => {
       const email = "olamide.aboyeji@konga.com";
       const password = "wrong_password";
 

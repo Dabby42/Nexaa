@@ -19,6 +19,7 @@ import { AuthModule } from "./auth/auth.module";
       database: config.redis.db,
       ttl: 172800,
       max: 300000,
+      isGlobal: true,
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
     UserModule,
