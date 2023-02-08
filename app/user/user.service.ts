@@ -3,6 +3,7 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "./entities/user.entity";
+import { UpdateUserDto } from "./dto/update-user.dto";
 
 @Injectable()
 export class UserService {
@@ -25,5 +26,13 @@ export class UserService {
     } catch (err) {
       throw new UnprocessableEntityException("An unknown error occurred");
     }
+  }
+
+  async updateUser(id: number, updateUserDto: UpdateUserDto) {
+    if (updateUserDto.username) {
+      const user = await this.userRepository.findOne({ where: { username: updateUserDto.username } });
+      if (user) throw new BadRequestException("Username already in use.");
+    }
+    await this.userRepository.update(id, updateUserDto);
   }
 }

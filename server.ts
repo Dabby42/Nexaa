@@ -20,7 +20,11 @@ async function bootstrap() {
   });
   app.use(helmet());
   app.setGlobalPrefix("v1");
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+    })
+  );
 
   const PORT: any = config.web.port;
 
