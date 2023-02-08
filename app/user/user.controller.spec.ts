@@ -4,7 +4,7 @@ import { UserService } from "./user.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
 import { updateProfileResponseData, updateUserData, userRequestMock } from "./user.mock";
-import { BadRequestException } from "@nestjs/common";
+import { ConflictException } from "@nestjs/common";
 
 describe("UserController", () => {
   let controller: UserController;
@@ -41,7 +41,7 @@ describe("UserController", () => {
     it("should return error if user is changing to a username already in use", async () => {
       userRepository.findOne.mockImplementationOnce(() => Promise.resolve(true));
 
-      await expect(controller.updateUser(updateUserData, userRequestMock)).rejects.toThrowError(BadRequestException);
+      await expect(controller.updateUser(updateUserData, userRequestMock)).rejects.toThrowError(ConflictException);
     });
   });
 });
