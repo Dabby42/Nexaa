@@ -31,7 +31,7 @@ export class UserService {
   async updateUser(id: number, updateUserDto: UpdateUserDto) {
     if (updateUserDto.username) {
       const user = await this.userRepository.findOne({ where: { username: updateUserDto.username } });
-      if (user) throw new BadRequestException("Username already in use.");
+      if (user) throw new ConflictException("Username already in use.");
     }
     await this.userRepository.update(id, updateUserDto);
   }
