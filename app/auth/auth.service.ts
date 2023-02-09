@@ -81,7 +81,6 @@ export class AuthService {
     const { token } = confirmResetPasswordTokenDto;
 
     const value = await this.cacheManager.get(token);
-    console.log(value);
 
     if (!value) {
       throw new BadRequestException("Token is not valid");

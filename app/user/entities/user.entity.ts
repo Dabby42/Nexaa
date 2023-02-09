@@ -47,6 +47,9 @@ export class User {
   @Column({ nullable: true })
   website_url: string;
 
+  @Column({ nullable: true })
+  account_number: number;
+
   @Column({
     type: "enum",
     enum: UserStatusEnum,

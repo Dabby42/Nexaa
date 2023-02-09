@@ -4,6 +4,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "./entities/user.entity";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { UpdateBankDetailsDto } from "./dto/update-bank-details.dto";
+import { sendSuccess } from "app/utils/helpers/response.helpers";
 
 @Injectable()
 export class UserService {
@@ -34,5 +36,14 @@ export class UserService {
       if (user) throw new ConflictException("Username already in use.");
     }
     await this.userRepository.update(id, updateUserDto);
+  }
+
+  async updateBankDetails(id: number, updateBankDetailsDto: UpdateBankDetailsDto) {
+    try {
+      await this.userRepository.update(id, updateBankDetailsDto);
+      return sendSuccess(null, "Bank Details Updated");
+    } catch (error) {
+      throw new UnprocessableEntityException("An unknown error occurred");
+    }
   }
 }
