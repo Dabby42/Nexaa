@@ -9,6 +9,7 @@ import { UserModule } from "./user/user.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { dataSourceOptions } from "./db/data-source";
 import { AuthModule } from "./auth/auth.module";
+import { BannersModule } from "./banners/banners.module";
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AuthModule } from "./auth/auth.module";
     TypeOrmModule.forRoot(dataSourceOptions),
     UserModule,
     AuthModule,
+    BannersModule,
   ],
   controllers: [AppController],
   providers: [
