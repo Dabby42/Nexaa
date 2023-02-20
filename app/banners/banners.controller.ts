@@ -10,6 +10,6 @@ export class BannersController {
   @UseGuards(JwtGuard)
   @Post()
   async createBanner(@Body() createBannerDto: CreateBannerDto, @Request() req) {
-    return await this.bannersService.createBanner(req.user.role, createBannerDto);
+    return await this.bannersService.createBanner(createBannerDto, req);
   }
 }

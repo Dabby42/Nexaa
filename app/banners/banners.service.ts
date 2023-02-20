@@ -10,8 +10,8 @@ import { RoleEnum } from "app/user/entities/user.entity";
 export class BannersService {
   constructor(@InjectRepository(Banner) private bannerRepository: Repository<Banner>) {}
 
-  async createBanner(role: number, createBannerDto: CreateBannerDto) {
-    if (role === RoleEnum.ADMIN) {
+  async createBanner(createBannerDto: CreateBannerDto, req: any) {
+    if (req.user.role === RoleEnum.ADMIN) {
       try {
         const banner_urls_and_sizes = JSON.stringify(createBannerDto.banner_images_and_sizes);
         const newBanner = { ...createBannerDto, banner_images_and_sizes: banner_urls_and_sizes };
