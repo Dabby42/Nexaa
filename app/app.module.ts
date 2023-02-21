@@ -9,6 +9,8 @@ import { UserModule } from "./user/user.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { dataSourceOptions } from "./db/data-source";
 import { AuthModule } from "./auth/auth.module";
+import { ContactUsModule } from "./contact_us/contact_us.module";
+import { NotificationModule } from "./notification/notification.module";
 import { BannersModule } from "./banners/banners.module";
 import { CategoriesModule } from "./categories/categories.module";
 import { NewsModule } from "./news/news.module";
@@ -31,6 +33,8 @@ import { NewsModule } from "./news/news.module";
     CategoriesModule,
     NewsModule,
     CategoriesModule,
+    NotificationModule,
+    ContactUsModule,
   ],
   controllers: [AppController],
   providers: [

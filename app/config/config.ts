@@ -44,4 +44,24 @@ export const config = {
     secret: process.env.JWT_SECRET,
     expiry: process.env.JWT_EXPIRY,
   },
+  oauth: {
+    client_id: process.env.OAUTH_CLIENT_ID,
+    client_secret: process.env.OAUTH_CLIENT_SECRET,
+    cache_key: appName,
+    url: process.env.OAUTH_URL,
+    timeout: parseInt(process.env.OAUTH_REQUEST_TIMEOUT),
+    retry: {
+      count: parseInt(process.env.OAUTH_RETRY_COUNT),
+      delay: parseInt(process.env.OAUTH_RETRY_DELAY),
+    },
+  },
+  hermes: {
+    url: process.env.HERMES_API_URL,
+    scope: process.env.HERMES_SCOPE,
+    contact_us: {
+      template_name: process.env.CONTACT_US_TEMPLATE_NAME,
+      recipient: process.env.CONTACT_US_RECIPIENT,
+      sender: process.env.CONTACT_US_SENDER,
+    }
+  },
 };
