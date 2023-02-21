@@ -17,7 +17,7 @@ export class UserService {
     });
     if (user) {
       if (createUserDto.username === user.username) throw new ConflictException("A user with this username already exist");
-      else if (createUserDto.email === user.email) throw new ConflictException("A user with this email already exist");
+      else if (createUserDto.email === user.email) throw new ConflictException("A user with this notification already exist");
     }
 
     const newUser = this.userRepository.create(createUserDto);
