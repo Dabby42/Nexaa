@@ -14,7 +14,7 @@ export class ContactUsController {
 
       return sendSuccess(null, "Contact message received.");
     } catch {
-      throw new BadRequestException("Unable to submit contact us request")
+      throw new BadRequestException("Unable to submit contact us request");
     }
   }
 }
