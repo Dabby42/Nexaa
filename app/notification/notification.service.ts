@@ -11,7 +11,7 @@ export class NotificationService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {
     const oauth = new OAuth2(config.oauth.url, config.oauth.client_id, config.oauth.client_secret, cacheManager, config.oauth);
     const provider = provide.create(oauth, config.hermes.scope, "hermes");
-    this.hermesClient = new Hermes('https://staging-hermes.igbimo.com', provider);
+    this.hermesClient = new Hermes("https://staging-hermes.igbimo.com", provider);
   }
 
   async send(medium: string, name: string, recipient: string, subject: string, sender: string, sender_id: string, params: any) {

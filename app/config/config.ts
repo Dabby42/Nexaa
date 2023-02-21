@@ -62,6 +62,6 @@ export const config = {
       template_name: process.env.CONTACT_US_TEMPLATE_NAME,
       recipient: process.env.CONTACT_US_RECIPIENT,
       sender: process.env.CONTACT_US_SENDER,
-    }
+    },
   },
 };
