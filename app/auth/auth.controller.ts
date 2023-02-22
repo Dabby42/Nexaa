@@ -9,7 +9,9 @@ import { UserService } from "../user/user.service";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { ConfirmResetPasswordTokenDto } from "./dto/confirm-reset-password-token.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags("Auth")
 @Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
