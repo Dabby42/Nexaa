@@ -6,7 +6,7 @@ import { sendSuccess } from "../utils/helpers/response.helpers";
 import { UpdateBankDetailsDto } from "./dto/update-bank-details.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
-@ApiBearerAuth('jwt')
+@ApiBearerAuth("jwt")
 @ApiTags("User")
 @Controller("user")
 export class UserController {

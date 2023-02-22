@@ -6,7 +6,7 @@ import { AdminGuard } from "app/admin/admin.guard";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
 @ApiTags("Banners")
-@ApiBearerAuth('jwt')
+@ApiBearerAuth("jwt")
 @Controller("banners")
 export class BannersController {
   constructor(private readonly bannersService: BannersService) {}
