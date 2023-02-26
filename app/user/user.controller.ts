@@ -4,7 +4,10 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 import { JwtGuard } from "../auth/auth.jwt.guard";
 import { sendSuccess } from "../utils/helpers/response.helpers";
 import { UpdateBankDetailsDto } from "./dto/update-bank-details.dto";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+@ApiBearerAuth("jwt")
+@ApiTags("User")
 @Controller("user")
 export class UserController {
   constructor(private readonly userService: UserService) {}
