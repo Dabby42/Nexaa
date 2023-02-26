@@ -40,3 +40,26 @@ export const notAdminRequestMock: any = {
     role: 31,
   },
 };
+
+export const getActiveBannersResponseMock: any = {
+  status: "success",
+  message: "Data fetched successfully",
+  data: {
+    banners: [
+      {
+        id: 1,
+        banner_name: "string",
+        banner_images_and_sizes: "[{}]",
+        banner_link: "string",
+        tracking_tag: "string",
+        status: 1,
+        commission: 0,
+        created_at: "2023-02-21T21:53:43.371Z",
+        updated_at: "2023-02-21T21:53:43.371Z",
+      },
+    ],
+    count: 1,
+    current_page: 1,
+    pages: 1,
+  },
+};
