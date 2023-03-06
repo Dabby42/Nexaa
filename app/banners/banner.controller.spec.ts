@@ -3,7 +3,7 @@ import { BannersController } from "./banners.controller";
 import { BannersService } from "./banners.service";
 import { Banner } from "./entities/banner.entity";
 import { getRepositoryToken } from "@nestjs/typeorm";
-import { createBannerData, createBannerResponseData, getActiveBannersResponseMock } from "./banner.mock";
+import { createBannerData, createBannerResponseData, getActiveBannersResponseMock, updateBannerData, updateBannerDetailsResponseData, updateBannerMock } from "./banner.mock";
 
 describe("BannersController", () => {
   let controller: BannersController;
@@ -16,6 +16,7 @@ describe("BannersController", () => {
       })
     ),
     findAndCount: jest.fn().mockImplementation(() => Promise.resolve([])),
+    update: jest.fn().mockImplementation((dto) => dto),
   };
 
   beforeEach(async () => {
@@ -47,6 +48,13 @@ describe("BannersController", () => {
     it("should fetch all active banners successfully", async () => {
       bannerRepository.findAndCount.mockImplementationOnce(() => Promise.resolve([getActiveBannersResponseMock.data.banners, 1]));
       expect(await controller.getBanners()).toStrictEqual(getActiveBannersResponseMock);
+    });
+  });
+
+  describe("Update banner details", () => {
+    it("should update the banner details successfully", async () => {
+      const result: any = await controller.createBanner(createBannerData);
+      expect(await controller.updateBanner(result.data.id, updateBannerData)).toStrictEqual(updateBannerDetailsResponseData);
     });
   });
 });

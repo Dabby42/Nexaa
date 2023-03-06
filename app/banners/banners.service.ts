@@ -4,6 +4,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Banner, BannerStatusEnum } from "./entities/banner.entity";
 import { Repository } from "typeorm";
 import { sendSuccess } from "app/utils/helpers/response.helpers";
+import { UpdateBannerDto } from "./dto/update-banner.dto";
 
 @Injectable()
 export class BannersService {
@@ -38,5 +39,24 @@ export class BannersService {
       current_page: page,
       pages,
     };
+  }
+
+  async updateBanner(id: number, updateBannerDto: UpdateBannerDto) {
+    try {
+      let banner_urls_and_sizes: string;
+      let updatedBanner;
+
+      if (updateBannerDto.banner_images_and_sizes) {
+        banner_urls_and_sizes = JSON.stringify(updateBannerDto.banner_images_and_sizes);
+        updatedBanner = { ...updateBannerDto, banner_images_and_sizes: banner_urls_and_sizes };
+      } else {
+        updatedBanner = { ...updateBannerDto };
+      }
+
+      await this.bannerRepository.update(id, updatedBanner);
+      return sendSuccess(null, "Banner Updated");
+    } catch (error) {
+      throw new UnprocessableEntityException("An unknown error occurred");
+    }
   }
 }

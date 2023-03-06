@@ -63,3 +63,28 @@ export const getActiveBannersResponseMock: any = {
     pages: 1,
   },
 };
+
+export const updateBannerData: any = {
+  banner_name: "automobiles",
+  banner_images_and_sizes: [
+    {
+      banner_size: "300 x 200",
+      banner_image_url: "https://test.com",
+    },
+    {
+      banner_size: "100 x 200",
+      banner_image_url: "https://test2.com",
+    },
+  ],
+  banner_link: "https://test.com",
+  tracking_tag: "lmao",
+  commission: 12,
+};
+
+export const updateBannerDetailsResponseData: any = {
+  status: "success",
+  message: "Banner Updated",
+  data: null,
+};
+
+export const updateBannerMock: any = 1;
