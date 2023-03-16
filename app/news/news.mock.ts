@@ -1,25 +1,25 @@
 export const newsData = {
-  "title" : "Hello affiliates.",
-  "body" : "Hello affiliates2 \nThis is a new update about our new platform \nThanks for remaining with us."
-}
+  title: "Hello affiliates.",
+  body: "Hello affiliates2 \nThis is a new update about our new platform \nThanks for remaining with us.",
+};
 
 export const createNewsMock = {
-  "status": "success",
-  "message": "News created.",
-  "data": null
-}
+  status: "success",
+  message: "News created.",
+  data: null,
+};
 
 export const updateNewsMock = {
-  "status": "success",
-  "message": "News updated.",
-  "data": null
-}
+  status: "success",
+  message: "News updated.",
+  data: null,
+};
 
 export const deleteNewsMock = {
-  "status": "success",
-  "message": "News deleted.",
-  "data": null
-}
+  status: "success",
+  message: "News deleted.",
+  data: null,
+};
 
 export const userMock = {
   id: 1,

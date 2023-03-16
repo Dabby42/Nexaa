@@ -2,8 +2,8 @@ import { IsNotEmpty } from "class-validator";
 
 export class CreateNewsDto {
   @IsNotEmpty()
-  title : string
+  title: string;
 
   @IsNotEmpty()
-  body : string
+  body: string;
 }

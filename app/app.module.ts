@@ -10,7 +10,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { dataSourceOptions } from "./db/data-source";
 import { AuthModule } from "./auth/auth.module";
 import { BannersModule } from "./banners/banners.module";
-import { NewsModule } from './news/news.module';
+import { NewsModule } from "./news/news.module";
 
 @Module({
   imports: [
