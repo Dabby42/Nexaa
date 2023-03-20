@@ -10,6 +10,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { dataSourceOptions } from "./db/data-source";
 import { AuthModule } from "./auth/auth.module";
 import { BannersModule } from "./banners/banners.module";
+import { CategoriesModule } from "./categories/categories.module";
 import { NewsModule } from "./news/news.module";
 
 @Module({
@@ -27,7 +28,9 @@ import { NewsModule } from "./news/news.module";
     UserModule,
     AuthModule,
     BannersModule,
+    CategoriesModule,
     NewsModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [
