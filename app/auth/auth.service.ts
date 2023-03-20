@@ -29,6 +29,8 @@ export class AuthService {
       where: { email: loginUserDto.email },
     });
 
+    const finalUser = { ...user };
+
     if (!user) {
       throw new UnauthorizedException("Invalid email or password");
     }
@@ -49,7 +51,9 @@ export class AuthService {
     };
     const token = this.jwtService.sign(payload);
 
-    return sendSuccess({ token }, "Login Success");
+    delete finalUser.password;
+
+    return sendSuccess({ token, user: finalUser }, "Login Success");
   }
 
   async loginWithGoogle(googleLoginDto: GoogleLoginDto) {
