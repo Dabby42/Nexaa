@@ -28,7 +28,7 @@ export const userRepositoryMock = {
   website_url: null,
   status: 0,
   role: 1,
-  password: "$2a$10$cHeGc6gnIiCrh6T6YZ2aYufI.6kkkTTfNLMYggeoT2kL38GHYjqf6",
+  password: "$2a$10$s.1AXYLRgHqwUZPt3p1w6.TJJ7VmfHGvvUwe8BTBXIE7ZQyzfiwCW",
   verified_at: null,
   created_at: "2023-02-02T12:47:26.000Z",
   updated_at: "2023-02-02T12:47:26.000Z",
@@ -45,12 +45,18 @@ export const userDataMock: any = {
   status: 0,
   state: 1,
   website_url: "https://olamide.affliate.com",
-  password: "password",
+  password: "password123",
 };
 
 export const registerUserSuccessMock: any = {
   status: "success",
   message: "Account created successfully",
+  data: null,
+};
+
+export const changeUserPasswordSuccessMock: any = {
+  status: "success",
+  message: "Password updated successfully",
   data: null,
 };
 

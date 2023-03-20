@@ -12,6 +12,7 @@ import * as crypto from "crypto";
 import { Cache } from "cache-manager";
 import { ConfirmResetPasswordTokenDto } from "./dto/confirm-reset-password-token.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { ChangePasswordDto } from "./dto/change-password.dto";
 //import { config } from "../config/config";
 
 @Injectable()
@@ -117,5 +118,19 @@ export class AuthService {
     //SendEmailHelper(user.email, 'Password Changed' , body);
 
     return user;
+  }
+
+  async changePassword(user, changePasswordDto: ChangePasswordDto) {
+    const foundUser = await this.userRepository.findOne({ where: { id: user.id } });
+    const isMatch = await User.comparePasswords(changePasswordDto.oldPassword, foundUser.password);
+
+    if (!isMatch) {
+      throw new BadRequestException("Invalid password");
+    }
+
+    foundUser.password = await User.hashPassword(changePasswordDto.newPassword);
+    await this.userRepository.save(foundUser);
+
+    return foundUser;
   }
 }
