@@ -1,4 +1,3 @@
-import { CountryRegion } from "app/country_region/entities/country_region.entity";
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
 import { config } from "../../config/config";
 import * as bcrypt from "bcryptjs";
@@ -34,9 +33,8 @@ export class User {
   @Column()
   address: string;
 
-  @ManyToOne(() => CountryRegion)
-  @JoinColumn({ name: "state" })
-  state: CountryRegion;
+  @Column()
+  state: string;
 
   @Column()
   country: string;
