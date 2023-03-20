@@ -1,8 +1,8 @@
-import { Controller, Post, Body, Param, UseGuards, Request, Put, Delete } from "@nestjs/common";
+import { Controller, Post, Body, Param, UseGuards, Request, Put, Delete, Get, Query } from "@nestjs/common";
 import { NewsService } from "./news.service";
 import { CreateNewsDto } from "./dto/create-news.dto";
 import { UpdateNewsDto } from "./dto/update-news.dto";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiQuery, ApiTags } from "@nestjs/swagger";
 import { JwtGuard } from "../auth/auth.jwt.guard";
 import { AdminGuard } from "../admin/admin.guard";
 import { sendSuccess } from "../utils/helpers/response.helpers";
@@ -31,5 +31,13 @@ export class NewsController {
   async deleteNews(@Param("id") id: string) {
     await this.newsService.delete(+id);
     return sendSuccess(null, "News deleted.");
+  }
+
+  @Get()
+  @ApiQuery({ name: "limit", type: "number", required: false })
+  @ApiQuery({ name: "page", type: "number", required: false })
+  async getNews(@Query("page") page = 1, @Query("limit") limit = 3) {
+    const data = await this.newsService.getMany(page, limit);
+    return sendSuccess(data, "News fetched.");
   }
 }
