@@ -46,4 +46,21 @@ export class UserService {
       throw new UnprocessableEntityException("An unknown error occurred");
     }
   }
+
+  async fetchAllUsers(page: number, limit: number) {
+    const [users, count] = await this.userRepository.findAndCount({
+      order: { created_at: "DESC" },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const pages = Math.ceil(count / limit);
+
+    return {
+      users,
+      count,
+      current_page: page,
+      pages,
+    };
+  }
 }
