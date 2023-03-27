@@ -24,3 +24,35 @@ export const userRequestMock: any = {
 export const updateBankDetailsData: any = {
   account_nummber: "1234567890",
 };
+
+export const approveAffiliateResponse: any = {
+  status: "success",
+  message: "Affiliate has been approved.",
+  data: null,
+};
+
+export const disableAffiliateResponse: any = {
+  status: "success",
+  message: "Affiliate has been disabled.",
+  data: null,
+};
+
+export const userRepositoryMock: any = {
+  id: 2,
+  first_name: "Olamide",
+  last_name: "Aboyeji",
+  email: "olamide.aboyeji@konga.com",
+  username: "olamidee",
+  address: "3B Cocoa Road",
+  state: "",
+  country: "Nigeria",
+  phone_number: "08000000000",
+  website_url: null,
+  account_number: 1234567890,
+  status: 0,
+  role: 3,
+  password: "$2a$10$s.1AXYLRgHqwUZPt3p1w6.TJJ7VmfHGvvUwe8BTBXIE7ZQyzfiwCW",
+  verified_at: null,
+  created_at: "2023-03-06T14:34:22.000Z",
+  updated_at: "2023-03-06T14:37:08.000Z",
+};

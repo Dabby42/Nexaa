@@ -86,6 +86,9 @@ export class User {
   })
   public updated_at: Date;
 
+  @Column({ type: "text", nullable: true })
+  disable_reason: string;
+
   static async hashPassword(password) {
     const salt = await bcrypt.genSalt(config.salt);
     return await bcrypt.hash(password, salt);

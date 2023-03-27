@@ -3,15 +3,25 @@ import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
-import { updateBankDetailsData, updateBankDetailsResponseData, updateProfileResponseData, updateUserData, userRequestMock } from "./user.mock";
-import { ConflictException } from "@nestjs/common";
+import {
+  approveAffiliateResponse,
+  updateBankDetailsData,
+  updateBankDetailsResponseData,
+  updateProfileResponseData,
+  updateUserData,
+  userRequestMock,
+  userRepositoryMock,
+  disableAffiliateResponse,
+} from "./user.mock";
+import { BadRequestException, ConflictException } from "@nestjs/common";
 
 describe("UserController", () => {
   let controller: UserController;
   let userRepository;
   const mockUserRepository = {
     update: jest.fn(),
-    findOne: jest.fn(),
+    findOne: jest.fn(() => null),
+    save: jest.fn(() => userRepositoryMock),
   };
 
   beforeEach(async () => {
@@ -48,6 +58,30 @@ describe("UserController", () => {
   describe("Update bank details of a user", () => {
     it("should update the bank details successfully", async () => {
       expect(await controller.updateBankDetails(updateBankDetailsData, userRequestMock)).toStrictEqual(updateBankDetailsResponseData);
+    });
+  });
+
+  describe("Approve affiliate", () => {
+    it("should approve affiliate successfully.", async () => {
+      userRepository.findOne.mockImplementationOnce(() => Promise.resolve(userRepositoryMock));
+      expect(await controller.approveAffiliate({ affiliate_id: 3 }, userRequestMock)).toStrictEqual(approveAffiliateResponse);
+    });
+
+    it("should fail is affiliate is already approved.", async () => {
+      userRepository.findOne.mockImplementationOnce(() => Promise.resolve({ ...userRepositoryMock, status: 1 }));
+      await expect(controller.approveAffiliate({ affiliate_id: 3 }, userRequestMock)).rejects.toThrowError(BadRequestException);
+    });
+  });
+
+  describe("Disable/reject affiliate", () => {
+    it("should reject affiliate successfully.", async () => {
+      userRepository.findOne.mockImplementationOnce(() => Promise.resolve(userRepositoryMock));
+      expect(await controller.rejectAffiliate({ affiliate_id: 3, reason: "Fake email and phone number" }, userRequestMock)).toStrictEqual(disableAffiliateResponse);
+    });
+
+    it("should fail if reason was not provided.", async () => {
+      userRepository.findOne.mockImplementationOnce(() => Promise.resolve(userRepositoryMock));
+      await expect(controller.rejectAffiliate({ affiliate_id: 3 }, userRequestMock)).rejects.toThrowError(BadRequestException);
     });
   });
 });
