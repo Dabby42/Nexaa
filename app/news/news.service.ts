@@ -23,4 +23,21 @@ export class NewsService {
     const data = await this.newsRepository.delete(id);
     if (data.affected === 0) throw new NotFoundException("News not found.");
   }
+
+  async getMany(page: number, limit: number) {
+    const [news, count] = await this.newsRepository.findAndCount({
+      order: { created_at: "DESC" },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const pages = Math.ceil(count / limit);
+
+    return {
+      news,
+      count,
+      current_page: page,
+      pages,
+    };
+  }
 }
