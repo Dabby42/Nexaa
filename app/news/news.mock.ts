@@ -38,3 +38,36 @@ export const userMock = {
   created_at: "2023-02-02T12:47:26.000Z",
   updated_at: "2023-02-02T12:47:26.000Z",
 };
+
+export const fetchNewsMock: any = {
+  status: "success",
+  message: "News fetched.",
+  data: {
+    news: [
+      {
+        id: 6,
+        title: "Hello affiliates.",
+        body: "Hello affiliates2 \n This is a new update about our new platform \n Thanks for remaining with us.",
+        created_at: "2023-03-14T13:29:39.129Z",
+        updated_at: "2023-03-14T13:29:39.129Z",
+      },
+      {
+        id: 4,
+        title: "Hello affiliates.",
+        body: "Hello affiliates2 \n This is a new update about our new platform \n Thanks for remaining with us.",
+        created_at: "2023-03-14T12:09:15.589Z",
+        updated_at: "2023-03-14T12:09:15.589Z",
+      },
+      {
+        id: 3,
+        title: "Hello affiliates.",
+        body: "Hello affiliates2 \n This is a new update about our new platform \n Thanks for remaining with us.",
+        created_at: "2023-03-14T12:07:42.502Z",
+        updated_at: "2023-03-14T12:07:42.502Z",
+      },
+    ],
+    count: 4,
+    current_page: 1,
+    pages: 2,
+  },
+};
