@@ -46,7 +46,7 @@ export class User {
   website_url: string;
 
   @Column({ nullable: true })
-  account_number: number;
+  account_number: string;
 
   @Column({
     type: "enum",
