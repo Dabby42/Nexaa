@@ -1,7 +1,7 @@
-import { IsNotEmpty, IsNumber } from "class-validator";
+import { IsNotEmpty, IsNumberString } from "class-validator";
 
 export class UpdateBankDetailsDto {
   @IsNotEmpty()
-  @IsNumber()
-  readonly account_number: number;
+  @IsNumberString()
+  readonly account_number: string;
 }
