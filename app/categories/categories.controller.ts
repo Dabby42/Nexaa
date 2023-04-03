@@ -5,7 +5,10 @@ import { sendSuccess } from "../utils/helpers/response.helpers";
 import { JwtGuard } from "../auth/auth.jwt.guard";
 import { AdminGuard } from "../admin/admin.guard";
 import { UpdateCategoryStatusDto } from "./dto/update-category-status.dto";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+@ApiTags("Categories")
+@ApiBearerAuth("jwt")
 @Controller("categories")
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
