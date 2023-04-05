@@ -78,9 +78,10 @@ export class AuthService {
       // <p>${config.baseUrl}/v1/auth/reset-password/${token}</p>`;
 
       //SendEmailHelper(email, 'Reset Password Link' , body);
+      return true;
+    } else {
+      throw new BadRequestException("User with account does not exist");
     }
-
-    return true;
   }
 
   async confirmResetPasswordToken(confirmResetPasswordTokenDto: ConfirmResetPasswordTokenDto) {

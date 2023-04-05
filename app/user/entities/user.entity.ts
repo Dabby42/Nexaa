@@ -39,7 +39,7 @@ export class User {
   @Column()
   country: string;
 
-  @Column()
+  @Column({ unique: true })
   phone_number: string;
 
   @Column({ nullable: true })
