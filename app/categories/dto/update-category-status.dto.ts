@@ -1,8 +1,9 @@
-import { IsNotEmpty, IsNumber } from "class-validator";
-import { CategoryStatusEnum } from "../entities/category.entity";
+import { IsIn, IsNotEmpty } from "class-validator";
+
+type MyType = 1 | 2;
 
 export class UpdateCategoryStatusDto {
   @IsNotEmpty()
-  @IsNumber()
-  readonly status: CategoryStatusEnum;
+  @IsIn([1, 2])
+  readonly status: MyType;
 }
