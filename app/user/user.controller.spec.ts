@@ -5,11 +5,17 @@ import { getRepositoryToken } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
 import { getAllUsersResponseMock, updateBankDetailsData, updateBankDetailsResponseData, updateProfileResponseData, updateUserData, userRequestMock } from "./user.mock";
 import { ConflictException } from "@nestjs/common";
+import { Admin } from "./entities/admin.entity";
 
 describe("UserController", () => {
   let controller: UserController;
   let userRepository;
   const mockUserRepository = {
+    update: jest.fn(),
+    findOne: jest.fn(),
+    findAndCount: jest.fn().mockImplementation(() => Promise.resolve([])),
+  };
+  const mockAdminRepository = {
     update: jest.fn(),
     findOne: jest.fn(),
     findAndCount: jest.fn().mockImplementation(() => Promise.resolve([])),
@@ -23,6 +29,10 @@ describe("UserController", () => {
         {
           provide: getRepositoryToken(User),
           useValue: mockUserRepository,
+        },
+        {
+          provide: getRepositoryToken(Admin),
+          useValue: mockAdminRepository,
         },
       ],
     }).compile();

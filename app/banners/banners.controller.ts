@@ -19,6 +19,7 @@ export class BannersController {
     return await this.bannersService.createBanner(createBannerDto);
   }
 
+  @UseGuards(JwtGuard)
   @Get()
   @ApiQuery({ name: "limit", type: "number", required: false })
   @ApiQuery({ name: "page", type: "number", required: false })

@@ -6,10 +6,12 @@ import { User } from "./entities/user.entity";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UpdateBankDetailsDto } from "./dto/update-bank-details.dto";
 import { sendSuccess } from "app/utils/helpers/response.helpers";
+import { Admin } from "./entities/admin.entity";
+import { CreateAdminDto } from "./dto/create-admin.dto";
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
+  constructor(@InjectRepository(User) private userRepository: Repository<User>, @InjectRepository(Admin) private adminRepository: Repository<Admin>) {}
 
   async createUser(createUserDto: CreateUserDto) {
     const user = await this.userRepository.findOne({
@@ -26,6 +28,18 @@ export class UserService {
 
     try {
       await this.userRepository.insert(newUser);
+    } catch (err) {
+      throw new UnprocessableEntityException("An unknown error occurred");
+    }
+  }
+
+  async createAdmin(createAdminDto: CreateAdminDto) {
+    const admin = await this.adminRepository.findOne({ where: { email: createAdminDto.email } });
+    if (admin) throw new ConflictException("An admin with this email already exists.");
+    const newAdmin = this.adminRepository.create(createAdminDto);
+    newAdmin.password = await Admin.hashPassword(createAdminDto.password);
+    try {
+      await this.adminRepository.insert(newAdmin);
     } catch (err) {
       throw new UnprocessableEntityException("An unknown error occurred");
     }

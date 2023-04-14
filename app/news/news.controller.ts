@@ -33,6 +33,7 @@ export class NewsController {
     return sendSuccess(null, "News deleted.");
   }
 
+  @UseGuards(JwtGuard)
   @Get()
   @ApiQuery({ name: "limit", type: "number", required: false })
   @ApiQuery({ name: "page", type: "number", required: false })
