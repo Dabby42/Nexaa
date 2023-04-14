@@ -99,3 +99,36 @@ env:
       secretKeyRef:
         name: hera-be-secret
         key: google-client-secret
+
+  #OAUTH
+  - name: OAUTH_URL
+    value: "http://auth.default.svc.cluster.local/v2/"
+  - name: OAUTH_CLIENT_ID
+    value: hera
+  - name: OAUTH_CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: hera-be-secret
+        key: oauth-client-secret
+  - name: OAUTH_REQUEST_TIMEOUT
+    value: 150000
+  - name: OAUTH_RETRY_COUNT
+    value: 3
+  - name: OAUTH_RETRY_DELAY
+    value: 100
+
+  #HERMES
+  - name: HERMES_API_URL
+    value: "http://hermesapi.default.svc.cluster.local"
+  - name: HERMES_SCOPE
+    value: "private/hermes/send-notification"
+  - name: CONTACT_US_TEMPLATE_NAME
+    value: "hera_contact_us"
+  - name: CONTACT_US_RECIPIENT
+    value: "olamide.aboyeji@konga.com"
+  - name: CONTACT_US_SENDER
+    value: "no-reply@konga.com"
+  - name: CONTACT_US_SENDER_ID
+    value: "Konga Affiliate"
+  - name: CONTACT_US_SUBJECT
+    value: "Konga Affiliate - Contact Us"
