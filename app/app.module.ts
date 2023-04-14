@@ -29,12 +29,12 @@ import { NewsModule } from "./news/news.module";
     TypeOrmModule.forRoot(dataSourceOptions),
     UserModule,
     AuthModule,
+    NotificationModule,
+    ContactUsModule,
     BannersModule,
     CategoriesModule,
     NewsModule,
-    CategoriesModule,
-    NotificationModule,
-    ContactUsModule,
+    CategoriesModule
   ],
   controllers: [AppController],
   providers: [
