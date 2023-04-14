@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
-import { loginUserSuccessMockData, registerUserSuccessMock, userDataMock, userRepositoryMock } from "./auth.mock";
+import { changeUserPasswordSuccessMock, loginUserSuccessMockData, registerUserSuccessMock, userDataMock, userRepositoryMock } from "./auth.mock";
 import { JwtService } from "@nestjs/jwt";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { User } from "app/user/entities/user.entity";
@@ -18,6 +18,7 @@ describe("AuthController", () => {
   const mockUserRepository = {
     findOne: jest.fn().mockImplementation(() => Promise.resolve(userRepositoryMock)),
     create: jest.fn().mockImplementation((dto) => dto),
+    save: jest.fn(),
     insert: jest.fn().mockImplementation((userData) =>
       Promise.resolve({
         id: 1,
@@ -93,7 +94,7 @@ describe("AuthController", () => {
   describe("login a user", () => {
     it("should return the user token when login is successful", async () => {
       const email = "olamide.aboyeji@konga.com";
-      const password = "olamide";
+      const password = "password123";
       expect(await controller.loginUser({ email, password })).toStrictEqual(loginUserSuccessMockData);
     });
 
@@ -122,6 +123,18 @@ describe("AuthController", () => {
         throw new UnauthorizedException();
       });
       await expect(controller.loginUserWithGoogle({ token: "invalid_token" })).rejects.toThrowError(UnauthorizedException);
+    });
+  });
+
+  describe("change user password", () => {
+    it("should return a success response", async () => {
+      const oldPassword = "password123";
+      const newPassword = "password";
+      const req = {
+        user: userRepositoryMock,
+      };
+
+      expect(await controller.changePassword(req, { oldPassword, newPassword })).toStrictEqual(changeUserPasswordSuccessMock);
     });
   });
 });

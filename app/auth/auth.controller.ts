@@ -9,7 +9,10 @@ import { UserService } from "../user/user.service";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { ConfirmResetPasswordTokenDto } from "./dto/confirm-reset-password-token.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { ApiTags } from "@nestjs/swagger";
+import { ChangePasswordDto } from "./dto/change-password.dto";
 
+@ApiTags("Auth")
 @Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
@@ -46,6 +49,13 @@ export class AuthController {
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     await this.authService.resetPassword(resetPasswordDto);
     return sendSuccess(null, "Password changed successfully");
+  }
+
+  @UseGuards(JwtGuard)
+  @Post("change-password")
+  async changePassword(@Request() req, @Body() changePasswordDto: ChangePasswordDto) {
+    await this.authService.changePassword(req.user, changePasswordDto);
+    return sendSuccess(null, "Password updated successfully");
   }
 
   @UseGuards(JwtGuard)

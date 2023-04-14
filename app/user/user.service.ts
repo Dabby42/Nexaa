@@ -13,11 +13,12 @@ export class UserService {
 
   async createUser(createUserDto: CreateUserDto) {
     const user = await this.userRepository.findOne({
-      where: [{ email: createUserDto.email }, { username: createUserDto.username }],
+      where: [{ email: createUserDto.email }, { username: createUserDto.username }, { phone_number: createUserDto.phone_number }],
     });
     if (user) {
       if (createUserDto.username === user.username) throw new ConflictException("A user with this username already exist");
       else if (createUserDto.email === user.email) throw new ConflictException("A user with this email already exist");
+      else throw new ConflictException("A user with this phone number already exist");
     }
 
     const newUser = this.userRepository.create(createUserDto);
@@ -45,5 +46,22 @@ export class UserService {
     } catch (error) {
       throw new UnprocessableEntityException("An unknown error occurred");
     }
+  }
+
+  async fetchAllUsers(page: number, limit: number) {
+    const [users, count] = await this.userRepository.findAndCount({
+      order: { created_at: "DESC" },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const pages = Math.ceil(count / limit);
+
+    return {
+      users,
+      count,
+      current_page: page,
+      pages,
+    };
   }
 }
