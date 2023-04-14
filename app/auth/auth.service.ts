@@ -1,8 +1,8 @@
-import { Injectable, UnauthorizedException, CACHE_MANAGER, Inject, ConflictException, BadRequestException } from "@nestjs/common";
+import { BadRequestException, CACHE_MANAGER, ConflictException, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { User } from "app/user/entities/user.entity";
+import { RoleEnum, User, UserStatusEnum } from "app/user/entities/user.entity";
 import { JwtService } from "@nestjs/jwt";
 import { sendSuccess } from "app/utils/helpers/response.helpers";
 import { GoogleLoginDto } from "./dto/google-login.dto";
@@ -13,27 +13,35 @@ import { Cache } from "cache-manager";
 import { ConfirmResetPasswordTokenDto } from "./dto/confirm-reset-password-token.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { ChangePasswordDto } from "./dto/change-password.dto";
-//import { config } from "../config/config";
+import { Admin } from "../user/entities/admin.entity";
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Admin) private adminRepository: Repository<Admin>,
     private jwtService: JwtService,
     private googleAuthService: GoogleAuthService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
-  async loginUser(loginUserDto: LoginUserDto, isSocial = false) {
-    const user = await this.userRepository.findOne({
-      where: { email: loginUserDto.email },
-    });
-
-    const finalUser = { ...user };
+  async loginUser(loginUserDto: LoginUserDto, isSocial = false, adminLogin = false) {
+    let user;
+    if (adminLogin) {
+      user = await this.adminRepository.findOne({
+        where: { email: loginUserDto.email },
+      });
+    } else {
+      user = await this.userRepository.findOne({
+        where: { email: loginUserDto.email },
+      });
+    }
 
     if (!user) {
       throw new UnauthorizedException("Invalid email or password");
     }
+
+    if ((adminLogin && !user.is_active) || (!adminLogin && user.status !== UserStatusEnum.APPROVED)) throw new UnauthorizedException("Your account is inactive.");
 
     if (!isSocial) {
       const isMatch = await User.comparePasswords(loginUserDto.password, user.password);
@@ -47,13 +55,13 @@ export class AuthService {
     const payload = {
       id: user.id,
       email: user.email,
-      role: user.role,
+      role: adminLogin ? RoleEnum.ADMIN : RoleEnum.AFFILIATE,
     };
     const token = this.jwtService.sign(payload);
 
-    delete finalUser.password;
+    delete user.password;
 
-    return sendSuccess({ token, user: finalUser }, "Login Success");
+    return sendSuccess({ token, user }, "Login Success");
   }
 
   async loginWithGoogle(googleLoginDto: GoogleLoginDto) {

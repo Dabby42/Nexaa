@@ -19,11 +19,29 @@ export const loginUserSuccessMockData: any = {
       phone_number: "08000000000",
       website_url: null,
       account_number: 1234567890,
-      status: 0,
+      status: 1,
       role: 3,
       verified_at: null,
       created_at: "2023-03-06T14:34:22.000Z",
       updated_at: "2023-03-06T14:37:08.000Z",
+    },
+  },
+};
+
+export const loginAdminSuccessMockData: any = {
+  status: "success",
+  message: "Login Success",
+  data: {
+    token:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJvbGFtaWRlLmFib3llamlAa29uZ2EuY29tIiwicm9sZSI6MywiaWF0IjoxNjc5MzE3NjQxLCJleHAiOjE2NzkzMjEyNDF9.r1TWM0hTbkhxG8OHHOkTV_3N9eNeMQkskRx2PbMvt2s",
+    user: {
+      id: 2,
+      first_name: "Olamide",
+      last_name: "Aboyeji",
+      email: "admin@konga.com",
+      created_at: "2023-04-13T22:50:13.000Z",
+      updated_at: "2023-04-13T22:50:13.000Z",
+      is_active: true,
     },
   },
 };
@@ -46,12 +64,23 @@ export const userRepositoryMock = {
   phone_number: "08000000000",
   website_url: null,
   account_number: 1234567890,
-  status: 0,
+  status: 1,
   role: 3,
   password: "$2a$10$s.1AXYLRgHqwUZPt3p1w6.TJJ7VmfHGvvUwe8BTBXIE7ZQyzfiwCW",
   verified_at: null,
   created_at: "2023-03-06T14:34:22.000Z",
   updated_at: "2023-03-06T14:37:08.000Z",
+};
+
+export const adminRepositoryMock = {
+  id: 2,
+  first_name: "Olamide",
+  last_name: "Aboyeji",
+  email: "admin@konga.com",
+  is_active: true,
+  password: "$2a$10$s.1AXYLRgHqwUZPt3p1w6.TJJ7VmfHGvvUwe8BTBXIE7ZQyzfiwCW",
+  created_at: "2023-04-13T22:50:13.000Z",
+  updated_at: "2023-04-13T22:50:13.000Z",
 };
 
 export const userDataMock: any = {

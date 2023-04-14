@@ -1,6 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
-import { config } from "../../config/config";
-import * as bcrypt from "bcryptjs";
+import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
+import { BaseUser } from "./base-user.entity";
 
 export enum UserStatusEnum {
   PENDING = 0,
@@ -14,19 +13,7 @@ export enum RoleEnum {
 }
 
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  first_name: string;
-
-  @Column()
-  last_name: string;
-
-  @Column({ unique: true })
-  email: string;
-
+export class User extends BaseUser {
   @Column({ unique: true })
   username: string;
 
@@ -62,32 +49,10 @@ export class User {
   })
   role: number;
 
-  @Column()
-  password: string;
-
-  static async comparePasswords(password: string, hashedPassword: string) {
-    return await bcrypt.compare(password, hashedPassword);
-  }
-
   @Column({ type: "timestamp", nullable: true })
   public verified_at: Date;
 
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: "verified_by" })
   public verified_by: User;
-
-  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-  public created_at: Date;
-
-  @Column({
-    type: "timestamp",
-    default: () => "CURRENT_TIMESTAMP",
-    onUpdate: "CURRENT_TIMESTAMP",
-  })
-  public updated_at: Date;
-
-  static async hashPassword(password) {
-    const salt = await bcrypt.genSalt(config.salt);
-    return await bcrypt.hash(password, salt);
-  }
 }
