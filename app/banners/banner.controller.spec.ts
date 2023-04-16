@@ -3,7 +3,7 @@ import { BannersController } from "./banners.controller";
 import { BannersService } from "./banners.service";
 import { Banner } from "./entities/banner.entity";
 import { getRepositoryToken } from "@nestjs/typeorm";
-import { createBannerData, createBannerResponseData, getActiveBannersResponseMock, updateBannerData, updateBannerDetailsResponseData, updateBannerMock } from "./banner.mock";
+import { createBannerData, createBannerResponseData, getActiveBannersResponseMock, updateBannerData, updateBannerDetailsResponseData } from "./banner.mock";
 
 describe("BannersController", () => {
   let controller: BannersController;

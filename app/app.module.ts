@@ -14,6 +14,7 @@ import { NotificationModule } from "./notification/notification.module";
 import { BannersModule } from "./banners/banners.module";
 import { CategoriesModule } from "./categories/categories.module";
 import { NewsModule } from "./news/news.module";
+import { LinksModule } from "./links/links.module";
 
 @Module({
   imports: [
@@ -34,15 +35,16 @@ import { NewsModule } from "./news/news.module";
     BannersModule,
     CategoriesModule,
     NewsModule,
-    CategoriesModule
+    CategoriesModule,
+    LinksModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: CacheInterceptor,
-    },
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: CacheInterceptor,
+    // },
   ],
 })
 export class AppModule {}
