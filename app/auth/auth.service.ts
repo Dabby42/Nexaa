@@ -82,7 +82,7 @@ export class AuthService {
     if (existingUser) {
       const token = crypto.randomBytes(20).toString("hex");
 
-      this.cacheManager.set(token, existingUser.id, 60 * 10);
+      this.cacheManager.set(token, existingUser.id, { ttl: 60 * 10 });
 
       const subject = "Konga Affiliate - Reset Password Link";
       try {
@@ -139,6 +139,8 @@ export class AuthService {
     user.password = await User.hashPassword(newPassword);
 
     await this.userRepository.save(user);
+
+    await this.cacheManager.del(token);
 
     return user;
   }
