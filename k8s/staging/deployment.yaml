@@ -104,11 +104,11 @@ spec:
                   name: hera-be-secret
                   key: oauth-client-secret
             - name: OAUTH_REQUEST_TIMEOUT
-              value: 150000
+              value: "150000"
             - name: OAUTH_RETRY_COUNT
-              value: 3
+              value: "3"
             - name: OAUTH_RETRY_DELAY
-              value: 100
+              value: "100"
 
             #HERMES
             - name: HERMES_API_URL
