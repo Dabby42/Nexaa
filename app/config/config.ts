@@ -65,5 +65,10 @@ export const config = {
       subject: process.env.CONTACT_US_SUBJECT,
       sender_id: process.env.CONTACT_US_SENDER_ID,
     },
+    forgot_password: {
+      template_name: process.env.FORGOT_PASSWORD_TEMPLATE_NAME,
+      sender: process.env.FORGOT_PASSWORD_SENDER,
+      sender_id: process.env.FORGOT_PASSWORD_SENDER_ID,
+    },
   },
 };

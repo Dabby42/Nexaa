@@ -72,6 +72,10 @@ spec:
             - name: DATABASE_POOL_MIN
               value: "2"
 
+            #BASEURL
+            - name: BASE_URL
+              value: "https://stagiing-affiliate-api.konga.com"
+
             #JWT
             - name: JWT_SECRET
               valueFrom:

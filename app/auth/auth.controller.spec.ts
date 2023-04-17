@@ -18,6 +18,7 @@ import { Cache } from "cache-manager";
 import { CACHE_MANAGER, ConflictException, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
 import { GoogleAuthService } from "./google-auth.service";
 import { Admin } from "../user/entities/admin.entity";
+import { NotificationService } from "../notification/notification.service";
 
 describe("AuthController", () => {
   let controller: AuthController;
@@ -61,6 +62,8 @@ describe("AuthController", () => {
     set: jest.fn(),
   };
 
+  const mockNotificationService = {};
+
   beforeEach(async () => {
     module = await Test.createTestingModule({
       controllers: [AuthController],
@@ -86,6 +89,10 @@ describe("AuthController", () => {
         {
           provide: CACHE_MANAGER,
           useValue: mockCache,
+        },
+        {
+          provide: NotificationService,
+          useValue: mockNotificationService,
         },
       ],
     }).compile();

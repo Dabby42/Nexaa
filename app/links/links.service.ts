@@ -8,6 +8,7 @@ import { randomUUID } from "crypto";
 import { config } from "../config/config";
 import { Clicks } from "./entities/click.entity";
 import { Ips } from "./entities/ip.entity";
+import { GetClickRecordsByDaysDto } from "./dto/get-click-records-by-days.dto";
 
 @Injectable()
 export class LinksService {
@@ -18,9 +19,10 @@ export class LinksService {
   ) {}
 
   async generateCustomUrl(createCustomUrlDto: CreateCustomUrlDto, req) {
-    const { redirect_url } = createCustomUrlDto;
+    let { redirect_url } = createCustomUrlDto;
     const userId: number = req.user.id;
     const uuid = randomUUID();
+    redirect_url = redirect_url + `?k_id=${req.user.username}`;
     const newLink: DeepPartial<Links> = { redirect_url, user_id: { id: userId }, k_id: uuid };
 
     const newLinkEntityInstance = this.linkRepository.create(newLink);
@@ -68,7 +70,8 @@ export class LinksService {
           unique_count: 1,
           count: 1,
         };
-        await this.clickRepository.insert(newClickDetails);
+        const newClickInstance = this.clickRepository.create(newClickDetails);
+        await this.clickRepository.insert(newClickInstance);
       }
 
       return foundLinkModel.redirect_url;
@@ -88,6 +91,7 @@ export class LinksService {
           { link_id: { id: foundLinkModel.id } },
           {
             unique_count: click.unique_count + 1,
+            count: click.count + 1,
           }
         );
       } else {
@@ -101,5 +105,14 @@ export class LinksService {
       }
       return foundLinkModel.redirect_url;
     }
+  }
+
+  async getClicksByDays(getClickRecordsByDays: GetClickRecordsByDaysDto, req) {
+    const today = new Date();
+    const userId: number = req.user.id;
+    const links = await this.linkRepository.find({ where: { user_id: { id: userId } } });
+    const linkIds = links.map((link) => link.id);
+    const date = new Date(today.setDate(today.getDate() - getClickRecordsByDays.daysAgo));
+    return await this.clickRepository.createQueryBuilder("click").where("click.created_at >= :date AND click.link_id IN (:...link_ids)", { date, link_ids: linkIds }).getMany();
   }
 }
