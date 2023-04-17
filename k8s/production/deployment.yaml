@@ -96,6 +96,10 @@ spec:
             - name: JWT_EXPIRY
               value: "1h"
 
+            #BASEURL
+            - name: BASE_URL
+              value: "https://aff.konga.com"
+
             #SOCIAL
             - name: GOOGLE_CLIENT_ID
               valueFrom:
@@ -140,3 +144,9 @@ spec:
               value: "Konga Affiliate"
             - name: CONTACT_US_SUBJECT
               value: "Konga Affiliate - Contact Us"
+            - name: FORGOT_PASSWORD_TEMPLATE_NAME
+              value: "hera_forgot_password"
+            - name: FORGOT_PASSWORD_SENDER
+              value: "no-reply@konga.com"
+            - name: FORGOT_PASSWORD_SENDER_ID
+              value: "Konga Affiliate"

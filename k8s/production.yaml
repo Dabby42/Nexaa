@@ -81,6 +81,10 @@ env:
   - name: JWT_EXPIRY
     value: "1h"
 
+  #BASEURL
+  - name: BASE_URL
+    value: "https://aff.konga.com"
+
   #SOCIAL
   - name: GOOGLE_CLIENT_ID
     valueFrom:

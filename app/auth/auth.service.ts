@@ -1,4 +1,4 @@
-import { BadRequestException, CACHE_MANAGER, ConflictException, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, CACHE_MANAGER, ConflictException, Inject, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -14,14 +14,18 @@ import { ConfirmResetPasswordTokenDto } from "./dto/confirm-reset-password-token
 import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { ChangePasswordDto } from "./dto/change-password.dto";
 import { Admin } from "../user/entities/admin.entity";
+import { NotificationService } from "../notification/notification.service";
+import { config } from "../config/config";
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger("AuthService");
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Admin) private adminRepository: Repository<Admin>,
     private jwtService: JwtService,
     private googleAuthService: GoogleAuthService,
+    private notificationService: NotificationService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
@@ -80,12 +84,23 @@ export class AuthService {
 
       this.cacheManager.set(token, existingUser.id, 60 * 10);
 
-      //Send reset link as a mail to user
-      // let body = `
-      // <h2>Please click on the given link to reset your password</h2>
-      // <p>${config.baseUrl}/v1/auth/reset-password/${token}</p>`;
-
-      //SendEmailHelper(email, 'Reset Password Link' , body);
+      const subject = "Konga Affiliate - Reset Password Link";
+      try {
+        await this.notificationService.send(
+          "email",
+          config.hermes.forgot_password.template_name,
+          email,
+          subject,
+          config.hermes.forgot_password.sender,
+          config.hermes.forgot_password.sender_id,
+          {
+            firstname: existingUser.first_name,
+            token,
+          }
+        );
+      } catch (e) {
+        this.logger.log(e);
+      }
       return true;
     } else {
       throw new BadRequestException("User with account does not exist");
@@ -124,11 +139,6 @@ export class AuthService {
     user.password = await User.hashPassword(newPassword);
 
     await this.userRepository.save(user);
-
-    //Send a mail of successful password reset
-    //let body = "<h2>Your password has been changed, as you asked.</h2><br/><p>If you didn't ask to change your password,
-    //we're here to help keep your account secure. Visit our support page for more info.</p>"
-    //SendEmailHelper(user.email, 'Password Changed' , body);
 
     return user;
   }

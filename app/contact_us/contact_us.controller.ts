@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Post } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Logger, Post } from "@nestjs/common";
 import { ContactUsDto } from "./dto/contact_us.dto";
 import { NotificationService } from "../notification/notification.service";
 import { sendSuccess } from "../utils/helpers/response.helpers";
@@ -6,6 +6,7 @@ import { config } from "../config/config";
 
 @Controller("contact-us")
 export class ContactUsController {
+  private readonly logger = new Logger("ContactUsService");
   constructor(private readonly notificationService: NotificationService) {}
 
   @Post()
@@ -23,7 +24,7 @@ export class ContactUsController {
 
       return sendSuccess(null, "Contact message received.");
     } catch (e) {
-      console.log(e);
+      this.logger.log(e);
       throw new BadRequestException("Unable to submit contact us request");
     }
   }
