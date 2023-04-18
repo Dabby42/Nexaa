@@ -8,7 +8,6 @@ import { randomUUID } from "crypto";
 import { config } from "../config/config";
 import { Clicks } from "./entities/click.entity";
 import { Ips } from "./entities/ip.entity";
-import { GetClickRecordsByDaysDto } from "./dto/get-click-records-by-days.dto";
 
 @Injectable()
 export class LinksService {
@@ -107,12 +106,12 @@ export class LinksService {
     }
   }
 
-  async getClicksByDays(getClickRecordsByDays: GetClickRecordsByDaysDto, req) {
+  async getClicksByDays(req, days) {
     const today = new Date();
     const userId: number = req.user.id;
     const links = await this.linkRepository.find({ where: { user_id: { id: userId } } });
     const linkIds = links.map((link) => link.id);
-    const date = new Date(today.setDate(today.getDate() - getClickRecordsByDays.daysAgo));
+    const date = new Date(today.setDate(today.getDate() - days));
     return await this.clickRepository.createQueryBuilder("click").where("click.created_at >= :date AND click.link_id IN (:...link_ids)", { date, link_ids: linkIds }).getMany();
   }
 }

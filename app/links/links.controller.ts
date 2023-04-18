@@ -1,10 +1,9 @@
-import { Controller, Post, Body, Req, UseGuards } from "@nestjs/common";
+import { Controller, Post, Body, Req, UseGuards, Query, Get } from "@nestjs/common";
 import { LinksService } from "./links.service";
 import { CreateCustomUrlDto } from "./dto/create-custom-url.dto";
 import { sendSuccess } from "../utils/helpers/response.helpers";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { JwtGuard } from "../auth/auth.jwt.guard";
-import { GetClickRecordsByDaysDto } from "./dto/get-click-records-by-days.dto";
 
 @ApiBearerAuth("jwt")
 @ApiTags("Links")
@@ -25,9 +24,9 @@ export class LinksController {
   }
 
   @UseGuards(JwtGuard)
-  @Post("click-by-days")
-  async getClicksByDays(@Body() getClickRecordsByDays: GetClickRecordsByDaysDto, @Req() req: Request) {
-    const result = await this.linksService.getClicksByDays(getClickRecordsByDays, req);
+  @Get("click-by-days")
+  async getClicksByDays(@Req() req: Request, @Query("days") days = 7) {
+    const result = await this.linksService.getClicksByDays(req, days);
     return sendSuccess(result, "Clicks retrieved successfully");
   }
 }
