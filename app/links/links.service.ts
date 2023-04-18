@@ -18,11 +18,10 @@ export class LinksService {
   ) {}
 
   async generateCustomUrl(createCustomUrlDto: CreateCustomUrlDto, req) {
-    let { redirect_url } = createCustomUrlDto;
+    const { redirect_url, is_default = false } = createCustomUrlDto;
     const userId: number = req.user.id;
     const uuid = randomUUID();
-    redirect_url = redirect_url + `?k_id=${req.user.username}`;
-    const newLink: DeepPartial<Links> = { redirect_url, user_id: { id: userId }, k_id: uuid };
+    const newLink: DeepPartial<Links> = { redirect_url: redirect_url + `?k_id=${req.user.username}`, user_id: { id: userId }, k_id: uuid, is_default };
 
     const newLinkEntityInstance = this.linkRepository.create(newLink);
 

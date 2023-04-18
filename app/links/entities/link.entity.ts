@@ -13,6 +13,9 @@ export class Links {
   @Column()
   public redirect_url: string;
 
+  @Column({ default: false })
+  public is_default: boolean;
+
   @Column()
   public k_id: string;
 

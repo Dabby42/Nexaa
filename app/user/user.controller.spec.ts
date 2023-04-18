@@ -6,6 +6,7 @@ import { User } from "./entities/user.entity";
 import { getAllUsersResponseMock, updateBankDetailsData, updateBankDetailsResponseData, updateProfileResponseData, updateUserData, userRequestMock } from "./user.mock";
 import { ConflictException } from "@nestjs/common";
 import { Admin } from "./entities/admin.entity";
+import { LinksService } from "../links/links.service";
 
 describe("UserController", () => {
   let controller: UserController;
@@ -33,6 +34,10 @@ describe("UserController", () => {
         {
           provide: getRepositoryToken(Admin),
           useValue: mockAdminRepository,
+        },
+        {
+          provide: LinksService,
+          useValue: {},
         },
       ],
     }).compile();

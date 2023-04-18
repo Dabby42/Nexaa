@@ -19,6 +19,7 @@ import { CACHE_MANAGER, ConflictException, UnauthorizedException, UnprocessableE
 import { GoogleAuthService } from "./google-auth.service";
 import { Admin } from "../user/entities/admin.entity";
 import { NotificationService } from "../notification/notification.service";
+import { LinksService } from "../links/links.service";
 
 describe("AuthController", () => {
   let controller: AuthController;
@@ -34,6 +35,9 @@ describe("AuthController", () => {
       Promise.resolve({
         id: 1,
         ...userData,
+        raw: {
+          insertId: 1,
+        },
       })
     ),
   };
@@ -64,6 +68,8 @@ describe("AuthController", () => {
 
   const mockNotificationService = {};
 
+  const mockLinksService = { generateCustomUrl: jest.fn() };
+
   beforeEach(async () => {
     module = await Test.createTestingModule({
       controllers: [AuthController],
@@ -93,6 +99,10 @@ describe("AuthController", () => {
         {
           provide: NotificationService,
           useValue: mockNotificationService,
+        },
+        {
+          provide: LinksService,
+          useValue: mockLinksService,
         },
       ],
     }).compile();

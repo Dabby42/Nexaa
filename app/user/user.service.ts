@@ -8,10 +8,15 @@ import { UpdateBankDetailsDto } from "./dto/update-bank-details.dto";
 import { sendSuccess } from "app/utils/helpers/response.helpers";
 import { Admin } from "./entities/admin.entity";
 import { CreateAdminDto } from "./dto/create-admin.dto";
+import { LinksService } from "../links/links.service";
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) private userRepository: Repository<User>, @InjectRepository(Admin) private adminRepository: Repository<Admin>) {}
+  constructor(
+    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Admin) private adminRepository: Repository<Admin>,
+    private readonly linksService: LinksService
+  ) {}
 
   async createUser(createUserDto: CreateUserDto) {
     const user = await this.userRepository.findOne({
@@ -27,8 +32,10 @@ export class UserService {
     newUser.password = await User.hashPassword(createUserDto.password);
 
     try {
-      await this.userRepository.insert(newUser);
+      const saveUser = await this.userRepository.insert(newUser);
+      await this.linksService.generateCustomUrl({ redirect_url: "https://konga.com", is_default: true }, { user: { id: saveUser.raw.insertId, username: createUserDto.username } });
     } catch (err) {
+      console.log(err);
       throw new UnprocessableEntityException("An unknown error occurred");
     }
   }
