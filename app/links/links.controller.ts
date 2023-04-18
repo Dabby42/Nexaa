@@ -25,7 +25,7 @@ export class LinksController {
 
   @UseGuards(JwtGuard)
   @Get("click-by-days")
-  async getClicksByDays(@Req() req: Request, @Query("days") days= 7) {
+  async getClicksByDays(@Req() req: Request, @Query("days") days = 7) {
     const result = await this.linksService.getClicksByDays(req, days);
     return sendSuccess(result, "Clicks retrieved successfully");
   }
