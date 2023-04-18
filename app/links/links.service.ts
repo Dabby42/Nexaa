@@ -113,4 +113,20 @@ export class LinksService {
     const date = new Date(today.setDate(today.getDate() - days));
     return await this.clickRepository.createQueryBuilder("click").where("click.created_at >= :date AND click.link_id IN (:...link_ids)", { date, link_ids: linkIds }).getMany();
   }
+
+  async getTotalClicksCount(user_id: number) {
+    const result = await this.clickRepository
+      .createQueryBuilder("click")
+      .leftJoin("click.link_id", "link")
+      .select("SUM(click.count)", "clicksCount")
+      .addSelect("SUM(click.unique_count)", "uniqueClicksCount")
+      .where("link.user_id = :user_id", { user_id })
+      .getRawOne();
+    if (!result?.clicksCount)
+      return {
+        clicksCount: "0",
+        uniqueClicksCount: "0",
+      };
+    return result;
+  }
 }
