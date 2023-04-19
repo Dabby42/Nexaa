@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsUrl } from "class-validator";
+import { IsNotEmpty, IsOptional, IsUrl } from "class-validator";
 
 export class CreateCustomUrlDto {
   @IsNotEmpty()
@@ -9,4 +9,7 @@ export class CreateCustomUrlDto {
     }
   )
   readonly redirect_url: string;
+
+  @IsOptional()
+  readonly is_default?: boolean;
 }

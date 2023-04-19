@@ -18,11 +18,10 @@ export class LinksService {
   ) {}
 
   async generateCustomUrl(createCustomUrlDto: CreateCustomUrlDto, req) {
-    let { redirect_url } = createCustomUrlDto;
+    const { redirect_url, is_default = false } = createCustomUrlDto;
     const userId: number = req.user.id;
     const uuid = randomUUID();
-    redirect_url = redirect_url + `?k_id=${req.user.username}`;
-    const newLink: DeepPartial<Links> = { redirect_url, user_id: { id: userId }, k_id: uuid };
+    const newLink: DeepPartial<Links> = { redirect_url: redirect_url + `?k_id=${req.user.username}`, user_id: { id: userId }, k_id: uuid, is_default };
 
     const newLinkEntityInstance = this.linkRepository.create(newLink);
 
@@ -113,5 +112,21 @@ export class LinksService {
     const linkIds = links.map((link) => link.id);
     const date = new Date(today.setDate(today.getDate() - days));
     return await this.clickRepository.createQueryBuilder("click").where("click.created_at >= :date AND click.link_id IN (:...link_ids)", { date, link_ids: linkIds }).getMany();
+  }
+
+  async getTotalClicksCount(user_id: number) {
+    const result = await this.clickRepository
+      .createQueryBuilder("click")
+      .leftJoin("click.link_id", "link")
+      .select("SUM(click.count)", "clicksCount")
+      .addSelect("SUM(click.unique_count)", "uniqueClicksCount")
+      .where("link.user_id = :user_id", { user_id })
+      .getRawOne();
+    if (!result?.clicksCount)
+      return {
+        clicksCount: "0",
+        uniqueClicksCount: "0",
+      };
+    return result;
   }
 }
