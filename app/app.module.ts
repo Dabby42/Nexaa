@@ -14,6 +14,8 @@ import { BannersModule } from "./banners/banners.module";
 import { CategoriesModule } from "./categories/categories.module";
 import { NewsModule } from "./news/news.module";
 import { LinksModule } from "./links/links.module";
+import { OrdersModule } from "./orders/orders.module";
+import { RabbitmqModule } from "./rabbitmq/rabbitmq.module";
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { LinksModule } from "./links/links.module";
     NewsModule,
     CategoriesModule,
     LinksModule,
+    OrdersModule,
+    RabbitmqModule,
   ],
   controllers: [AppController],
   providers: [
