@@ -6,6 +6,7 @@ import { sendSuccess } from "../utils/helpers/response.helpers";
 import { UpdateBankDetailsDto } from "./dto/update-bank-details.dto";
 import { ApiBearerAuth, ApiTags, ApiQuery } from "@nestjs/swagger";
 import { AdminGuard } from "app/admin/admin.guard";
+import { SearchAndFilterAffiliateDto } from "./dto/searchAndFilterAffiliateDto";
 
 @ApiBearerAuth("jwt")
 @ApiTags("User")
@@ -27,11 +28,22 @@ export class UserController {
   }
 
   @UseGuards(JwtGuard, AdminGuard)
-  @Get()
+  @Get("affiliates")
   @ApiQuery({ name: "limit", type: "number", required: false })
   @ApiQuery({ name: "page", type: "number", required: false })
-  async fetchAllUsers(@Query("page") page = 1, @Query("limit") limit = 20) {
-    const data = await this.userService.fetchAllUsers(page, limit);
-    return sendSuccess(data, "Users retrieved successfully");
+  async fetchAllAffiliates(@Query("page") page = 1, @Query("limit") limit = 20) {
+    const data = await this.userService.fetchAllAffiliates(page, limit);
+    return sendSuccess(data, "Affiliates retrieved successfully");
+  }
+
+  @UseGuards(JwtGuard, AdminGuard)
+  @Get("affiliates/search")
+  @ApiQuery({ name: "limit", type: "number", required: false })
+  @ApiQuery({ name: "page", type: "number", required: false })
+  @ApiQuery({ name: "status", type: "number", required: false })
+  @ApiQuery({ name: "q", type: "string", required: false })
+  async searchAndFilterAffiliates(@Query() searchAndFilterAffiliateDto: SearchAndFilterAffiliateDto) {
+    const data = await this.userService.searchAndFilterAffiliates(searchAndFilterAffiliateDto);
+    return sendSuccess(data, "Affiliates retrieved successfully");
   }
 }

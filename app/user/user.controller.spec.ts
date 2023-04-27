@@ -67,10 +67,10 @@ describe("UserController", () => {
     });
   });
 
-  describe("Fetch User", () => {
-    it("should fetch all users successfully", async () => {
+  describe("Fetch Affiliates", () => {
+    it("should fetch all affiliates successfully", async () => {
       userRepository.findAndCount.mockImplementationOnce(() => Promise.resolve([getAllUsersResponseMock.data.users, 1]));
-      expect(await controller.fetchAllUsers()).toStrictEqual(getAllUsersResponseMock);
+      expect(await controller.fetchAllAffiliates()).toStrictEqual(getAllUsersResponseMock);
     });
   });
 });
