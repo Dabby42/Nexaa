@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, UnprocessableEntityException } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Like, Repository } from "typeorm";
 import { User } from "./entities/user.entity";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UpdateBankDetailsDto } from "./dto/update-bank-details.dto";
@@ -9,6 +9,7 @@ import { sendSuccess } from "app/utils/helpers/response.helpers";
 import { Admin } from "./entities/admin.entity";
 import { CreateAdminDto } from "./dto/create-admin.dto";
 import { LinksService } from "../links/links.service";
+import { SearchAndFilterAffiliateDto } from "./dto/searchAndFilterAffiliateDto";
 
 @Injectable()
 export class UserService {
@@ -69,11 +70,12 @@ export class UserService {
     }
   }
 
-  async fetchAllUsers(page: number, limit: number) {
+  async fetchAllAffiliates(page: number, limit: number) {
     const [users, count] = await this.userRepository.findAndCount({
       order: { created_at: "DESC" },
       skip: (page - 1) * limit,
       take: limit,
+      select: ["first_name", "last_name", "username", "verified_at", "created_at", "phone_number", "status"],
     });
 
     const pages = Math.ceil(count / limit);
@@ -82,6 +84,34 @@ export class UserService {
       users,
       count,
       current_page: page,
+      pages,
+    };
+  }
+
+  async searchAndFilterAffiliates(searchAndFilterAffiliateDto: SearchAndFilterAffiliateDto) {
+    const { page, limit, q, status } = searchAndFilterAffiliateDto;
+    const options: any = {
+      order: { created_at: "DESC" },
+      skip: (+page - 1) * +limit,
+      take: +limit,
+      select: ["first_name", "last_name", "username", "verified_at", "created_at", "phone_number", "status"],
+    };
+
+    if (q) {
+      options.where = [{ first_name: Like(`%${q}%`) }, { last_name: Like(`%${q}%`) }, { username: Like(`%${q}%`) }];
+    }
+
+    if (status) {
+      options.where = options.where?.map((w) => ({ ...w, status })) || { status };
+    }
+
+    const [users, count] = await this.userRepository.findAndCount(options);
+    const pages = Math.ceil(count / +limit);
+
+    return {
+      users,
+      count,
+      current_page: +page,
       pages,
     };
   }

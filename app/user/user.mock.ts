@@ -27,7 +27,7 @@ export const updateBankDetailsData: any = {
 
 export const getAllUsersResponseMock: any = {
   status: "success",
-  message: "Users retrieved successfully",
+  message: "Affiliates retrieved successfully",
   data: {
     users: [
       {
