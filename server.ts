@@ -4,13 +4,11 @@ import { FastifyAdapter, NestFastifyApplication } from "@nestjs/platform-fastify
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import helmet from "helmet";
 import { config } from "app/config/config";
-import { RequestMethod, ValidationPipe } from "@nestjs/common";
+import { ValidationPipe } from "@nestjs/common";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter({ logger: true }));
-  app.setGlobalPrefix("v1", {
-    exclude: [{ path: "/:uuid", method: RequestMethod.GET }],
-  });
+  app.setGlobalPrefix("v1");
   if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "staging") {
     const documentOptions = new DocumentBuilder()
       .setTitle("Hera Docs")

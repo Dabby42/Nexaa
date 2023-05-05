@@ -115,4 +115,13 @@ export class UserService {
       pages,
     };
   }
+
+  async fetchUserStats() {
+    return await this.userRepository
+      .createQueryBuilder("users")
+      .select("COUNT(*)", "totalUsers")
+      .addSelect("COUNT(CASE WHEN users.status='0' THEN 1 ELSE NULL END )", "pendingUsers")
+      .addSelect("COUNT(CASE WHEN users.status='1' THEN 1 ELSE NULL END )", "approvedUsers")
+      .getRawOne();
+  }
 }

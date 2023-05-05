@@ -16,6 +16,8 @@ import { NewsModule } from "./news/news.module";
 import { LinksModule } from "./links/links.module";
 import { OrdersModule } from "./orders/orders.module";
 import { RabbitmqModule } from "./rabbitmq/rabbitmq.module";
+import { MagentoModule } from "./magento/magento.module";
+import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { RabbitmqModule } from "./rabbitmq/rabbitmq.module";
       isGlobal: true,
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
+    ScheduleModule.forRoot(),
     UserModule,
     AuthModule,
     NotificationModule,
@@ -36,10 +39,10 @@ import { RabbitmqModule } from "./rabbitmq/rabbitmq.module";
     BannersModule,
     CategoriesModule,
     NewsModule,
-    CategoriesModule,
     LinksModule,
     OrdersModule,
     RabbitmqModule,
+    MagentoModule,
   ],
   controllers: [AppController],
   providers: [

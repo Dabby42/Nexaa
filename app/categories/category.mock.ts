@@ -29,3 +29,28 @@ export const getActiveCategoryResponseMock: any = {
     ],
   },
 };
+
+export const getAllCategoryResponseMock: any = {
+  status: "success",
+  message: "All categories retrieved successfully",
+  data: {
+    categories: [
+      {
+        id: 1,
+        category_name: "string",
+        status: 1,
+        commission: 10,
+        created_at: "2023-02-21T21:53:43.371Z",
+        updated_at: "2023-02-21T21:53:43.371Z",
+      },
+      {
+        id: 2,
+        category_name: "string",
+        status: 0,
+        commission: 5,
+        created_at: "2023-02-21T21:53:43.371Z",
+        updated_at: "2023-02-21T21:53:43.371Z",
+      },
+    ],
+  },
+};
