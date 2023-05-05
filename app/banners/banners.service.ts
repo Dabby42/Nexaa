@@ -59,4 +59,21 @@ export class BannersService {
       throw new UnprocessableEntityException("An unknown error occurred");
     }
   }
+
+  async loadAllBanners(page: number, limit: number){
+    const [banners, count] = await this.bannerRepository.findAndCount({
+      where: { status: BannerStatusEnum.ACTIVE && BannerStatusEnum.DISABLED},
+      order: { created_at: "DESC"},
+      skip: (page - 1) * limit,
+      take: limit
+    })
+
+    const pages = Math.ceil(count / limit);
+    return {
+      banners,
+      count,
+      current_page: page,
+      pages,
+    };
+  }
 }

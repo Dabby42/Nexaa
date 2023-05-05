@@ -33,4 +33,13 @@ export class BannersController {
   async updateBanner(@Param("id") id: number, @Body() updateBannerDto: UpdateBannerDto) {
     return await this.bannersService.updateBanner(id, updateBannerDto);
   }
+
+  @UseGuards(JwtGuard, AdminGuard)
+  @Get()
+  @ApiQuery({ name: "limit", type: "number", required: false })
+  @ApiQuery({ name: "page", type: "number", required: false })
+  async getAllBanners(@Query("page") page = 1, @Query("limit") limit = 20){
+    const data = await this.bannersService.loadAllBanners(page, limit);
+    return sendSuccess(data);
+  }
 }
