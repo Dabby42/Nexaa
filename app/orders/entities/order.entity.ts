@@ -1,7 +1,11 @@
-import { Column, CreateDateColumn, JoinColumn, ManyToOne, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "../../user/entities/user.entity";
 
-export class Order {
+@Entity()
+export class Orders {
+  @PrimaryGeneratedColumn()
+  public id: number;
+
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: "user_id" })
   public affiliate_id: number;
@@ -23,7 +27,7 @@ export class Order {
     precision: 2,
     scale: 1,
   })
-  public amount: number;
+  public total_amount: number;
 
   @CreateDateColumn()
   created_at: Date;

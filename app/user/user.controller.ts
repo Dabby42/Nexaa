@@ -34,4 +34,11 @@ export class UserController {
     const data = await this.userService.fetchAllUsers(page, limit);
     return sendSuccess(data, "Users retrieved successfully");
   }
+
+  @UseGuards(JwtGuard, AdminGuard)
+  @Get("users-stats")
+  async fetchUserStats() {
+    const data = await this.userService.fetchUserStats();
+    return sendSuccess(data, "Users statistics retrieved successfully");
+  }
 }

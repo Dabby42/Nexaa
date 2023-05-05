@@ -24,6 +24,10 @@ export class CategoriesService {
     });
   }
 
+  async findAllCategories() {
+    return await this.categoryRepository.find();
+  }
+
   async updateCategoryStatus(id: number, updateCategoryStatusDto: UpdateCategoryStatusDto) {
     await this.categoryRepository.update(id, updateCategoryStatusDto);
   }

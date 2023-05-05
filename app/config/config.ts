@@ -29,6 +29,18 @@ export const config = {
       max: process.env.DATABASE_POOL_MAX ? Number(process.env.DATABASE_POOL_MAX) : 2,
     },
   },
+  magento: {
+    connection: {
+      host: process.env.MAGENTO_DATABASE_HOST,
+      database: process.env.MAGENTO_DATABASE_NAME,
+      user: process.env.MAGENTO_DATABASE_USERNAME,
+      password: process.env.MAGENTO_DATABASE_PASSWORD,
+    },
+    pool: {
+      min: Number(process.env.MAGENTO_DATABASE_POOL_MIN) || 2,
+      max: Number(process.env.MAGENTO_DATABASE_POOL_MAX) || 5,
+    },
+  },
   redis: {
     host: process.env.REDIS_HOST,
     port: Number(process.env.REDIS_PORT) || 6379,
