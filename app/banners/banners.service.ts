@@ -60,13 +60,12 @@ export class BannersService {
     }
   }
 
-  async loadAllBanners(page: number, limit: number){
+  async loadAllBanners(page: number, limit: number) {
     const [banners, count] = await this.bannerRepository.findAndCount({
-      where: { status: BannerStatusEnum.ACTIVE && BannerStatusEnum.DISABLED},
-      order: { created_at: "DESC"},
+      order: { created_at: "DESC" },
       skip: (page - 1) * limit,
-      take: limit
-    })
+      take: limit,
+    });
 
     const pages = Math.ceil(count / limit);
     return {
