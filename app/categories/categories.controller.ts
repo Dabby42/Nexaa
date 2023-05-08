@@ -22,6 +22,13 @@ export class CategoriesController {
 
   @UseGuards(JwtGuard, AdminGuard)
   @Get()
+  async findAllCategories() {
+    const categories = await this.categoriesService.findAllCategories();
+    return sendSuccess(categories, "All categories retrieved successfully");
+  }
+
+  @UseGuards(JwtGuard, AdminGuard)
+  @Get("active")
   async findAllActiveCategories() {
     const categories = await this.categoriesService.findAllActiveCategories();
     return sendSuccess(categories, "Categories retrieved successfully");

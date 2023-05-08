@@ -46,4 +46,11 @@ export class UserController {
     const data = await this.userService.searchAndFilterAffiliates(searchAndFilterAffiliateDto);
     return sendSuccess(data, "Affiliates retrieved successfully");
   }
+
+  @UseGuards(JwtGuard, AdminGuard)
+  @Get("users-stats")
+  async fetchUserStats() {
+    const data = await this.userService.fetchUserStats();
+    return sendSuccess(data, "Users statistics retrieved successfully");
+  }
 }

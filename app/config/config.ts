@@ -29,6 +29,18 @@ export const config = {
       max: process.env.DATABASE_POOL_MAX ? Number(process.env.DATABASE_POOL_MAX) : 2,
     },
   },
+  magento: {
+    connection: {
+      host: process.env.MAGENTO_DATABASE_HOST,
+      database: process.env.MAGENTO_DATABASE_NAME,
+      user: process.env.MAGENTO_DATABASE_USERNAME,
+      password: process.env.MAGENTO_DATABASE_PASSWORD,
+    },
+    pool: {
+      min: Number(process.env.MAGENTO_DATABASE_POOL_MIN) || 2,
+      max: Number(process.env.MAGENTO_DATABASE_POOL_MAX) || 5,
+    },
+  },
   redis: {
     host: process.env.REDIS_HOST,
     port: Number(process.env.REDIS_PORT) || 6379,
@@ -53,6 +65,27 @@ export const config = {
     retry: {
       count: parseInt(process.env.OAUTH_RETRY_COUNT),
       delay: parseInt(process.env.OAUTH_RETRY_DELAY),
+    },
+  },
+  amqp: {
+    connection: {
+      host: process.env.AMQP_HOST || "127.0.0.1",
+      port: process.env.AMQP_PORT || 5672,
+      login: process.env.AMQP_USER,
+      user: process.env.AMQP_USER,
+      password: process.env.AMQP_PASSWORD,
+      connectionTimeout: parseInt(process.env.AMQP_TIMEOUT),
+      heartbeat: parseInt(process.env.AMQP_HEARTBEAT),
+      appId: appName,
+      vhost: "/",
+    },
+    consumers: {
+      order_split: {
+        queueName: process.env.AMQP_ORDER_SPLIT_QUEUE,
+        prefetch: process.env.AMQP_ORDER_SPLIT_PREFETCH,
+        exchangeName: process.env.AMQP_ORDER_SPLIT_EXCHANGE,
+        routingKey: process.env.AMQP_ORDER_SPLIT_ROUTING_KEY,
+      },
     },
   },
   hermes: {
