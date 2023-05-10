@@ -14,7 +14,7 @@ export class Orders {
   public product_id: number;
 
   @Column()
-  public order_id: number;
+  public order_id: string;
 
   @Column()
   public status: string;

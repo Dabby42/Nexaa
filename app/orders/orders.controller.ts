@@ -9,8 +9,8 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  async create(@Body() createOrderDto: CreateOrderDto) {
-    await this.ordersService.create(createOrderDto);
+  async createOrder(@Body() createOrderDto: CreateOrderDto) {
+    await this.ordersService.createOrder(createOrderDto);
     return sendSuccess(null, "Order created successfully");
   }
 
@@ -22,7 +22,7 @@ export class OrdersController {
 
   @Get(":id")
   async findSingleOrder(@Param("id") id: string) {
-    const order = this.ordersService.findSingleOrder(+id);
+    const order = await this.ordersService.findSingleOrder(+id);
     return sendSuccess(order, "Order retrieved successfully");
   }
 
