@@ -1,7 +1,7 @@
 export const createAffiliateOrderData: any = {
   status: "success",
   message: "Affiliate order created successfully",
-  data: null
+  data: null,
 };
 
 export const createAffiliateOrderResponseData: any = {
