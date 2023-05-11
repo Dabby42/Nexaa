@@ -5,7 +5,6 @@ import { AffiliateOrders } from "./entities/affiliate_order.entity";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { createAffiliateOrderData, createAffiliateOrderResponseData } from "./affiliate_order.mock";
 
-
 describe("AffiliateOrderController", () => {
   let controller: AffiliateOrderController;
   let AffiliateOrderRepository;
@@ -41,7 +40,7 @@ describe("AffiliateOrderController", () => {
 
   describe("Create an affiliate order", () => {
     it("should create an affiliate order successfully", async () => {
-      expect(await controller.create(createAffiliateOrderResponseData)).toStrictEqual(createAffiliateOrderData);
+      expect(await controller.createAffiliateOrder(createAffiliateOrderResponseData)).toStrictEqual(createAffiliateOrderData);
     });
   });
-})
+});

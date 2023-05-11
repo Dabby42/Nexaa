@@ -15,6 +15,7 @@ import { CategoriesModule } from "./categories/categories.module";
 import { NewsModule } from "./news/news.module";
 import { LinksModule } from "./links/links.module";
 import { OrdersModule } from "./orders/orders.module";
+import { AffiliateOrdersModule } from "./affiliate_orders/affiliate_orders.module";
 import { RabbitmqModule } from "./rabbitmq/rabbitmq.module";
 import { MagentoModule } from "./magento/magento.module";
 import { ScheduleModule } from "@nestjs/schedule";
@@ -43,6 +44,7 @@ import { ScheduleModule } from "@nestjs/schedule";
     OrdersModule,
     RabbitmqModule,
     MagentoModule,
+    AffiliateOrdersModule,
   ],
   controllers: [AppController],
   providers: [
