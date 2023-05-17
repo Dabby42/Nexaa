@@ -35,7 +35,7 @@ export class BannersController {
   }
 
   @UseGuards(JwtGuard, AdminGuard)
-  @Get()
+  @Get('all')
   @ApiQuery({ name: "limit", type: "number", required: false })
   @ApiQuery({ name: "page", type: "number", required: false })
   async getAllBanners(@Query("page") page = 1, @Query("limit") limit = 20){
