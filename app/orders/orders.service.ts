@@ -13,7 +13,7 @@ export class OrdersService {
 
   constructor(@InjectRepository(Orders) private orderRepository: Repository<Orders>, private readonly magentoRepository: MagentoRepository) {}
 
-  async create(createOrderDto: CreateOrderDto) {
+  async createOrder(createOrderDto: CreateOrderDto) {
     const newOrder = this.orderRepository.create(createOrderDto);
     return await this.orderRepository.save(newOrder);
   }

@@ -37,7 +37,7 @@ export class RabbitmqService {
   async consumeMessage() {
     const handler = async (message, possibleRedelivery, messageId, callback) => {
       this.logger.log("Handling Split Customer Order for messageId: %s", messageId);
-      await this.ordersService.create(message);
+      await this.ordersService.createOrder(message);
       callback();
     };
 
