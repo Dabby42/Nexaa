@@ -7,7 +7,6 @@ import { Repository } from "typeorm";
 
 @Injectable()
 export class AffiliateOrdersService {
-
   constructor(@InjectRepository(AffiliateOrders) private affiliateOrderRepository: Repository<AffiliateOrders>) {}
 
   async createAffiliateOrder(createAffiliateOrderDto: CreateAffiliateOrderDto) {

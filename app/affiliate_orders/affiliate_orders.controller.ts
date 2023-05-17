@@ -4,7 +4,7 @@ import { AffiliateOrdersService } from "./affiliate_orders.service";
 import { CreateAffiliateOrderDto } from "./dto/create-affiliate_order.dto";
 import { sendSuccess } from "../utils/helpers/response.helpers";
 import { AdminGuard } from "app/admin/admin.guard";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger"
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
 @ApiTags("Affiliates")
 @ApiBearerAuth("jwt")
