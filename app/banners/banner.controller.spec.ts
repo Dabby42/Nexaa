@@ -71,4 +71,11 @@ describe("BannersController", () => {
       expect(await controller.getAllBanners()).toStrictEqual(getAllBannersResponseMock);
     });
   });
+
+  describe("Search and filter banners", () => {
+    it("should filter and search banners", async () => {
+      bannerRepository.findAndCount.mockImplementationOnce(() => Promise.resolve([getAllBannersResponseMock.data.banners, 1]));
+      expect(await controller.searchBanners({ search: "konga", filter: "old", page: 1, limit: 20 })).toStrictEqual(getAllBannersResponseMock);
+    });
+  });
 });

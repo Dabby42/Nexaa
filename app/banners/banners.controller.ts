@@ -32,7 +32,8 @@ export class BannersController {
   @Get("search")
   @ApiQuery({ name: "limit", type: "number", required: false })
   @ApiQuery({ name: "page", type: "number", required: false })
-  @ApiQuery({ name: "name", type: "string", required: true })
+  @ApiQuery({ name: "search", description: "search query for banner name", type: "string", required: false })
+  @ApiQuery({ name: "filter", description: "old or new", type: "string", required: false })
   async searchBanners(@Query() searchDto: BannerSearchDto) {
     const data = await this.bannersService.searchBanners(searchDto);
     return sendSuccess(data);

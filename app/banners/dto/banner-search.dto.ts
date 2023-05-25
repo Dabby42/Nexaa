@@ -1,9 +1,13 @@
-import { IsInt, IsNotEmpty } from "class-validator";
+import { IsInt, IsOptional, IsString } from "class-validator";
 import { Transform } from "class-transformer";
 
 export class BannerSearchDto {
-  @IsNotEmpty()
-  name?: string;
+  @IsString()
+  search?: string = "";
+
+  @IsOptional()
+  @IsString()
+  filter: string;
 
   @IsInt()
   @Transform(({ value }) => parseInt(value, 10))
