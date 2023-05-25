@@ -87,4 +87,27 @@ export const updateBannerDetailsResponseData: any = {
   data: null,
 };
 
+export const getAllBannersResponseMock: any = {
+  status: "success",
+  message: "Data fetched successfully",
+  data: {
+    banners: [
+      {
+        id: 1,
+        banner_name: "string",
+        banner_images_and_sizes: "[{}]",
+        banner_link: "string",
+        tracking_tag: "string",
+        status: 1,
+        commission: 0,
+        created_at: "2023-05-07T21:53:43.371Z",
+        updated_at: "2023-05-07T21:53:43.371Z",
+      },
+    ],
+    count: 1,
+    current_page: 1,
+    pages: 1,
+  },
+};
+
 export const updateBannerMock: any = 1;

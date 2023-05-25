@@ -3,7 +3,7 @@ import { CategoriesController } from "./categories.controller";
 import { CategoriesService } from "./categories.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { Category } from "./entities/category.entity";
-import { createCategoryData, createCategoryResponseData, getActiveCategoryResponseMock, updateCategoryStatusData } from "./category.mock";
+import { createCategoryData, createCategoryResponseData, getActiveCategoryResponseMock, getAllCategoryResponseMock, updateCategoryStatusData } from "./category.mock";
 import { UnprocessableEntityException } from "@nestjs/common";
 
 describe("CategoriesController", () => {
@@ -17,6 +17,7 @@ describe("CategoriesController", () => {
         ...categoryData,
       })
     ),
+    find: jest.fn().mockImplementation(() => Promise.resolve(getAllCategoryResponseMock.data)),
     findBy: jest.fn().mockImplementation(() => Promise.resolve(getActiveCategoryResponseMock.data)),
     update: jest.fn(),
   };
@@ -54,6 +55,12 @@ describe("CategoriesController", () => {
   describe("Fetch all active categories", () => {
     it("should fetch all active categories successfully", async () => {
       expect(await controller.findAllActiveCategories()).toStrictEqual(getActiveCategoryResponseMock);
+    });
+  });
+
+  describe("Fetch all categories", () => {
+    it("should fetch all categories successfully", async () => {
+      expect(await controller.findAllCategories()).toStrictEqual(getAllCategoryResponseMock);
     });
   });
 

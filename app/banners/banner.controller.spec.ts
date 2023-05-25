@@ -3,7 +3,14 @@ import { BannersController } from "./banners.controller";
 import { BannersService } from "./banners.service";
 import { Banner } from "./entities/banner.entity";
 import { getRepositoryToken } from "@nestjs/typeorm";
-import { createBannerData, createBannerResponseData, getActiveBannersResponseMock, updateBannerData, updateBannerDetailsResponseData, updateBannerMock } from "./banner.mock";
+import {
+  createBannerData,
+  createBannerResponseData,
+  getActiveBannersResponseMock,
+  updateBannerData,
+  updateBannerDetailsResponseData,
+  getAllBannersResponseMock,
+} from "./banner.mock";
 
 describe("BannersController", () => {
   let controller: BannersController;
@@ -55,6 +62,20 @@ describe("BannersController", () => {
     it("should update the banner details successfully", async () => {
       const result: any = await controller.createBanner(createBannerData);
       expect(await controller.updateBanner(result.data.id, updateBannerData)).toStrictEqual(updateBannerDetailsResponseData);
+    });
+  });
+
+  describe("Fetch all banners", () => {
+    it("should fetch all banners both active and inactive successfully", async () => {
+      bannerRepository.findAndCount.mockImplementationOnce(() => Promise.resolve([getAllBannersResponseMock.data.banners, 1]));
+      expect(await controller.getAllBanners()).toStrictEqual(getAllBannersResponseMock);
+    });
+  });
+
+  describe("Search and filter banners", () => {
+    it("should filter and search banners", async () => {
+      bannerRepository.findAndCount.mockImplementationOnce(() => Promise.resolve([getAllBannersResponseMock.data.banners, 1]));
+      expect(await controller.searchBanners({ search: "konga", filter: "old", page: 1, limit: 20 })).toStrictEqual(getAllBannersResponseMock);
     });
   });
 });

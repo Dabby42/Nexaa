@@ -12,14 +12,23 @@ import {
   userRequestMock,
   userRepositoryMock,
   disableAffiliateResponse,
+  getAllUsersResponseMock
 } from "./user.mock";
 import { BadRequestException, ConflictException } from "@nestjs/common";
+import { Admin } from "./entities/admin.entity";
+import { LinksService } from "../links/links.service";
 
 describe("UserController", () => {
   let controller: UserController;
   let userRepository;
   const mockUserRepository = {
     update: jest.fn(),
+    findOne: jest.fn(),
+    findAndCount: jest.fn().mockImplementation(() => Promise.resolve([])),
+  };
+  const mockAdminRepository = {
+    update: jest.fn(),
+    findAndCount: jest.fn().mockImplementation(() => Promise.resolve([])),
     findOne: jest.fn(() => null),
     save: jest.fn(() => userRepositoryMock),
   };
@@ -32,6 +41,14 @@ describe("UserController", () => {
         {
           provide: getRepositoryToken(User),
           useValue: mockUserRepository,
+        },
+        {
+          provide: getRepositoryToken(Admin),
+          useValue: mockAdminRepository,
+        },
+        {
+          provide: LinksService,
+          useValue: {},
         },
       ],
     }).compile();
@@ -58,6 +75,13 @@ describe("UserController", () => {
   describe("Update bank details of a user", () => {
     it("should update the bank details successfully", async () => {
       expect(await controller.updateBankDetails(updateBankDetailsData, userRequestMock)).toStrictEqual(updateBankDetailsResponseData);
+    });
+  });
+
+  describe("Fetch Affiliates", () => {
+    it("should fetch all affiliates successfully", async () => {
+      userRepository.findAndCount.mockImplementationOnce(() => Promise.resolve([getAllUsersResponseMock.data.users, 1]));
+      expect(await controller.fetchAllAffiliates()).toStrictEqual(getAllUsersResponseMock);
     });
   });
 

@@ -1,7 +1,15 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
-import { changeUserPasswordSuccessMock, loginUserSuccessMockData, registerUserSuccessMock, userDataMock, userRepositoryMock } from "./auth.mock";
+import {
+  adminRepositoryMock,
+  changeUserPasswordSuccessMock,
+  loginAdminSuccessMockData,
+  loginUserSuccessMockData,
+  registerUserSuccessMock,
+  userDataMock,
+  userRepositoryMock,
+} from "./auth.mock";
 import { JwtService } from "@nestjs/jwt";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { User } from "app/user/entities/user.entity";
@@ -9,14 +17,32 @@ import { UserService } from "app/user/user.service";
 import { Cache } from "cache-manager";
 import { CACHE_MANAGER, ConflictException, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
 import { GoogleAuthService } from "./google-auth.service";
+import { Admin } from "../user/entities/admin.entity";
+import { NotificationService } from "../notification/notification.service";
+import { LinksService } from "../links/links.service";
 
 describe("AuthController", () => {
   let controller: AuthController;
   let module: TestingModule;
   let userRepository;
+  let adminRepository;
   let googleAuthService;
   const mockUserRepository = {
-    findOne: jest.fn().mockImplementation(() => Promise.resolve(userRepositoryMock)),
+    findOne: jest.fn().mockImplementation(() => Promise.resolve({ ...userRepositoryMock })),
+    create: jest.fn().mockImplementation((dto) => dto),
+    save: jest.fn(),
+    insert: jest.fn().mockImplementation((userData) =>
+      Promise.resolve({
+        id: 1,
+        ...userData,
+        raw: {
+          insertId: 1,
+        },
+      })
+    ),
+  };
+  const mockAdminRepository = {
+    findOne: jest.fn().mockImplementation(() => Promise.resolve({ ...adminRepositoryMock })),
     create: jest.fn().mockImplementation((dto) => dto),
     save: jest.fn(),
     insert: jest.fn().mockImplementation((userData) =>
@@ -40,6 +66,10 @@ describe("AuthController", () => {
     set: jest.fn(),
   };
 
+  const mockNotificationService = {};
+
+  const mockLinksService = { generateCustomUrl: jest.fn() };
+
   beforeEach(async () => {
     module = await Test.createTestingModule({
       controllers: [AuthController],
@@ -49,6 +79,10 @@ describe("AuthController", () => {
         {
           provide: getRepositoryToken(User),
           useValue: mockUserRepository,
+        },
+        {
+          provide: getRepositoryToken(Admin),
+          useValue: mockAdminRepository,
         },
         {
           provide: JwtService,
@@ -62,11 +96,20 @@ describe("AuthController", () => {
           provide: CACHE_MANAGER,
           useValue: mockCache,
         },
+        {
+          provide: NotificationService,
+          useValue: mockNotificationService,
+        },
+        {
+          provide: LinksService,
+          useValue: mockLinksService,
+        },
       ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
     userRepository = module.get(getRepositoryToken(User));
+    adminRepository = module.get(getRepositoryToken(Admin));
     googleAuthService = module.get<GoogleAuthService>(GoogleAuthService);
   });
 
@@ -110,6 +153,28 @@ describe("AuthController", () => {
       const password = "wrong_password";
 
       await expect(controller.loginUser({ email, password })).rejects.toThrowError(UnauthorizedException);
+    });
+  });
+
+  describe("login an admin", () => {
+    it("should login admin successfully", async () => {
+      const email = "admin@konga.com";
+      const password = "password123";
+      expect(await controller.loginAdmin({ email, password })).toStrictEqual(loginAdminSuccessMockData);
+    });
+
+    it("should return an error when password does not match", async () => {
+      const email = "admin@konga.com";
+      const password = "wrong_password";
+
+      await expect(controller.loginAdmin({ email, password })).rejects.toThrowError(UnauthorizedException);
+    });
+
+    it("should throw account inactive error if account is not active", async () => {
+      const email = "admin@konga.com";
+      const password = "password123";
+      adminRepository.findOne.mockImplementationOnce(() => Promise.resolve({ ...adminRepositoryMock, is_active: false }));
+      await expect(controller.loginAdmin({ email, password })).rejects.toThrowError(UnauthorizedException);
     });
   });
 

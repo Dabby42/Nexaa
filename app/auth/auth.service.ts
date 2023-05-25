@@ -1,8 +1,8 @@
-import { Injectable, UnauthorizedException, CACHE_MANAGER, Inject, ConflictException, BadRequestException } from "@nestjs/common";
+import { BadRequestException, CACHE_MANAGER, ConflictException, Inject, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { User } from "app/user/entities/user.entity";
+import { RoleEnum, User, UserStatusEnum } from "app/user/entities/user.entity";
 import { JwtService } from "@nestjs/jwt";
 import { sendSuccess } from "app/utils/helpers/response.helpers";
 import { GoogleLoginDto } from "./dto/google-login.dto";
@@ -13,27 +13,39 @@ import { Cache } from "cache-manager";
 import { ConfirmResetPasswordTokenDto } from "./dto/confirm-reset-password-token.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { ChangePasswordDto } from "./dto/change-password.dto";
-//import { config } from "../config/config";
+import { Admin } from "../user/entities/admin.entity";
+import { NotificationService } from "../notification/notification.service";
+import { config } from "../config/config";
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger("AuthService");
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Admin) private adminRepository: Repository<Admin>,
     private jwtService: JwtService,
     private googleAuthService: GoogleAuthService,
+    private notificationService: NotificationService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
-  async loginUser(loginUserDto: LoginUserDto, isSocial = false) {
-    const user = await this.userRepository.findOne({
-      where: { email: loginUserDto.email },
-    });
-
-    const finalUser = { ...user };
+  async loginUser(loginUserDto: LoginUserDto, isSocial = false, adminLogin = false) {
+    let user;
+    if (adminLogin) {
+      user = await this.adminRepository.findOne({
+        where: { email: loginUserDto.email },
+      });
+    } else {
+      user = await this.userRepository.findOne({
+        where: { email: loginUserDto.email },
+      });
+    }
 
     if (!user) {
       throw new UnauthorizedException("Invalid email or password");
     }
+
+    if ((adminLogin && !user.is_active) || (!adminLogin && user.status !== UserStatusEnum.APPROVED)) throw new UnauthorizedException("Your account is inactive.");
 
     if (!isSocial) {
       const isMatch = await User.comparePasswords(loginUserDto.password, user.password);
@@ -47,13 +59,13 @@ export class AuthService {
     const payload = {
       id: user.id,
       email: user.email,
-      role: user.role,
+      role: adminLogin ? RoleEnum.ADMIN : RoleEnum.AFFILIATE,
     };
     const token = this.jwtService.sign(payload);
 
-    delete finalUser.password;
+    delete user.password;
 
-    return sendSuccess({ token, user: finalUser }, "Login Success");
+    return sendSuccess({ token, user }, "Login Success");
   }
 
   async loginWithGoogle(googleLoginDto: GoogleLoginDto) {
@@ -70,17 +82,29 @@ export class AuthService {
     if (existingUser) {
       const token = crypto.randomBytes(20).toString("hex");
 
-      this.cacheManager.set(token, existingUser.id, 60 * 10);
+      this.cacheManager.set(token, existingUser.id, { ttl: 60 * 10 });
 
-      //Send reset link as a mail to user
-      // let body = `
-      // <h2>Please click on the given link to reset your password</h2>
-      // <p>${config.baseUrl}/v1/auth/reset-password/${token}</p>`;
-
-      //SendEmailHelper(email, 'Reset Password Link' , body);
+      const subject = "Konga Affiliate - Reset Password Link";
+      try {
+        await this.notificationService.send(
+          "email",
+          config.hermes.forgot_password.template_name,
+          email,
+          subject,
+          config.hermes.forgot_password.sender,
+          config.hermes.forgot_password.sender_id,
+          {
+            firstname: existingUser.first_name,
+            token,
+          }
+        );
+      } catch (e) {
+        this.logger.log(e);
+      }
+      return true;
+    } else {
+      throw new BadRequestException("User with account does not exist");
     }
-
-    return true;
   }
 
   async confirmResetPasswordToken(confirmResetPasswordTokenDto: ConfirmResetPasswordTokenDto) {
@@ -116,10 +140,7 @@ export class AuthService {
 
     await this.userRepository.save(user);
 
-    //Send a mail of successful password reset
-    //let body = "<h2>Your password has been changed, as you asked.</h2><br/><p>If you didn't ask to change your password,
-    //we're here to help keep your account secure. Visit our support page for more info.</p>"
-    //SendEmailHelper(user.email, 'Password Changed' , body);
+    await this.cacheManager.del(token);
 
     return user;
   }

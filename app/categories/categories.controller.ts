@@ -5,7 +5,10 @@ import { sendSuccess } from "../utils/helpers/response.helpers";
 import { JwtGuard } from "../auth/auth.jwt.guard";
 import { AdminGuard } from "../admin/admin.guard";
 import { UpdateCategoryStatusDto } from "./dto/update-category-status.dto";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+@ApiTags("Categories")
+@ApiBearerAuth("jwt")
 @Controller("categories")
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
@@ -19,6 +22,13 @@ export class CategoriesController {
 
   @UseGuards(JwtGuard, AdminGuard)
   @Get()
+  async findAllCategories() {
+    const categories = await this.categoriesService.findAllCategories();
+    return sendSuccess(categories, "All categories retrieved successfully");
+  }
+
+  @UseGuards(JwtGuard, AdminGuard)
+  @Get("active")
   async findAllActiveCategories() {
     const categories = await this.categoriesService.findAllActiveCategories();
     return sendSuccess(categories, "Categories retrieved successfully");

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { NewsController } from "./news.controller";
 import { NewsService } from "./news.service";
-import { newsData, createNewsMock, updateNewsMock, userMock, deleteNewsMock } from "./news.mock";
+import { newsData, createNewsMock, updateNewsMock, userMock, deleteNewsMock, fetchNewsMock } from "./news.mock";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { News } from "./entities/news.entity";
 import { BadRequestException, NotFoundException } from "@nestjs/common";
@@ -24,6 +24,9 @@ describe("NewsController", () => {
     delete: jest.fn().mockImplementation((id) => {
       if (id === 1) return { affected: 1 };
       return { affected: 0 };
+    }),
+    findAndCount: jest.fn().mockImplementation(() => {
+      return [fetchNewsMock.data.news, 4];
     }),
   };
 
@@ -69,6 +72,12 @@ describe("NewsController", () => {
 
     it("should fail nd throw error if news is not found", async () => {
       await expect(controller.deleteNews("2")).rejects.toThrowError(NotFoundException);
+    });
+  });
+
+  describe("Fetch news", () => {
+    it("should fetch news successfully", async () => {
+      expect(await controller.getNews()).toStrictEqual(fetchNewsMock);
     });
   });
 });
