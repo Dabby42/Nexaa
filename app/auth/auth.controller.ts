@@ -10,6 +10,9 @@ import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { ConfirmResetPasswordTokenDto } from "./dto/confirm-reset-password-token.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { ApiTags } from "@nestjs/swagger";
+import { ChangePasswordDto } from "./dto/change-password.dto";
+import { CreateAdminDto } from "../user/dto/create-admin.dto";
+import { AdminGuard } from "../admin/admin.guard";
 
 @ApiTags("Auth")
 @Controller("auth")
@@ -22,9 +25,21 @@ export class AuthController {
     return sendSuccess(null, "Account created successfully");
   }
 
+  @UseGuards(JwtGuard, AdminGuard)
+  @Post("admin/register")
+  async registerAdmin(@Body() createAdminDto: CreateAdminDto) {
+    await this.userService.createAdmin(createAdminDto);
+    return sendSuccess(null, "Admin created successfully.");
+  }
+
   @Post("login")
   async loginUser(@Body() loginUserDto: LoginUserDto) {
     return await this.authService.loginUser(loginUserDto);
+  }
+
+  @Post("admin/login")
+  async loginAdmin(@Body() loginUserDto: LoginUserDto) {
+    return await this.authService.loginUser(loginUserDto, false, true);
   }
 
   @Post("login/google")
@@ -48,6 +63,13 @@ export class AuthController {
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     await this.authService.resetPassword(resetPasswordDto);
     return sendSuccess(null, "Password changed successfully");
+  }
+
+  @UseGuards(JwtGuard)
+  @Post("change-password")
+  async changePassword(@Request() req, @Body() changePasswordDto: ChangePasswordDto) {
+    await this.authService.changePassword(req.user, changePasswordDto);
+    return sendSuccess(null, "Password updated successfully");
   }
 
   @UseGuards(JwtGuard)

@@ -5,6 +5,7 @@ import { Banner, BannerStatusEnum } from "./entities/banner.entity";
 import { Like, Repository } from "typeorm";
 import { sendSuccess } from "app/utils/helpers/response.helpers";
 import { BannerSearchDto } from "./dto/banner-search.dto";
+import { UpdateBannerDto } from "./dto/update-banner.dto";
 
 @Injectable()
 export class BannersService {
@@ -55,6 +56,41 @@ export class BannersService {
 
     const pages = Math.ceil(count / limit);
 
+    return {
+      banners,
+      count,
+      current_page: page,
+      pages,
+    };
+  }
+
+  async updateBanner(id: number, updateBannerDto: UpdateBannerDto) {
+    try {
+      let banner_urls_and_sizes: string;
+      let updatedBanner;
+
+      if (updateBannerDto.banner_images_and_sizes) {
+        banner_urls_and_sizes = JSON.stringify(updateBannerDto.banner_images_and_sizes);
+        updatedBanner = { ...updateBannerDto, banner_images_and_sizes: banner_urls_and_sizes };
+      } else {
+        updatedBanner = { ...updateBannerDto };
+      }
+
+      await this.bannerRepository.update(id, updatedBanner);
+      return sendSuccess(null, "Banner Updated");
+    } catch (error) {
+      throw new UnprocessableEntityException("An unknown error occurred");
+    }
+  }
+
+  async loadAllBanners(page: number, limit: number) {
+    const [banners, count] = await this.bannerRepository.findAndCount({
+      order: { created_at: "DESC" },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const pages = Math.ceil(count / limit);
     return {
       banners,
       count,

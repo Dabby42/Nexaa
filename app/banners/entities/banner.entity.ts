@@ -18,7 +18,7 @@ export class Banner {
   @Column()
   banner_name: string;
 
-  @Column()
+  @Column({ type: "text" })
   banner_images_and_sizes: string;
 
   @Column()

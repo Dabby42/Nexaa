@@ -30,9 +30,7 @@ async function bootstrap() {
     SwaggerModule.setup("docs", app, document);
   }
 
-  app.enableCors({
-    origin: ["127.0.0.1", "*", "/.konga.com$/", "/.igbimo.com$/"],
-  });
+  app.enableCors();
   app.use(helmet());
 
   app.useGlobalPipes(

@@ -6,6 +6,7 @@ import { config } from "app/config/config";
 import { JwtStrategy } from "./auth.jwt.strategy";
 import { UserModule } from "../user/user.module";
 import { GoogleAuthService } from "./google-auth.service";
+import { NotificationModule } from "../notification/notification.module";
 
 @Module({
   controllers: [AuthController],
@@ -16,6 +17,7 @@ import { GoogleAuthService } from "./google-auth.service";
       signOptions: { expiresIn: config.jwt.expiry },
     }),
     UserModule,
+    NotificationModule,
   ],
 })
 export class AuthModule {}
