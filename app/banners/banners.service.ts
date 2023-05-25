@@ -2,8 +2,9 @@ import { Injectable, UnprocessableEntityException } from "@nestjs/common";
 import { CreateBannerDto } from "./dto/create-banner.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Banner, BannerStatusEnum } from "./entities/banner.entity";
-import { Repository } from "typeorm";
+import { FindOptionsOrder, Like, Repository } from "typeorm";
 import { sendSuccess } from "app/utils/helpers/response.helpers";
+import { BannerSearchDto } from "./dto/banner-search.dto";
 import { UpdateBannerDto } from "./dto/update-banner.dto";
 
 @Injectable()
@@ -27,6 +28,30 @@ export class BannersService {
     const [banners, count] = await this.bannerRepository.findAndCount({
       where: { status: BannerStatusEnum.ACTIVE },
       order: { created_at: "DESC" },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const pages = Math.ceil(count / limit);
+
+    return {
+      banners,
+      count,
+      current_page: page,
+      pages,
+    };
+  }
+
+  async searchBanners(searchDto: BannerSearchDto) {
+    const { search = "", page, limit, filter = "new" } = searchDto;
+    let order: FindOptionsOrder<Banner> = { created_at: "DESC" };
+    if (filter === "old") order = { created_at: "ASC" };
+    const [banners, count] = await this.bannerRepository.findAndCount({
+      where: {
+        banner_name: Like(`%${search}%`),
+        status: BannerStatusEnum.ACTIVE,
+      },
+      order,
       skip: (page - 1) * limit,
       take: limit,
     });
