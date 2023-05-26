@@ -12,11 +12,12 @@ import {
   userRequestMock,
   userRepositoryMock,
   disableAffiliateResponse,
-  getAllUsersResponseMock
+  getAllUsersResponseMock,
 } from "./user.mock";
 import { BadRequestException, ConflictException } from "@nestjs/common";
 import { Admin } from "./entities/admin.entity";
 import { LinksService } from "../links/links.service";
+import { NotificationService } from "../notification/notification.service";
 
 describe("UserController", () => {
   let controller: UserController;
@@ -25,6 +26,7 @@ describe("UserController", () => {
     update: jest.fn(),
     findOne: jest.fn(),
     findAndCount: jest.fn().mockImplementation(() => Promise.resolve([])),
+    save: jest.fn(),
   };
   const mockAdminRepository = {
     update: jest.fn(),
@@ -48,6 +50,10 @@ describe("UserController", () => {
         },
         {
           provide: LinksService,
+          useValue: {},
+        },
+        {
+          provide: NotificationService,
           useValue: {},
         },
       ],

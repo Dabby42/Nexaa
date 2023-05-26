@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException, UnprocessableEntityException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Like, Repository } from "typeorm";
@@ -10,13 +10,17 @@ import { Admin } from "./entities/admin.entity";
 import { CreateAdminDto } from "./dto/create-admin.dto";
 import { LinksService } from "../links/links.service";
 import { SearchAndFilterAffiliateDto } from "./dto/searchAndFilterAffiliateDto";
+import { NotificationService } from "../notification/notification.service";
+import { config } from "../config/config";
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger("UserService");
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Admin) private adminRepository: Repository<Admin>,
-    private readonly linksService: LinksService
+    private readonly linksService: LinksService,
+    private readonly notificationService: NotificationService
   ) {}
 
   async createUser(createUserDto: CreateUserDto) {
@@ -36,7 +40,7 @@ export class UserService {
       const saveUser = await this.userRepository.insert(newUser);
       await this.linksService.generateCustomUrl({ redirect_url: "https://konga.com", is_default: true }, { user: { id: saveUser.raw.insertId, username: createUserDto.username } });
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       throw new UnprocessableEntityException("An unknown error occurred");
     }
   }
@@ -125,7 +129,7 @@ export class UserService {
       .getRawOne();
   }
 
-  async updateAffiliateStatus(affiliate_id: number, status: UserStatusEnum, reason: string, admin: User) {
+  async updateAffiliateStatus(affiliate_id: number, status: UserStatusEnum, reason: string, admin: Admin) {
     const affiliate = await this.userRepository.findOne({ where: { id: affiliate_id } });
     if (!affiliate) throw new NotFoundException("Affiliate not found.");
     if (affiliate.status === status) throw new BadRequestException("Please update affiliate to a new status.");
@@ -135,15 +139,47 @@ export class UserService {
       affiliate.verified_by = admin;
       affiliate.verified_at = new Date();
     }
-    await this.userRepository.save(affiliate);
+    return await this.userRepository.save(affiliate);
   }
 
-  async approveAffiliate(affiliate_id: number, admin: User) {
-    return await this.updateAffiliateStatus(affiliate_id, UserStatusEnum.APPROVED, null, admin);
+  async approveAffiliate(affiliate_id: number, admin: Admin) {
+    const user: User = await this.updateAffiliateStatus(affiliate_id, UserStatusEnum.APPROVED, null, admin);
+    //send approved email to affiliate
+    try {
+      await this.notificationService.send(
+        "email",
+        "hera_affiliate_approved",
+        user.email,
+        "Konga Affiliate Account approved.",
+        config.hermes.generic.sender,
+        config.hermes.generic.sender_id,
+        {
+          firstname: user.first_name,
+        }
+      );
+    } catch (e) {
+      this.logger.log(e);
+    }
   }
 
-  async disableAffiliate(affiliate_id: number, reason: string, admin: User) {
+  async disableAffiliate(affiliate_id: number, reason: string, admin: Admin) {
     if (!reason) throw new BadRequestException("Please provide a reason for disabling this affiliate.");
-    return await this.updateAffiliateStatus(affiliate_id, UserStatusEnum.DISABLED, reason, admin);
+    const affiliate: User = await this.updateAffiliateStatus(affiliate_id, UserStatusEnum.DISABLED, reason, admin);
+    try {
+      await this.notificationService.send(
+        "email",
+        "hera_affiliate_rejected",
+        affiliate.email,
+        "Konga Affiliate Account rejected.",
+        config.hermes.generic.sender,
+        config.hermes.generic.sender_id,
+        {
+          firstname: affiliate.first_name,
+          reason,
+        }
+      );
+    } catch (e) {
+      this.logger.log(e);
+    }
   }
 }

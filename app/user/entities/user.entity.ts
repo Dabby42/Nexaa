@@ -1,5 +1,6 @@
 import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
 import { BaseUser } from "./base-user.entity";
+import { Admin } from "./admin.entity";
 
 export enum UserStatusEnum {
   PENDING = 0,
@@ -52,9 +53,9 @@ export class User extends BaseUser {
   @Column({ type: "timestamp", nullable: true })
   public verified_at: Date;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne(() => Admin, { nullable: true })
   @JoinColumn({ name: "verified_by" })
-  public verified_by: User;
+  public verified_by: Admin;
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   public created_at: Date;

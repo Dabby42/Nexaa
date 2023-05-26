@@ -91,6 +91,10 @@ export const config = {
   hermes: {
     url: process.env.HERMES_API_URL,
     scope: process.env.HERMES_SCOPE,
+    generic: {
+      sender: process.env.GENERIC_EMAIL_SENDER,
+      sender_id: process.env.GENERIC_EMAIL_SENDER_ID,
+    },
     contact_us: {
       template_name: process.env.CONTACT_US_TEMPLATE_NAME,
       recipient: process.env.CONTACT_US_RECIPIENT,
