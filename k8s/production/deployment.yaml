@@ -134,6 +134,10 @@ spec:
               value: "http://hermesapi.default.svc.cluster.local"
             - name: HERMES_SCOPE
               value: "private/hermes/send-notification"
+            - name: GENERIC_EMAIL_SENDER
+              value: "affiliates@konga.com"
+            - name: GENERIC_EMAIL_SENDER_ID
+              value: "Konga Affiliate"
             - name: CONTACT_US_TEMPLATE_NAME
               value: "hera_contact_us"
             - name: CONTACT_US_RECIPIENT

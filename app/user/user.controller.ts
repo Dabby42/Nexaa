@@ -7,6 +7,7 @@ import { UpdateBankDetailsDto } from "./dto/update-bank-details.dto";
 import { ApiBearerAuth, ApiTags, ApiQuery } from "@nestjs/swagger";
 import { AdminGuard } from "app/admin/admin.guard";
 import { SearchAndFilterAffiliateDto } from "./dto/searchAndFilterAffiliateDto";
+import { UpdateAffiliateStatusDto } from "./dto/update-affiliate-status.dto";
 
 @ApiBearerAuth("jwt")
 @ApiTags("User")
@@ -52,5 +53,19 @@ export class UserController {
   async fetchUserStats() {
     const data = await this.userService.fetchUserStats();
     return sendSuccess(data, "Users statistics retrieved successfully");
+  }
+
+  @UseGuards(AdminGuard)
+  @Put("affiliate/approve")
+  async approveAffiliate(@Body() updateAffiliateStatusDto: UpdateAffiliateStatusDto, @Request() req) {
+    await this.userService.approveAffiliate(updateAffiliateStatusDto.affiliate_id, req.user);
+    return sendSuccess(null, "Affiliate has been approved.");
+  }
+
+  @UseGuards(AdminGuard)
+  @Put("affiliate/disable")
+  async rejectAffiliate(@Body() updateAffiliateStatusDto: UpdateAffiliateStatusDto, @Request() req) {
+    await this.userService.disableAffiliate(updateAffiliateStatusDto.affiliate_id, updateAffiliateStatusDto.reason, req.user);
+    return sendSuccess(null, "Affiliate has been disabled.");
   }
 }
