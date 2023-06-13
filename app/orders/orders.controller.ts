@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from "@nestjs/common";
 import { OrdersService } from "./orders.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { UpdateOrderDto } from "./dto/update-order.dto";
 import { sendSuccess } from "../utils/helpers/response.helpers";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { JwtGuard } from "app/auth/auth.jwt.guard";
+import { AdminGuard } from "app/admin/admin.guard";
 
 @ApiTags("Orders")
 @ApiBearerAuth("jwt")
@@ -37,5 +39,14 @@ export class OrdersController {
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.ordersService.remove(+id);
+  }
+
+  @UseGuards(JwtGuard, AdminGuard)
+  @Get("all_orders")
+  @ApiQuery({ name: "limit", type: "number", required: false})
+  @ApiQuery({ name: "page", type: "number", required: false})
+  async getAllOrders(@Query("page") page = 1, @Query("limit") limit = 20) {
+    const orders = await this.ordersService.getAllOrders(page, limit);
+    return sendSuccess(orders, "Orders retrieved successfully");
   }
 }

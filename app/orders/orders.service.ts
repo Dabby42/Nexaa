@@ -56,4 +56,20 @@ export class OrdersService {
   remove(id: number) {
     return `This action removes a #${id} order`;
   }
+
+
+  async getAllOrders(page: number, limit: number) {
+    const [orders, count] =  await this.orderRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const pages = Math.ceil(count / limit);
+
+    return {
+      orders,
+      current_page: page,
+      pages,
+    };
+  }
 }
