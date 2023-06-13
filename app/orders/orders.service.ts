@@ -57,9 +57,8 @@ export class OrdersService {
     return `This action removes a #${id} order`;
   }
 
-
   async getAllOrders(page: number, limit: number) {
-    const [orders, count] =  await this.orderRepository.findAndCount({
+    const [orders, count] = await this.orderRepository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
     });

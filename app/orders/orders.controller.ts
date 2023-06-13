@@ -43,8 +43,8 @@ export class OrdersController {
 
   @UseGuards(JwtGuard, AdminGuard)
   @Get("all_orders")
-  @ApiQuery({ name: "limit", type: "number", required: false})
-  @ApiQuery({ name: "page", type: "number", required: false})
+  @ApiQuery({ name: "limit", type: "number", required: false })
+  @ApiQuery({ name: "page", type: "number", required: false })
   async getAllOrders(@Query("page") page = 1, @Query("limit") limit = 20) {
     const orders = await this.ordersService.getAllOrders(page, limit);
     return sendSuccess(orders, "Orders retrieved successfully");
