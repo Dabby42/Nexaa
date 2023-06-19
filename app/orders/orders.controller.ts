@@ -42,7 +42,7 @@ export class OrdersController {
   }
 
   @UseGuards(JwtGuard, AdminGuard)
-  @Get("all_orders")
+  @Get("orders")
   @ApiQuery({ name: "limit", type: "number", required: false })
   @ApiQuery({ name: "page", type: "number", required: false })
   async getAllOrders(@Query("page") page = 1, @Query("limit") limit = 20) {

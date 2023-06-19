@@ -8,6 +8,7 @@ import { MagentoRepository } from "../magento/magento.repository";
 
 describe("OrderController", () => {
   let controller: OrdersController;
+  let orderRepository;
 
   const mockOrderRepository = {
     create: jest.fn().mockImplementation((dto) => dto),
@@ -22,7 +23,8 @@ describe("OrderController", () => {
         getMany: jest.fn(),
       })),
     })),
-    find: jest.fn().mockImplementation(() => Promise.resolve(getAllOrdersResponseMock.data)),
+    find: jest.fn().mockImplementation(() => Promise.resolve([])),
+    findAndCount: jest.fn().mockImplementation(() => Promise.resolve([getAllOrdersResponseMock.data])),
     findOne: jest.fn().mockImplementation(() => Promise.resolve(getOrderResponseMock.data)),
     update: jest.fn(),
     remove: jest.fn(),
@@ -42,6 +44,7 @@ describe("OrderController", () => {
     }).compile();
 
     controller = module.get<OrdersController>(OrdersController);
+    orderRepository = module.get(getRepositoryToken(Orders))
   });
 
   it("should be defined", () => {
@@ -60,4 +63,11 @@ describe("OrderController", () => {
       expect(await controller.findSingleOrder(id)).toStrictEqual(getOrderResponseMock);
     });
   });
+
+  describe("Get all orders", () => {
+    it("Admin should retrieve all orders successfully", async() => {
+      orderRepository.findAndCount.mockImplementationOnce(() => Promise.resolve([getAllOrdersResponseMock.data.orders, 1]));
+      expect(await controller.getAllOrders()).toStrictEqual(getAllOrdersResponseMock);
+    })
+  })
 });
