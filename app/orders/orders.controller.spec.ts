@@ -44,7 +44,7 @@ describe("OrderController", () => {
     }).compile();
 
     controller = module.get<OrdersController>(OrdersController);
-    orderRepository = module.get(getRepositoryToken(Orders))
+    orderRepository = module.get(getRepositoryToken(Orders));
   });
 
   it("should be defined", () => {
@@ -65,9 +65,9 @@ describe("OrderController", () => {
   });
 
   describe("Get all orders", () => {
-    it("Admin should retrieve all orders successfully", async() => {
+    it("Admin should retrieve all orders successfully", async () => {
       orderRepository.findAndCount.mockImplementationOnce(() => Promise.resolve([getAllOrdersResponseMock.data.orders, 1]));
       expect(await controller.getAllOrders()).toStrictEqual(getAllOrdersResponseMock);
-    })
-  })
+    });
+  });
 });
