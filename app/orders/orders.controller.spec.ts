@@ -1,5 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { createOrdersMock, getAllOrdersResponseMock, getOrderResponseMock } from "./orders.mock";
+import { createOrderData, createOrdersMock, getAllOrdersResponseMock, getCommissionStatsMock, getOrderResponseMock } from "./orders.mock";
 import { OrdersService } from "./orders.service";
 import { OrdersController } from "./orders.controller";
 import { getRepositoryToken } from "@nestjs/typeorm";
@@ -18,9 +18,16 @@ describe("OrderController", () => {
       })
     ),
     createQueryBuilder: jest.fn(() => ({
-      where: jest.fn(() => ({
-        getMany: jest.fn(),
-      })),
+      where: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      update: jest.fn().mockReturnThis(),
+      set: jest.fn().mockReturnThis(),
+      addSelect: jest.fn().mockReturnThis(),
+      getRawOne: jest.fn().mockReturnValue(getCommissionStatsMock.data),
+      getOne: jest.fn().mockReturnValue({}),
+      execute: jest.fn().mockReturnThis(),
     })),
     find: jest.fn().mockImplementation(() => Promise.resolve(getAllOrdersResponseMock.data)),
     findOne: jest.fn().mockImplementation(() => Promise.resolve(getOrderResponseMock.data)),
@@ -50,7 +57,7 @@ describe("OrderController", () => {
 
   describe("Create an order", () => {
     it("should create an order successfully", async () => {
-      expect(await controller.createOrder({})).toStrictEqual(createOrdersMock);
+      expect(await controller.createOrder(createOrderData)).toStrictEqual(createOrdersMock);
     });
   });
 
@@ -58,6 +65,13 @@ describe("OrderController", () => {
     it("should retrieve an order successfully", async () => {
       const id = "1";
       expect(await controller.findSingleOrder(id)).toStrictEqual(getOrderResponseMock);
+    });
+  });
+
+  describe("Get commission statistics", () => {
+    it("should retrieve commission statistics successfully", async () => {
+      expect(await controller.getCommissionStats()).toStrictEqual(getCommissionStatsMock);
+      expect(mockOrderRepository.createQueryBuilder).toHaveBeenCalled();
     });
   });
 });
