@@ -1,13 +1,18 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "../../user/entities/user.entity";
 
+export enum CommissionPaymentStatusEnum {
+  PAID = 2,
+  PENDING = 1,
+  UNPAID = 0,
+}
 @Entity()
 export class Orders {
   @PrimaryGeneratedColumn()
   public id: number;
 
   @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: "user_id" })
+  @JoinColumn({ name: "affiliate_id" })
   public affiliate_id: number;
 
   @Column()
@@ -22,10 +27,27 @@ export class Orders {
   @Column()
   public category: string;
 
+  @Column()
+  public return_id: string;
+
+  @Column({
+    type: "enum",
+    enum: CommissionPaymentStatusEnum,
+    default: CommissionPaymentStatusEnum.UNPAID,
+  })
+  public commission_payment_status: string;
+
   @Column({
     type: "decimal",
-    precision: 2,
-    scale: 1,
+    precision: 10,
+    scale: 2,
+  })
+  public commission: number;
+
+  @Column({
+    type: "decimal",
+    precision: 10,
+    scale: 2,
   })
   public total_amount: number;
 

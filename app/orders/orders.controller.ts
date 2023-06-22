@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param, UseGuards, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { OrdersService } from "./orders.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
-import { UpdateOrderDto } from "./dto/update-order.dto";
 import { sendSuccess } from "../utils/helpers/response.helpers";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { AdminGuard } from "../admin/admin.guard";
+import { JwtGuard } from "../auth/auth.jwt.guard";
+import { FileFilterInterceptor } from "./file-upload.interceptor";
 
 @ApiTags("Orders")
 @ApiBearerAuth("jwt")
@@ -11,6 +13,7 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @UseGuards(AdminGuard)
   @Post()
   async createOrder(@Body() createOrderDto: CreateOrderDto) {
     await this.ordersService.createOrder(createOrderDto);
@@ -29,13 +32,18 @@ export class OrdersController {
     return sendSuccess(order, "Order retrieved successfully");
   }
 
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(+id, updateOrderDto);
+  @UseGuards(JwtGuard, AdminGuard)
+  @Get("commission-stats")
+  async getCommissionStats() {
+    const data = await this.ordersService.getCommissionStats();
+    return sendSuccess(data, "Commission statistics retrieved successfully");
   }
 
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.ordersService.remove(+id);
+  @UseGuards(JwtGuard)
+  @Post("file-upload")
+  @UseInterceptors(FileFilterInterceptor)
+  async importPaidRecords(@UploadedFile("file") file: any) {
+    await this.ordersService.importPaidRecords(file);
+    return sendSuccess(null, "Paid commissions uploaded successfully");
   }
 }

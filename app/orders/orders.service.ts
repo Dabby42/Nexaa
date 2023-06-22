@@ -1,11 +1,12 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, InternalServerErrorException } from "@nestjs/common";
 import { CreateOrderDto } from "./dto/create-order.dto";
-import { UpdateOrderDto } from "./dto/update-order.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Orders } from "./entities/order.entity";
 import { Repository } from "typeorm";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { MagentoRepository } from "../magento/magento.repository";
+import { parse } from "@fast-csv/parse";
+import { Readable } from "stream";
 
 @Injectable()
 export class OrdersService {
@@ -28,7 +29,7 @@ export class OrdersService {
       .update(Orders)
       .set(
         orderDetails.reduce((acc, order) => {
-          acc[order.entity_id] = order.status;
+          acc["status"] = order.status;
           return acc;
         }, {})
       )
@@ -45,15 +46,54 @@ export class OrdersService {
     return await this.orderRepository.find();
   }
 
+  async getCommissionStats() {
+    return await this.orderRepository
+      .createQueryBuilder("order")
+      .select("SUM(order.commission)", "totalCommissions")
+      .addSelect("SUM(order.total_amount)", "totalSales")
+      .addSelect("SUM(CASE WHEN order.commission_payment_status='1' THEN order.commission ELSE NULL END )", "pendingCommissions")
+      .addSelect("SUM(CASE WHEN order.commission_payment_status='0' THEN order.commission ELSE NULL END )", "unpaidCommissions")
+      .getRawOne();
+  }
+
   async findSingleOrder(id: number) {
     return await this.orderRepository.findOne({ where: { id } });
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
-  }
+  async importPaidRecords(file) {
+    const { buffer } = file._readableState;
+    const readableStream = Readable.from(buffer);
+    const rows: any[] = [];
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+    try {
+      await new Promise<void>((resolve, reject) => {
+        readableStream
+          .pipe(parse({ delimiter: ",", ignoreEmpty: true, headers: true }))
+          .on("data", (row) => {
+            rows.push(row);
+          })
+          .on("end", () => {
+            this.logger.log("CSV parsing completed");
+            resolve();
+          })
+          .on("error", (error) => {
+            this.logger.log("Error parsing CSV: %error", error);
+            reject(error);
+          });
+      });
+      return await this.orderRepository
+        .createQueryBuilder()
+        .update(Orders)
+        .set(
+          rows.reduce((acc, row) => {
+            acc["status"] = row.status;
+            return acc;
+          }, {})
+        )
+        .where("order_id IN (:orderIds)", { orderIds: rows.map((row) => row.id) })
+        .execute();
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }
