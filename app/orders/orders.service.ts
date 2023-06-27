@@ -21,8 +21,8 @@ export class OrdersService {
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async updateOrderStatus() {
-    const stateArr = ["cancelled", "new"];
-    const orderIds = await this.orderRepository.createQueryBuilder().select("order_id").where("state IS IN (:...stateArr)", { stateArr }).getMany();
+    const statusArr = ["cancelled", "new"];
+    const orderIds = await this.orderRepository.createQueryBuilder().select("order_id").where("status IS IN (:...statusArr)", { statusArr }).getMany();
     const orderDetails = await this.magentoRepository.getOrder(orderIds);
     await this.orderRepository
       .createQueryBuilder()
