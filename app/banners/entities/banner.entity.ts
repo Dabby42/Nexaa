@@ -18,11 +18,23 @@ export class Banner {
   @Column()
   banner_name: string;
 
+  @Column()
+  banner_description: string;
+
   @Column({ type: "text" })
   banner_images_and_sizes: string;
 
   @Column()
   banner_link: string;
+
+  @Column()
+  banner_code: string;
+
+  @Column()
+  campaign_start_date: Date;
+
+  @Column()
+  campaign_end_date: Date;
 
   @Column({ nullable: true })
   tracking_tag: string;
