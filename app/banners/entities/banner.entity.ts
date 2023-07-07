@@ -18,7 +18,7 @@ export class Banner {
   @Column()
   banner_name: string;
 
-  @Column()
+  @Column({ nullable: true })
   banner_description: string;
 
   @Column({ type: "text" })
@@ -27,13 +27,13 @@ export class Banner {
   @Column()
   banner_link: string;
 
-  @Column()
+  @Column({ nullable: true })
   banner_code: string;
 
-  @Column()
+  @Column({ nullable: true })
   campaign_start_date: Date;
 
-  @Column()
+  @Column({ nullable: true })
   campaign_end_date: Date;
 
   @Column({ nullable: true })
