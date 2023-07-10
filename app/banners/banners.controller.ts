@@ -28,7 +28,6 @@ export class BannersController {
     const data = await this.bannersService.loadBanners(page, limit);
     return sendSuccess(data);
   }
-
   @Get("search")
   @ApiQuery({ name: "limit", type: "number", required: false })
   @ApiQuery({ name: "page", type: "number", required: false })
@@ -51,6 +50,13 @@ export class BannersController {
   @ApiQuery({ name: "page", type: "number", required: false })
   async getAllBanners(@Query("page") page = 1, @Query("limit") limit = 20) {
     const data = await this.bannersService.loadAllBanners(page, limit);
+    return sendSuccess(data);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(":id")
+  async getBanner(@Param("id") id: number) {
+    const data = await this.bannersService.getBanner(id);
     return sendSuccess(data);
   }
 }
