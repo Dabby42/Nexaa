@@ -10,6 +10,7 @@ import {
   updateBannerData,
   updateBannerDetailsResponseData,
   getAllBannersResponseMock,
+  getBannerResponseData,
 } from "./banner.mock";
 
 describe("BannersController", () => {
@@ -20,6 +21,11 @@ describe("BannersController", () => {
     save: jest.fn().mockImplementation(() =>
       Promise.resolve({
         ...createBannerResponseData.data,
+      })
+    ),
+    findOne: jest.fn().mockImplementation(() =>
+      Promise.resolve({
+        ...getBannerResponseData.data,
       })
     ),
     findAndCount: jest.fn().mockImplementation(() => Promise.resolve([])),
@@ -62,6 +68,12 @@ describe("BannersController", () => {
     it("should update the banner details successfully", async () => {
       const result: any = await controller.createBanner(createBannerData);
       expect(await controller.updateBanner(result.data.id, updateBannerData)).toStrictEqual(updateBannerDetailsResponseData);
+    });
+  });
+
+  describe("Get single banner", () => {
+    it("should fetch one banner successfully", async () => {
+      expect(await controller.getBanner(2)).toStrictEqual(getBannerResponseData);
     });
   });
 
