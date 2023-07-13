@@ -17,7 +17,10 @@ export const getBannerResponseData: any = {
   message: "Data fetched successfully",
   data: {
     banner_name: "Yakata",
-    banner_images_and_sizes: '[{"banner_size":"300 x 200","banner_image_url":"https://test.com"},{"banner_size":"100 x 200","banner_image_url":"https://test2.com"}]',
+    banner_images_and_sizes: [
+      { banner_size: "300 x 200", banner_image_url: "https://test.com" },
+      { banner_size: "100 x 200", banner_image_url: "https://test2.com" },
+    ],
     banner_link: "https://test.com",
     tracking_tag: "lmao",
     commission: 14,
@@ -63,7 +66,7 @@ export const getActiveBannersResponseMock: any = {
       {
         id: 1,
         banner_name: "string",
-        banner_images_and_sizes: "[{}]",
+        banner_images_and_sizes: [{}],
         banner_link: "string",
         tracking_tag: "string",
         status: 1,
@@ -109,7 +112,7 @@ export const getAllBannersResponseMock: any = {
       {
         id: 1,
         banner_name: "string",
-        banner_images_and_sizes: "[{}]",
+        banner_images_and_sizes: [{}],
         banner_link: "string",
         tracking_tag: "string",
         status: 1,
