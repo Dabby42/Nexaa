@@ -50,9 +50,11 @@ export class OrdersService {
     return await this.orderRepository
       .createQueryBuilder("order")
       .select("SUM(order.commission)", "totalCommissions")
+      .addSelect("COUNT(*)", "totalSalesCount")
       .addSelect("SUM(order.total_amount)", "totalSales")
       .addSelect("SUM(CASE WHEN order.commission_payment_status='1' THEN order.commission ELSE NULL END )", "pendingCommissions")
       .addSelect("SUM(CASE WHEN order.commission_payment_status='0' THEN order.commission ELSE NULL END )", "unpaidCommissions")
+      .where("order.status =:orderStatus", { orderStatus: "complete" })
       .getRawOne();
   }
 

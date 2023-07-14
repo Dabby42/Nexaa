@@ -11,5 +11,8 @@ export class CreateCustomUrlDto {
   readonly redirect_url: string;
 
   @IsOptional()
+  readonly banner_id?: number;
+
+  @IsOptional()
   readonly is_default?: boolean;
 }
