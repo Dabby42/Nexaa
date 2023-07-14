@@ -86,6 +86,12 @@ export const config = {
         exchangeName: process.env.AMQP_ORDER_SPLIT_EXCHANGE,
         routingKey: process.env.AMQP_ORDER_SPLIT_ROUTING_KEY,
       },
+      clicked_link: {
+        queueName: process.env.AMQP_CLICKED_LINK_QUEUE,
+        prefetch: process.env.AMQP_CLICKED_LINK_PREFETCH,
+        exchangeName: process.env.AMQP_CLICKED_LINK_EXCHANGE,
+        routingKey: process.env.AMQP_CLICKED_LINK_ROUTING_KEY,
+      },
     },
   },
   hermes: {

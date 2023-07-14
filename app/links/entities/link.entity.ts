@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { User } from "../../user/entities/user.entity";
+import { Banner } from "../../banners/entities/banner.entity";
 
 @Entity()
 export class Links {
@@ -18,6 +19,10 @@ export class Links {
 
   @Column()
   public k_id: string;
+
+  @ManyToOne(() => Banner, { nullable: true })
+  @JoinColumn({ name: "banner_id" })
+  public banner_id: Banner;
 
   @CreateDateColumn()
   created_at: Date;
