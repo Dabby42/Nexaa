@@ -1,4 +1,4 @@
-import { BadRequestException, CACHE_MANAGER, ConflictException, Inject, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -9,13 +9,13 @@ import { GoogleLoginDto } from "./dto/google-login.dto";
 import { GoogleAuthService } from "./google-auth.service";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import * as crypto from "crypto";
-import { Cache } from "cache-manager";
 import { ConfirmResetPasswordTokenDto } from "./dto/confirm-reset-password-token.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { ChangePasswordDto } from "./dto/change-password.dto";
 import { Admin } from "../user/entities/admin.entity";
 import { NotificationService } from "../notification/notification.service";
 import { config } from "../config/config";
+import { CacheService } from "../cache/cache.service";
 
 @Injectable()
 export class AuthService {
@@ -26,7 +26,7 @@ export class AuthService {
     private jwtService: JwtService,
     private googleAuthService: GoogleAuthService,
     private notificationService: NotificationService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
+    private cacheService: CacheService
   ) {}
 
   async loginUser(loginUserDto: LoginUserDto, isSocial = false, adminLogin = false) {
@@ -82,7 +82,7 @@ export class AuthService {
     if (existingUser) {
       const token = crypto.randomBytes(20).toString("hex");
 
-      this.cacheManager.set(token, existingUser.id, { ttl: 60 * 10 });
+      this.cacheService.set(token, existingUser.id, 60 * 10);
 
       const subject = "Konga Affiliate - Reset Password Link";
       try {
@@ -110,7 +110,7 @@ export class AuthService {
   async confirmResetPasswordToken(confirmResetPasswordTokenDto: ConfirmResetPasswordTokenDto) {
     const { token } = confirmResetPasswordTokenDto;
 
-    const value = await this.cacheManager.get(token);
+    const value = await this.cacheService.get(token);
 
     if (!value) {
       throw new BadRequestException("Token is not valid");
@@ -122,7 +122,7 @@ export class AuthService {
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const { newPassword, token } = resetPasswordDto;
 
-    const userId = await this.cacheManager.get(token);
+    const userId = await this.cacheService.get(token);
 
     if (!userId) {
       throw new BadRequestException("Token is not valid");
@@ -140,7 +140,7 @@ export class AuthService {
 
     await this.userRepository.save(user);
 
-    await this.cacheManager.del(token);
+    await this.cacheService.delete(token);
 
     return user;
   }

@@ -32,7 +32,7 @@ export class OrdersController {
     return sendSuccess(order, "Order retrieved successfully");
   }
 
-  @UseGuards(JwtGuard, AdminGuard)
+  @UseGuards(AdminGuard)
   @Get("commission-stats")
   async getCommissionStats() {
     const data = await this.ordersService.getCommissionStats();

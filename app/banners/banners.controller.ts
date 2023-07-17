@@ -14,7 +14,7 @@ import { UpdateBannerDto } from "./dto/update-banner.dto";
 export class BannersController {
   constructor(private readonly bannersService: BannersService) {}
 
-  @UseGuards(JwtGuard, AdminGuard)
+  @UseGuards(AdminGuard)
   @Post()
   async createBanner(@Body() createBannerDto: CreateBannerDto) {
     return await this.bannersService.createBanner(createBannerDto);
@@ -38,13 +38,13 @@ export class BannersController {
     return sendSuccess(data);
   }
 
-  @UseGuards(JwtGuard, AdminGuard)
+  @UseGuards(AdminGuard)
   @Put(":id")
   async updateBanner(@Param("id") id: number, @Body() updateBannerDto: UpdateBannerDto) {
     return await this.bannersService.updateBanner(id, updateBannerDto);
   }
 
-  @UseGuards(JwtGuard, AdminGuard)
+  @UseGuards(AdminGuard)
   @Get("all")
   @ApiQuery({ name: "limit", type: "number", required: false })
   @ApiQuery({ name: "page", type: "number", required: false })

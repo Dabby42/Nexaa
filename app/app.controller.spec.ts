@@ -6,13 +6,21 @@ import { getRepositoryToken } from "@nestjs/typeorm";
 import { Clicks } from "./links/entities/click.entity";
 import { Links } from "./links/entities/link.entity";
 import { Ips } from "./links/entities/ip.entity";
+import { CacheService } from "./cache/cache.service";
+import { RabbitmqService } from "./rabbitmq/rabbitmq.service";
 
 describe("AppController", () => {
   let appController: AppController;
   const mockClickRepository = {};
   const mockLinkRepository = {};
   const mockIpRepository = {};
-
+  const mockCacheService = {
+    get: jest.fn().mockImplementation(() => null),
+    set: jest.fn(),
+  };
+  const mockRabbitMqService = {
+    publishClickMessage: jest.fn(),
+  };
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
@@ -30,6 +38,14 @@ describe("AppController", () => {
         {
           provide: getRepositoryToken(Ips),
           useValue: mockIpRepository,
+        },
+        {
+          provide: CacheService,
+          useValue: mockCacheService,
+        },
+        {
+          provide: RabbitmqService,
+          useValue: mockRabbitMqService,
         },
       ],
     }).compile();

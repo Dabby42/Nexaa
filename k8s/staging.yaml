@@ -81,7 +81,7 @@ env:
 
   #BASEURL
   - name: BASE_URL
-    value: "https://stagiing-affiliate-api.konga.com"
+    value: "https://staging-affiliate-api.konga.com"
 
   #JWT
   - name: JWT_SECRET
@@ -146,3 +146,27 @@ env:
     value: "no-reply@konga.com"
   - name: FORGOT_PASSWORD_SENDER_ID
     value: "Konga Affiliate"
+
+  #AMQP
+  - name: AMQP_HOST
+    valueFrom:
+      secretKeyRef:
+        name: konga-secret
+        key: rabbitmq-host
+  - name: AMQP_PORT
+    value: "5672"
+  - name: AMQP_USER
+    value: "recommendation"
+  - name: AMQP_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: konga-secret
+        key: rec-amqp-password
+  - name: AMQP_TIMEOUT
+    value: "1000"
+  - name: AMQP_HEARTBEAT
+    value: "30"
+  - name: AMQP_CLICKED_LINK_QUEUE
+    value: "hera.clicks"
+  - name: AMQP_ORDER_SYNC_QUEUE
+    value: "hera.orders"

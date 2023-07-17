@@ -69,10 +69,10 @@ export const config = {
   },
   amqp: {
     connection: {
-      host: process.env.AMQP_HOST || "127.0.0.1",
-      port: process.env.AMQP_PORT || 5672,
+      hostname: process.env.AMQP_HOST,
+      port: process.env.AMQP_PORT,
       login: process.env.AMQP_USER,
-      user: process.env.AMQP_USER,
+      username: process.env.AMQP_USER,
       password: process.env.AMQP_PASSWORD,
       connectionTimeout: parseInt(process.env.AMQP_TIMEOUT),
       heartbeat: parseInt(process.env.AMQP_HEARTBEAT),
@@ -80,17 +80,11 @@ export const config = {
       vhost: "/",
     },
     consumers: {
-      order_split: {
-        queueName: process.env.AMQP_ORDER_SPLIT_QUEUE,
-        prefetch: process.env.AMQP_ORDER_SPLIT_PREFETCH,
-        exchangeName: process.env.AMQP_ORDER_SPLIT_EXCHANGE,
-        routingKey: process.env.AMQP_ORDER_SPLIT_ROUTING_KEY,
+      order_sync: {
+        queueName: process.env.AMQP_ORDER_SYNC_QUEUE,
       },
       clicked_link: {
         queueName: process.env.AMQP_CLICKED_LINK_QUEUE,
-        prefetch: process.env.AMQP_CLICKED_LINK_PREFETCH,
-        exchangeName: process.env.AMQP_CLICKED_LINK_EXCHANGE,
-        routingKey: process.env.AMQP_CLICKED_LINK_ROUTING_KEY,
       },
     },
   },

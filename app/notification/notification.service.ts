@@ -1,15 +1,15 @@
 import * as OAuth2 from "konga-oauth2";
 import * as provide from "konga-accesstoken-provider";
 import * as Hermes from "konga-hermes";
-import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
-import { Cache } from "cache-manager";
+import { Injectable } from "@nestjs/common";
 import { config } from "../config/config";
+import { CacheService } from "../cache/cache.service";
 
 @Injectable()
 export class NotificationService {
   hermesClient: Hermes;
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {
-    const oauth = new OAuth2(config.oauth.url, config.oauth.client_id, config.oauth.client_secret, cacheManager, config.oauth);
+  constructor(private cacheService: CacheService) {
+    const oauth = new OAuth2(config.oauth.url, config.oauth.client_id, config.oauth.client_secret, cacheService, config.oauth);
     const provider = provide.create(oauth, config.hermes.scope, "hermes");
     this.hermesClient = new Hermes(config.hermes.url, provider);
   }
