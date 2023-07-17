@@ -20,6 +20,7 @@ import { GoogleAuthService } from "./google-auth.service";
 import { Admin } from "../user/entities/admin.entity";
 import { NotificationService } from "../notification/notification.service";
 import { LinksService } from "../links/links.service";
+import { CacheService } from "../cache/cache.service";
 
 describe("AuthController", () => {
   let controller: AuthController;
@@ -61,7 +62,7 @@ describe("AuthController", () => {
     authenticate: jest.fn().mockImplementation(() => userRepositoryMock.email),
   };
 
-  const mockCache: Cache = {
+  const mockCache = {
     get: jest.fn().mockImplementation(() => userRepositoryMock.id),
     set: jest.fn(),
   };
@@ -93,7 +94,7 @@ describe("AuthController", () => {
           useValue: mockGoogleAuthService,
         },
         {
-          provide: CACHE_MANAGER,
+          provide: CacheService,
           useValue: mockCache,
         },
         {

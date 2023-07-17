@@ -9,6 +9,14 @@ services:
       - "6379"
     networks:
       - main_network
+  rabbitmq:
+    container_name: hera-be_rabbitmq
+    image: rabbitmq:3.12.1-management-alpine
+    ports:
+      - "5672"
+      - "15672"
+    networks:
+      - main_network
   database:
     container_name: hera-be_mysql
     image: mysql:5.7

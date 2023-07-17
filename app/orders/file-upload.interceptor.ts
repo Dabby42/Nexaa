@@ -1,8 +1,6 @@
-import { BadRequestException, CallHandler, ExecutionContext, Injectable, InternalServerErrorException, NestInterceptor } from "@nestjs/common";
-import { map, Observable } from "rxjs";
-//import {sendError} from "../utils/helpers/response.helpers";
+import { BadRequestException, CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
+import { Observable } from "rxjs";
 import { FastifyRequest } from "fastify";
-//import {sendError} from "../utils/helpers/response.helpers";
 
 @Injectable()
 export class FileFilterInterceptor implements NestInterceptor {

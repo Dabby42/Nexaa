@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, UseGuards, Request, Put, Delete, Get, Query } from "@nestjs/common";
+import { Controller, Post, Body, UseGuards } from "@nestjs/common";
 import { JwtGuard } from "app/auth/auth.jwt.guard";
 import { AffiliateOrdersService } from "./affiliate_orders.service";
 import { CreateAffiliateOrderDto } from "./dto/create-affiliate_order.dto";
@@ -10,12 +10,12 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 @ApiBearerAuth("jwt")
 @Controller("affiliate")
 export class AffiliateOrderController {
-  constructor(private readonly AffiliateOrdersService: AffiliateOrdersService) {}
+  constructor(private readonly affiliateOrdersService: AffiliateOrdersService) {}
 
   @UseGuards(JwtGuard, AdminGuard)
   @Post()
   async createAffiliateOrder(@Body() createAffiliateOrderDto: CreateAffiliateOrderDto) {
-    await this.AffiliateOrdersService.createAffiliateOrder(createAffiliateOrderDto);
+    await this.affiliateOrdersService.createAffiliateOrder(createAffiliateOrderDto);
     return sendSuccess(null, "Affiliate order created successfully");
   }
 }

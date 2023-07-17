@@ -7,6 +7,7 @@ import { JwtStrategy } from "./auth.jwt.strategy";
 import { UserModule } from "../user/user.module";
 import { GoogleAuthService } from "./google-auth.service";
 import { NotificationModule } from "../notification/notification.module";
+import { CustomCacheModule } from "../cache/cache.module";
 
 @Module({
   controllers: [AuthController],
@@ -18,6 +19,7 @@ import { NotificationModule } from "../notification/notification.module";
     }),
     UserModule,
     NotificationModule,
+    CustomCacheModule,
   ],
 })
 export class AuthModule {}

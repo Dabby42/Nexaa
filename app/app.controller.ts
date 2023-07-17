@@ -14,7 +14,9 @@ export class AppController {
   @Redirect()
   async redirectToUrl(@Param("uuid") uuid: string, @Res() res, @Req() req: Request) {
     const url = await this.appService.redirectToUrl(uuid, req);
-
+    res.header("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.header("Pragma", "no-cache");
+    res.header("Expires", "0");
     return {
       url,
       statusCode: 301,
