@@ -17,6 +17,7 @@ import { RabbitmqModule } from "./rabbitmq/rabbitmq.module";
 import { MagentoModule } from "./magento/magento.module";
 import { ScheduleModule } from "@nestjs/schedule";
 import { CustomCacheModule } from "./cache/cache.module";
+import { StatsModule } from "./stats/stats.module";
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { CustomCacheModule } from "./cache/cache.module";
     MagentoModule,
     AffiliateOrdersModule,
     CustomCacheModule,
+    StatsModule,
   ],
   controllers: [AppController],
   providers: [
