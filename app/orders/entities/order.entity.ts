@@ -2,10 +2,16 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGenerat
 import { User } from "../../user/entities/user.entity";
 
 export enum CommissionPaymentStatusEnum {
-  PAID = 2,
-  PENDING = 1,
-  UNPAID = 0,
+  UNPAID = "unpaid",
+  PAID = "paid",
 }
+
+export enum CommissionStatusEnum {
+  PENDING = "pending",
+  APPROVED = "approved",
+  DECLINED = "declined",
+}
+
 @Entity()
 export class Orders {
   @PrimaryGeneratedColumn()
@@ -36,6 +42,13 @@ export class Orders {
     default: CommissionPaymentStatusEnum.UNPAID,
   })
   public commission_payment_status: string;
+
+  @Column({
+    type: "enum",
+    enum: CommissionStatusEnum,
+    default: CommissionStatusEnum.PENDING,
+  })
+  public commission_status: string;
 
   @Column({
     type: "decimal",
