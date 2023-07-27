@@ -46,20 +46,52 @@ export class OrdersService {
     return await this.orderRepository.find();
   }
 
-  async getCommissionStats() {
-    return await this.orderRepository
-      .createQueryBuilder("order")
-      .select("SUM(order.commission)", "totalCommissions")
-      .addSelect("COUNT(*)", "totalSalesCount")
-      .addSelect("SUM(order.total_amount)", "totalSales")
-      .addSelect("SUM(CASE WHEN order.commission_payment_status='1' THEN order.commission ELSE NULL END )", "pendingCommissions")
-      .addSelect("SUM(CASE WHEN order.commission_payment_status='0' THEN order.commission ELSE NULL END )", "unpaidCommissions")
-      .where("order.status =:orderStatus", { orderStatus: "complete" })
-      .getRawOne();
-  }
-
   async findSingleOrder(id: number) {
     return await this.orderRepository.findOne({ where: { id } });
+  }
+
+  getMonthsFromNowTill9MonthsBack() {
+    const today = new Date();
+    const nineMonthsAgo = new Date();
+    nineMonthsAgo.setMonth(today.getMonth() - 8);
+
+    const months = [];
+    while (nineMonthsAgo <= today) {
+      const year = nineMonthsAgo.getFullYear();
+      const month = nineMonthsAgo.getMonth() + 1; // Add 1 to adjust month range (1 to 12)
+      months.push(`${year}-${month.toString().padStart(2, "0")}`);
+      nineMonthsAgo.setMonth(nineMonthsAgo.getMonth() + 1);
+    }
+
+    return months;
+  }
+
+  async getApprovedCommissions(affiliate_id: number) {
+    const subQuery = await this.orderRepository
+      .createQueryBuilder("order")
+      .select('DATE_FORMAT(order.created_at, "%Y-%m")', "month")
+      .addSelect("SUM(order.commission)", "total_commission")
+      .where("order.affiliate_id = :affiliate_id", { affiliate_id })
+      .andWhere("order.created_at >= DATE_SUB(NOW(), INTERVAL 9 MONTH)")
+      .groupBy("month")
+      .getRawMany();
+    const monthsInRange = this.getMonthsFromNowTill9MonthsBack();
+    const result = monthsInRange.reduce((acc, curr) => {
+      acc[curr] = "0.00";
+      return acc;
+    }, {});
+
+    for (let i = 0; i < subQuery.length; i++) {
+      result[subQuery[i].month] = subQuery[i].total_commission;
+    }
+
+    const customMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    for (const key in result) {
+      result[customMonths[parseInt(key.split("-")[1]) - 1]] = result[key];
+      delete result[key];
+    }
+
+    return result;
   }
 
   async importPaidRecords(file) {

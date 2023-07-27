@@ -6,6 +6,12 @@ import { OrdersService } from "../orders/orders.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { Orders } from "../orders/entities/order.entity";
 import { MagentoRepository } from "../magento/magento.repository";
+import { LinksService } from "../links/links.service";
+import { Links } from "../links/entities/link.entity";
+import { Clicks } from "../links/entities/click.entity";
+import { Ips } from "../links/entities/ip.entity";
+import { CacheService } from "../cache/cache.service";
+import { RabbitmqService } from "../rabbitmq/rabbitmq.service";
 
 describe("StatsController", () => {
   let controller: StatsController;
@@ -21,6 +27,16 @@ describe("StatsController", () => {
     getRawMany: jest.fn().mockResolvedValue([]),
   };
   const mockMagentoRepository = {};
+  const mockLinksRepository = {};
+  const mockClicksRepository = {};
+  const mockIpRepository = {};
+  const mockCacheService = {
+    get: jest.fn().mockImplementation(() => null),
+    set: jest.fn(),
+  };
+  const mockRabbitMqService = {
+    publishClickMessage: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -28,13 +44,34 @@ describe("StatsController", () => {
       providers: [
         StatsService,
         OrdersService,
+        LinksService,
         {
           provide: getRepositoryToken(Orders),
           useValue: mockOrderRepository,
         },
         {
+          provide: getRepositoryToken(Links),
+          useValue: mockLinksRepository,
+        },
+        {
+          provide: getRepositoryToken(Clicks),
+          useValue: mockClicksRepository,
+        },
+        {
+          provide: getRepositoryToken(Ips),
+          useValue: mockIpRepository,
+        },
+        {
           provide: MagentoRepository,
           useValue: mockMagentoRepository,
+        },
+        {
+          provide: CacheService,
+          useValue: mockCacheService,
+        },
+        {
+          provide: RabbitmqService,
+          useValue: mockRabbitMqService,
         },
       ],
     }).compile();

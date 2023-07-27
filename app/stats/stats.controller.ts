@@ -1,9 +1,10 @@
-import { Controller, Get, Query, Req, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, Query, Req, UseGuards } from "@nestjs/common";
 import { StatsService } from "./stats.service";
 import { JwtGuard } from "../auth/auth.jwt.guard";
 import { sendSuccess } from "../utils/helpers/response.helpers";
 import { DateRangeDto } from "./dto/date-range.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { AdminGuard } from "../admin/admin.guard";
 
 @Controller("stats")
 @ApiBearerAuth("jwt")
@@ -30,5 +31,26 @@ export class StatsController {
   async getAffiliateAverageCommissionsByDateRange(@Query() dateRangeDto: DateRangeDto, @Req() req: any) {
     const data = await this.statsService.affiliateAverageCommissionsByDateRange(req.user.id, dateRangeDto.start_date, dateRangeDto.end_date);
     return sendSuccess(data, "Affiliate average commissions data success.");
+  }
+
+  @UseGuards(JwtGuard)
+  @Get("affiliates/clicks-sales-commissions")
+  async getAffiliateClicksSalesAndCommissionsCount(@Req() req: any) {
+    const data = await this.statsService.affiliateClicksSalesAndCommissionsCount(req.user.id);
+    return sendSuccess(data, "Affiliate total clicks, sales, and commissions retrieved successfully.");
+  }
+
+  @UseGuards(AdminGuard)
+  @Get("clicks-sales-commissions")
+  async getClicksSalesAndCommissionsCount(@Param("id") id: number) {
+    const data = await this.statsService.affiliateClicksSalesAndCommissionsCount(id);
+    return sendSuccess(data, "Affiliate total clicks, sales, and commissions retrieved successfully.");
+  }
+
+  @UseGuards(JwtGuard)
+  @Get("affiliates/approved-commissions-by-month")
+  async getAffiliateApprovedCommissions(@Req() req: any) {
+    const data = await this.statsService.affiliateApprovedCommissions(req.user.id);
+    return sendSuccess(data, "Affiliate approved commissions retrieved successfully");
   }
 }
