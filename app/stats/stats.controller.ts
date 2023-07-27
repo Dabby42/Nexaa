@@ -31,4 +31,18 @@ export class StatsController {
     const data = await this.statsService.affiliateAverageCommissionsByDateRange(req.user.id, dateRangeDto.start_date, dateRangeDto.end_date);
     return sendSuccess(data, "Affiliate average commissions data success.");
   }
+
+  @UseGuards(JwtGuard)
+  @Get("affiliates/clicks-sales-commissions")
+  async getClicksSalesAndCommissionsCount(@Req() req: any) {
+    const data = await this.statsService.getClicksSalesAndCommissionsCount(req.user.id);
+    return sendSuccess(data, "Affiliate total clicks, sales, and commissions retrieved successfully.");
+  }
+
+  @UseGuards(JwtGuard)
+  @Get("affiliates/approved-commissions-by-month")
+  async getApprovedCommissions(@Req() req: any) {
+    const data = await this.statsService.getApprovedCommissions(req.user.id);
+    return sendSuccess(data, "Affiliate approved commissions retrieved successfully");
+  }
 }
