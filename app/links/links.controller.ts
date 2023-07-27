@@ -30,11 +30,4 @@ export class LinksController {
     const result = await this.linksService.getClicksByDays(req, days);
     return sendSuccess(result, "Clicks retrieved successfully");
   }
-
-  @UseGuards(JwtGuard)
-  @Get("total-clicks-count")
-  async getTotalClicksCount(@Req() req) {
-    const result = await this.linksService.getTotalClicksCount(req.user.id);
-    return sendSuccess(result, "Total clicks count retrieved successfully.");
-  }
 }
