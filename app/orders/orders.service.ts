@@ -1,4 +1,4 @@
-import { Injectable, Logger, InternalServerErrorException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Orders } from "./entities/order.entity";
@@ -97,5 +97,104 @@ export class OrdersService {
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  async totalSalesStats(affiliate_id?: number, start_date?: string, end_date?: string) {
+    const query = this.orderRepository
+      .createQueryBuilder("order")
+      .select("IFNULL(SUM(order.total_amount), 0)", "total")
+      .addSelect("IFNULL(SUM(CASE WHEN order.commission_status = 'pending' THEN order.total_amount ELSE 0 END), 0)", "pending")
+      .addSelect("IFNULL(SUM(CASE WHEN order.commission_status = 'declined' THEN order.total_amount ELSE 0 END), 0)", "declined")
+      .addSelect("IFNULL(SUM(CASE WHEN order.commission_status = 'approved' THEN order.total_amount ELSE 0 END), 0)", "approved");
+
+    if (affiliate_id) {
+      query.where("order.affiliate_id = :affiliate_id", { affiliate_id });
+    }
+
+    if (start_date && end_date) {
+      query.andWhere("DATE(order.created_at) >= :start_date AND DATE(order.created_at) <= :end_date", {
+        start_date,
+        end_date,
+      });
+    }
+
+    return query.getRawOne();
+  }
+
+  async totalSalesCountStats(affiliate_id?: number, start_date?: string, end_date?: string) {
+    const query = this.orderRepository
+      .createQueryBuilder("order")
+      .select("IFNULL(COUNT(*), 0)", "total")
+      .addSelect("IFNULL(COUNT(CASE WHEN order.commission_status = 'pending' THEN 1 ELSE NULL END), 0)", "pending")
+      .addSelect("IFNULL(COUNT(CASE WHEN order.commission_status = 'declined' THEN 1 ELSE NULL END), 0)", "declined")
+      .addSelect("IFNULL(COUNT(CASE WHEN order.commission_status = 'approved' THEN 1 ELSE NULL END), 0)", "approved");
+
+    if (affiliate_id) {
+      query.where("order.affiliate_id = :affiliate_id", { affiliate_id });
+    }
+
+    if (start_date && end_date) {
+      query.andWhere("DATE(order.created_at) >= :start_date AND DATE(order.created_at) <= :end_date", {
+        start_date,
+        end_date,
+      });
+    }
+
+    return query.getRawOne();
+  }
+
+  async commissionsStats(affiliate_id?: number, start_date?: string, end_date?: string) {
+    const query = this.orderRepository
+      .createQueryBuilder("order")
+      .select("IFNULL(SUM(order.commission), 0)", "total")
+      .addSelect("IFNULL(SUM(CASE WHEN order.commission_status = 'pending' THEN order.commission ELSE 0 END), 0)", "pending")
+      .addSelect("IFNULL(SUM(CASE WHEN order.commission_status = 'declined' THEN order.commission ELSE 0 END), 0)", "declined")
+      .addSelect("IFNULL(SUM(CASE WHEN order.commission_status = 'approved' AND order.commission_payment_status = 'paid' THEN order.commission ELSE 0 END), 0)", "approved_paid")
+      .addSelect(
+        "IFNULL(SUM(CASE WHEN order.commission_status = 'approved' AND order.commission_payment_status = 'unpaid' THEN order.commission ELSE 0 END), 0)",
+        "approved_unpaid"
+      );
+
+    if (affiliate_id) {
+      query.where("order.affiliate_id = :affiliate_id", { affiliate_id });
+    }
+
+    if (start_date && end_date) {
+      query.andWhere("DATE(order.created_at) >= :start_date AND DATE(order.created_at) <= :end_date", {
+        start_date,
+        end_date,
+      });
+    }
+
+    return query.getRawOne();
+  }
+
+  async affiliateAverageCommissions(affiliate_id: number, start_date: string, end_date: string) {
+    const query = this.orderRepository
+      .createQueryBuilder("order")
+      .select("order.commission_status", "status")
+      .addSelect("SUM(order.commission)", "total_commission")
+      .addSelect("COUNT(order.id)", "order_count")
+      .where("order.affiliate_id = :affiliate_id", { affiliate_id });
+
+    if (start_date && end_date) {
+      query.andWhere("DATE(order.created_at) >= :start_date AND DATE(order.created_at) <= :end_date", {
+        start_date,
+        end_date,
+      });
+    }
+
+    const result = await query.groupBy("order.commission_status").getRawMany();
+    // Calculate the average commissions for each status
+    const total = result.reduce((acc, val) => acc + parseFloat(val.total_commission) / parseFloat(val.order_count), 0);
+    const averages = { pending: 0.0, approved: 0.0, declined: 0.0, total };
+    result.forEach((row) => {
+      const status = row.status;
+      const totalCommission = parseFloat(row.total_commission);
+      const orderCount = parseInt(row.order_count);
+      averages[status] = orderCount > 0 ? totalCommission / orderCount : 0;
+    });
+
+    return averages;
   }
 }

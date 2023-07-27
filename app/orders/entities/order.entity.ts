@@ -33,7 +33,7 @@ export class Orders {
   @Column()
   public category: string;
 
-  @Column()
+  @Column({ nullable: true })
   public return_id: string;
 
   @Column({
