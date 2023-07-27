@@ -99,14 +99,17 @@ export class OrdersService {
     }
   }
 
-  async affiliateTotalSales(affiliate_id: number, start_date: string, end_date: string) {
+  async totalSalesStats(affiliate_id?: number, start_date?: string, end_date?: string) {
     const query = this.orderRepository
       .createQueryBuilder("order")
       .select("IFNULL(SUM(order.total_amount), 0)", "total")
       .addSelect("IFNULL(SUM(CASE WHEN order.commission_status = 'pending' THEN order.total_amount ELSE 0 END), 0)", "pending")
       .addSelect("IFNULL(SUM(CASE WHEN order.commission_status = 'declined' THEN order.total_amount ELSE 0 END), 0)", "declined")
-      .addSelect("IFNULL(SUM(CASE WHEN order.commission_status = 'approved' THEN order.total_amount ELSE 0 END), 0)", "approved")
-      .where("order.affiliate_id = :affiliate_id", { affiliate_id });
+      .addSelect("IFNULL(SUM(CASE WHEN order.commission_status = 'approved' THEN order.total_amount ELSE 0 END), 0)", "approved");
+
+    if (affiliate_id) {
+      query.where("order.affiliate_id = :affiliate_id", { affiliate_id });
+    }
 
     if (start_date && end_date) {
       query.andWhere("DATE(order.created_at) >= :start_date AND DATE(order.created_at) <= :end_date", {
@@ -118,7 +121,29 @@ export class OrdersService {
     return query.getRawOne();
   }
 
-  async affiliateCommissions(affiliate_id: number, start_date: string, end_date: string) {
+  async totalSalesCountStats(affiliate_id?: number, start_date?: string, end_date?: string) {
+    const query = this.orderRepository
+      .createQueryBuilder("order")
+      .select("IFNULL(COUNT(*), 0)", "total")
+      .addSelect("IFNULL(COUNT(CASE WHEN order.commission_status = 'pending' THEN 1 ELSE NULL END), 0)", "pending")
+      .addSelect("IFNULL(COUNT(CASE WHEN order.commission_status = 'declined' THEN 1 ELSE NULL END), 0)", "declined")
+      .addSelect("IFNULL(COUNT(CASE WHEN order.commission_status = 'approved' THEN 1 ELSE NULL END), 0)", "approved");
+
+    if (affiliate_id) {
+      query.where("order.affiliate_id = :affiliate_id", { affiliate_id });
+    }
+
+    if (start_date && end_date) {
+      query.andWhere("DATE(order.created_at) >= :start_date AND DATE(order.created_at) <= :end_date", {
+        start_date,
+        end_date,
+      });
+    }
+
+    return query.getRawOne();
+  }
+
+  async commissionsStats(affiliate_id?: number, start_date?: string, end_date?: string) {
     const query = this.orderRepository
       .createQueryBuilder("order")
       .select("IFNULL(SUM(order.commission), 0)", "total")
@@ -128,8 +153,11 @@ export class OrdersService {
       .addSelect(
         "IFNULL(SUM(CASE WHEN order.commission_status = 'approved' AND order.commission_payment_status = 'unpaid' THEN order.commission ELSE 0 END), 0)",
         "approved_unpaid"
-      )
-      .where("order.affiliate_id = :affiliate_id", { affiliate_id });
+      );
+
+    if (affiliate_id) {
+      query.where("order.affiliate_id = :affiliate_id", { affiliate_id });
+    }
 
     if (start_date && end_date) {
       query.andWhere("DATE(order.created_at) >= :start_date AND DATE(order.created_at) <= :end_date", {
@@ -157,7 +185,6 @@ export class OrdersService {
     }
 
     const result = await query.groupBy("order.commission_status").getRawMany();
-    console.log(result);
     // Calculate the average commissions for each status
     const total = result.reduce((acc, val) => acc + parseFloat(val.total_commission) / parseFloat(val.order_count), 0);
     const averages = { pending: 0.0, approved: 0.0, declined: 0.0, total };
