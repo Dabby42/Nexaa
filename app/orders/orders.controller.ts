@@ -34,8 +34,8 @@ export class OrdersController {
 
   @UseGuards(AdminGuard)
   @Get("commission-stats")
-  async getCommissionStats() {
-    const data = await this.ordersService.getCommissionStats();
+  async getCommissionStats(@Param("id") id: string) {
+    const data = await this.ordersService.commissionsStats(+id);
     return sendSuccess(data, "Commission statistics retrieved successfully");
   }
 

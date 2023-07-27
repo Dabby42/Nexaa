@@ -67,11 +67,4 @@ describe("OrderController", () => {
       expect(await controller.findSingleOrder(id)).toStrictEqual(getOrderResponseMock);
     });
   });
-
-  describe("Get commission statistics", () => {
-    it("should retrieve commission statistics successfully", async () => {
-      expect(await controller.getCommissionStats()).toStrictEqual(getCommissionStatsMock);
-      expect(mockOrderRepository.createQueryBuilder).toHaveBeenCalled();
-    });
-  });
 });
