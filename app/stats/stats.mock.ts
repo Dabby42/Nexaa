@@ -35,3 +35,47 @@ export const affiliateAverageCommissionsDataResponse: any = {
     total: 72.39,
   },
 };
+
+export const affiliateClicksRawOnceMockResponse: any = {
+  totalClicks: "0",
+  uniqueClicks: "0",
+};
+
+export const affiliateClicksSalesAndCommissionsDataResponse: any = {
+  status: "success",
+  message: "Affiliate total clicks, sales, and commissions retrieved successfully.",
+  data: {
+    sales: {
+      pending: 0,
+      declined: 0,
+      approved: 0,
+    },
+    clicks: {
+      total: "0",
+      repeated: "0",
+      unique: "0",
+    },
+    commissions: {
+      pending: "66000.00",
+      declined: "0.00",
+      approved_paid: "0.00",
+      approved_unpaid: "0.00",
+    },
+  },
+};
+
+export const affiliateApprovedCommissionDataResponse: any = {
+  status: "success",
+  message: "Affiliate approved commissions retrieved successfully",
+  data: {
+    Nov: "0.00",
+    Dec: "0.00",
+    Jan: "0.00",
+    Feb: "0.00",
+    Mar: "0.00",
+    Apr: "0.00",
+    May: "0.00",
+    Jun: "0.00",
+    Jul: "0.00",
+  },
+};
