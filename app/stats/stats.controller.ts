@@ -41,7 +41,7 @@ export class StatsController {
   }
 
   @UseGuards(AdminGuard)
-  @Get("clicks-sales-commissions")
+  @Get("clicks-sales-commissions/:id")
   async getClicksSalesAndCommissionsCount(@Param("id") id: number) {
     const data = await this.statsService.affiliateClicksSalesAndCommissionsCount(id);
     return sendSuccess(data, "Affiliate total clicks, sales, and commissions retrieved successfully.");
