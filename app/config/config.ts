@@ -56,17 +56,6 @@ export const config = {
     secret: process.env.JWT_SECRET,
     expiry: process.env.JWT_EXPIRY,
   },
-  oauth: {
-    client_id: process.env.OAUTH_CLIENT_ID,
-    client_secret: process.env.OAUTH_CLIENT_SECRET,
-    cache_key: appName,
-    url: process.env.OAUTH_URL,
-    timeout: parseInt(process.env.OAUTH_REQUEST_TIMEOUT),
-    retry: {
-      count: parseInt(process.env.OAUTH_RETRY_COUNT),
-      delay: parseInt(process.env.OAUTH_RETRY_DELAY),
-    },
-  },
   amqp: {
     connection: {
       hostname: process.env.AMQP_HOST,
@@ -90,7 +79,7 @@ export const config = {
   },
   hermes: {
     url: process.env.HERMES_API_URL,
-    scope: process.env.HERMES_SCOPE,
+    use_queue: process.env.HERMES_USE_QUEUE === "true",
     generic: {
       sender: process.env.GENERIC_EMAIL_SENDER,
       sender_id: process.env.GENERIC_EMAIL_SENDER_ID,

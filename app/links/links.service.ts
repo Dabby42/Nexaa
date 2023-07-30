@@ -39,7 +39,7 @@ export class LinksService {
       await this.linkRepository.save(newLinkEntityInstance);
 
       return {
-        custom_url: `${config.baseUrl}/${uuid}`,
+        custom_url: `${config.baseUrl}/v1/${uuid}`,
       };
     } catch (e) {
       throw new UnprocessableEntityException("An unknown error occurred");
