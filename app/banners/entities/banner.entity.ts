@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, AfterLoad } from "typeorm";
 
 export enum BannerStatusEnum {
   ACTIVE = 1,
@@ -18,11 +18,23 @@ export class Banner {
   @Column()
   banner_name: string;
 
+  @Column({ nullable: true })
+  banner_description: string;
+
   @Column({ type: "text" })
   banner_images_and_sizes: string;
 
   @Column()
   banner_link: string;
+
+  @Column({ nullable: true })
+  banner_code: string;
+
+  @Column({ nullable: true })
+  campaign_start_date: Date;
+
+  @Column({ nullable: true })
+  campaign_end_date: Date;
 
   @Column({ nullable: true })
   tracking_tag: string;
@@ -42,4 +54,9 @@ export class Banner {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @AfterLoad()
+  convertBannerImageSizesToArray() {
+    this.banner_images_and_sizes = JSON.parse(this.banner_images_and_sizes);
+  }
 }

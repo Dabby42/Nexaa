@@ -14,7 +14,6 @@ export class CategoriesService {
       const category = this.categoryRepository.create(createCategoryDto);
       await this.categoryRepository.insert(category);
     } catch (error) {
-      console.log(error);
       throw new UnprocessableEntityException("An unknown error occurred");
     }
   }

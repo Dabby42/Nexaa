@@ -28,7 +28,7 @@ export class UserController {
     return await this.userService.updateBankDetails(req.user.id, updateBankDetailsDto);
   }
 
-  @UseGuards(JwtGuard, AdminGuard)
+  @UseGuards(AdminGuard)
   @Get("affiliates")
   @ApiQuery({ name: "limit", type: "number", required: false })
   @ApiQuery({ name: "page", type: "number", required: false })
@@ -37,7 +37,7 @@ export class UserController {
     return sendSuccess(data, "Affiliates retrieved successfully");
   }
 
-  @UseGuards(JwtGuard, AdminGuard)
+  @UseGuards(AdminGuard)
   @Get("affiliates/search")
   @ApiQuery({ name: "limit", type: "number", required: false })
   @ApiQuery({ name: "page", type: "number", required: false })
@@ -48,7 +48,7 @@ export class UserController {
     return sendSuccess(data, "Affiliates retrieved successfully");
   }
 
-  @UseGuards(JwtGuard, AdminGuard)
+  @UseGuards(AdminGuard)
   @Get("users-stats")
   async fetchUserStats() {
     const data = await this.userService.fetchUserStats();

@@ -4,6 +4,7 @@ import { CreateCustomUrlDto } from "./dto/create-custom-url.dto";
 import { sendSuccess } from "../utils/helpers/response.helpers";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { JwtGuard } from "../auth/auth.jwt.guard";
+import { AdminGuard } from "../admin/admin.guard";
 
 @ApiBearerAuth("jwt")
 @ApiTags("Links")
@@ -28,12 +29,5 @@ export class LinksController {
   async getClicksByDays(@Req() req: Request, @Query("days") days = 7) {
     const result = await this.linksService.getClicksByDays(req, days);
     return sendSuccess(result, "Clicks retrieved successfully");
-  }
-
-  @UseGuards(JwtGuard)
-  @Get("total-clicks-count")
-  async getTotalClicksCount(@Req() req) {
-    const result = await this.linksService.getTotalClicksCount(req.user.id);
-    return sendSuccess(result, "Total clicks count retrieved successfully.");
   }
 }

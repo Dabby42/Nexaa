@@ -25,7 +25,7 @@ export class AuthController {
     return sendSuccess(null, "Account created successfully");
   }
 
-  @UseGuards(JwtGuard, AdminGuard)
+  @UseGuards(AdminGuard)
   @Post("admin/register")
   async registerAdmin(@Body() createAdminDto: CreateAdminDto) {
     await this.userService.createAdmin(createAdminDto);

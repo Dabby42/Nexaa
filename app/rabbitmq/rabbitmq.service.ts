@@ -1,47 +1,61 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { forwardRef, Inject, Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { OrdersService } from "../orders/orders.service";
-import consumer from "konga-amqp-consumer";
 import { config } from "../config/config";
+import { Connection } from "amqplib";
+import { LinksService } from "../links/links.service";
 
 @Injectable()
-export class RabbitmqService {
+export class RabbitmqService implements OnModuleInit {
   private readonly logger = new Logger("RabbitmqService");
-  private readonly additionalConfig;
-  private readonly messageVersion;
-  private readonly queue: any;
-  private readonly binding: any;
-  private readonly schema: any;
-  private consumer: any;
 
-  constructor(private ordersService: OrdersService) {
-    this.consumer = consumer;
-    this.queue = {
-      name: config.amqp.consumers.order_split.queueName,
-      prefetch: config.amqp.consumers.order_split.prefetch,
-    };
+  constructor(
+    private ordersService: OrdersService,
+    @Inject(forwardRef(() => LinksService)) private linkService: LinksService,
+    @Inject("RABBITMQ_CONNECTION") private readonly connection: Connection
+  ) {}
 
-    this.binding = {
-      exchangeName: config.amqp.consumers.order_split.exchangeName,
-      routingKey: config.amqp.consumers.order_split.routingKey,
-    };
-
-    this.schema = {};
-
-    this.additionalConfig = {
-      logger: this.logger,
-    };
-
-    this.messageVersion = "1.0.0";
+  onModuleInit(): any {
+    this.consumeClickedLinkMessage();
+    this.consumeOrderMessage();
   }
 
-  async consumeMessage() {
-    const handler = async (message, possibleRedelivery, messageId, callback) => {
-      this.logger.log("Handling Split Customer Order for messageId: %s", messageId);
-      await this.ordersService.createOrder(message);
-      callback();
-    };
+  async consumeOrderMessage() {
+    if (this.connection) {
+      const channel = await this.connection.createChannel();
+      await channel.assertQueue(config.amqp.consumers.order_sync.queueName);
+      const handler = async (msg) => {
+        const message = JSON.parse(msg.content.toString());
+        this.logger.debug("Handling Split Customer Order for message : " + JSON.stringify(message));
+        await this.ordersService.createOrder(message);
+        channel.ack(msg);
+        this.logger.debug("Done handling Split Customer Order for message : " + JSON.stringify(message));
+      };
+      channel.consume(config.amqp.consumers.order_sync.queueName, handler);
+    }
+  }
 
-    const consumer = this.consumer.create(config.amqp.connection, this.queue, this.binding, this.messageVersion, handler, this.schema, this.additionalConfig);
-    consumer.start();
+  async publishClickMessage(message) {
+    try {
+      const channel = await this.connection.createChannel();
+      channel.sendToQueue(config.amqp.consumers.clicked_link.queueName, Buffer.from(JSON.stringify(message)));
+    } catch (err) {
+      this.logger.error("Unable to publish click message : " + JSON.stringify(message) + " with error " + err.message);
+    }
+  }
+
+  async consumeClickedLinkMessage() {
+    if (this.connection) {
+      const channel = await this.connection.createChannel();
+      await channel.assertQueue(config.amqp.consumers.clicked_link.queueName);
+      const handler = async (msg) => {
+        const message = JSON.parse(msg.content.toString());
+        this.logger.debug("Handling clicked link with message: " + JSON.stringify(message));
+        await this.linkService.registerClick(message);
+        channel.ack(msg);
+        this.logger.debug("Done handling clicked link with message: " + JSON.stringify(message));
+      };
+
+      channel.consume(config.amqp.consumers.clicked_link.queueName, handler);
+    }
   }
 }

@@ -8,20 +8,30 @@ import { randomUUID } from "crypto";
 import { config } from "../config/config";
 import { Clicks } from "./entities/click.entity";
 import { Ips } from "./entities/ip.entity";
+import { RabbitmqService } from "../rabbitmq/rabbitmq.service";
+import { CacheService } from "../cache/cache.service";
 
 @Injectable()
 export class LinksService {
   constructor(
     @InjectRepository(Links) private linkRepository: Repository<Links>,
     @InjectRepository(Clicks) private clickRepository: Repository<Clicks>,
-    @InjectRepository(Ips) private ipRepository: Repository<Ips>
+    @InjectRepository(Ips) private ipRepository: Repository<Ips>,
+    private cacheService: CacheService,
+    private rabbitMQService: RabbitmqService
   ) {}
 
   async generateCustomUrl(createCustomUrlDto: CreateCustomUrlDto, req) {
     const { redirect_url, is_default = false } = createCustomUrlDto;
     const userId: number = req.user.id;
     const uuid = randomUUID();
-    const newLink: DeepPartial<Links> = { redirect_url: redirect_url + `?k_id=${req.user.username}`, user_id: { id: userId }, k_id: uuid, is_default };
+    const existingLink = await this.linkRepository.findOne({ where: { redirect_url, user_id: { id: userId } } });
+    if (existingLink) {
+      return {
+        custom_url: `${config.baseUrl}/v1/${existingLink.k_id}`,
+      };
+    }
+    const newLink: DeepPartial<Links> = { redirect_url, user_id: { id: userId }, k_id: uuid, is_default };
 
     const newLinkEntityInstance = this.linkRepository.create(newLink);
 
@@ -29,7 +39,7 @@ export class LinksService {
       await this.linkRepository.save(newLinkEntityInstance);
 
       return {
-        custom_url: `${config.baseUrl}/${uuid}`,
+        custom_url: `${config.baseUrl}/v1/${uuid}`,
       };
     } catch (e) {
       throw new UnprocessableEntityException("An unknown error occurred");
@@ -37,12 +47,26 @@ export class LinksService {
   }
 
   async recordClicks(k_id: string, req) {
-    const foundLinkModel = await this.linkRepository.findOne({ where: { k_id } });
-    if (!foundLinkModel) {
-      throw new BadRequestException();
-    }
     const ipAddress = req.ip || req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-    const findOptions: FindOneOptions<Ips> = { relations: ["link_id"], where: { ip_address: ipAddress, link_id: { id: foundLinkModel.id } } };
+    const cacheKey = "link_" + k_id;
+    let data = await this.cacheService.get(cacheKey);
+    if (!data) {
+      const foundLinkModel = await this.linkRepository.findOne({ where: { k_id }, relations: ["user_id"] });
+      if (!foundLinkModel) {
+        throw new BadRequestException();
+      }
+      data = { id: foundLinkModel.id, username: foundLinkModel.user_id.username, redirect_url: foundLinkModel.redirect_url };
+      await this.cacheService.set(cacheKey, data, 60 * 60);
+    }
+
+    const publishData = { link_id: data.id, ip_address: ipAddress };
+    this.rabbitMQService.publishClickMessage(publishData);
+    return data.redirect_url + "?k_id=" + data.username;
+  }
+
+  async registerClick(message) {
+    const ipAddress = message.ip_address;
+    const findOptions: FindOneOptions<Ips> = { relations: ["link_id"], where: { ip_address: ipAddress, link_id: { id: message.link_id } } };
     const foundIpAddress = await this.ipRepository.findOne(findOptions);
 
     if (foundIpAddress) {
@@ -64,29 +88,27 @@ export class LinksService {
         );
       } else {
         const newClickDetails = {
-          link_id: { id: foundLinkModel.id },
+          link_id: { id: message.link_id },
           unique_count: 1,
           count: 1,
         };
         const newClickInstance = this.clickRepository.create(newClickDetails);
         await this.clickRepository.insert(newClickInstance);
       }
-
-      return foundLinkModel.redirect_url;
     } else {
       const ipDetails: DeepPartial<Ips> = {
-        link_id: { id: foundLinkModel.id },
+        link_id: { id: message.link_id },
         ip_address: ipAddress,
       };
 
       const newIpModel = this.ipRepository.create(ipDetails);
       await this.ipRepository.save(newIpModel);
 
-      const click = await this.clickRepository.findOne({ where: { link_id: { id: foundLinkModel.id } } });
+      const click = await this.clickRepository.findOne({ where: { link_id: { id: message.link_id } } });
 
       if (click) {
         await this.clickRepository.update(
-          { link_id: { id: foundLinkModel.id } },
+          { link_id: { id: message.link_id } },
           {
             unique_count: click.unique_count + 1,
             count: click.count + 1,
@@ -94,14 +116,13 @@ export class LinksService {
         );
       } else {
         const newClickDetails = {
-          link_id: { id: foundLinkModel.id },
+          link_id: { id: message.link_id },
           unique_count: 1,
           count: 1,
         };
         const newClickModel = this.clickRepository.create(newClickDetails);
         await this.clickRepository.save(newClickModel);
       }
-      return foundLinkModel.redirect_url;
     }
   }
 
@@ -128,5 +149,33 @@ export class LinksService {
         uniqueClicksCount: "0",
       };
     return result;
+  }
+
+  async getTotalClicksForCampaign(campaign_id: number, affiliate_id: number, start_date: string, end_date: string) {
+    const query = await this.clickRepository
+      .createQueryBuilder("click")
+      .leftJoin("click.link_id", "link")
+      .select("IFNULL(SUM(click.count), 0)", "clicksCount")
+      .addSelect("IFNULL(SUM(click.unique_count), 0)", "uniqueClicksCount")
+      .addSelect("IFNULL(SUM(click.count) - SUM(click.unique_count), 0)", "repeatedClicksCount");
+
+    if (campaign_id) {
+      query.where("link.banner_id = :campaign_id", { campaign_id });
+    } else {
+      query.where("link.banner_id IS NOT NULL");
+    }
+
+    if (affiliate_id) {
+      query.andWhere("link.user_id = :affiliate_id", { affiliate_id });
+    }
+
+    if (start_date && end_date) {
+      query.andWhere("DATE(click.created_at) >= :start_date AND DATE(click.created_at) <= :end_date", {
+        start_date,
+        end_date,
+      });
+    }
+
+    return query.getRawOne();
   }
 }

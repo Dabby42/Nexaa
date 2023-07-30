@@ -10,17 +10,11 @@ RUN mkdir /src
 WORKDIR /src
 COPY . /src
 
-# Tell npm to use our registry
-RUN yarn config set registry http://npm.konga.com:4873
-
 # Install node dependencies
 RUN yarn
 
 #add in pm2 to keep app running
-RUN yarn global add pm2@4.4.1 -y --ignore-engines
-
-RUN yarn global add typeorm @nestjs/cli -y --ignore-engines
-
+RUN yarn global add pm2 typeorm @nestjs/cli
 
 RUN yarn build
 
@@ -32,4 +26,4 @@ VOLUME ["/src", "/var/log/applications/hera-be"]
 EXPOSE  8000
 EXPOSE  5858
 
-CMD ["pm2-docker", "pm2.json"]
+CMD ["pm2-runtime", "pm2.json"]

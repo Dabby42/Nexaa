@@ -56,23 +56,12 @@ export const config = {
     secret: process.env.JWT_SECRET,
     expiry: process.env.JWT_EXPIRY,
   },
-  oauth: {
-    client_id: process.env.OAUTH_CLIENT_ID,
-    client_secret: process.env.OAUTH_CLIENT_SECRET,
-    cache_key: appName,
-    url: process.env.OAUTH_URL,
-    timeout: parseInt(process.env.OAUTH_REQUEST_TIMEOUT),
-    retry: {
-      count: parseInt(process.env.OAUTH_RETRY_COUNT),
-      delay: parseInt(process.env.OAUTH_RETRY_DELAY),
-    },
-  },
   amqp: {
     connection: {
-      host: process.env.AMQP_HOST || "127.0.0.1",
-      port: process.env.AMQP_PORT || 5672,
+      hostname: process.env.AMQP_HOST,
+      port: process.env.AMQP_PORT,
       login: process.env.AMQP_USER,
-      user: process.env.AMQP_USER,
+      username: process.env.AMQP_USER,
       password: process.env.AMQP_PASSWORD,
       connectionTimeout: parseInt(process.env.AMQP_TIMEOUT),
       heartbeat: parseInt(process.env.AMQP_HEARTBEAT),
@@ -80,17 +69,17 @@ export const config = {
       vhost: "/",
     },
     consumers: {
-      order_split: {
-        queueName: process.env.AMQP_ORDER_SPLIT_QUEUE,
-        prefetch: process.env.AMQP_ORDER_SPLIT_PREFETCH,
-        exchangeName: process.env.AMQP_ORDER_SPLIT_EXCHANGE,
-        routingKey: process.env.AMQP_ORDER_SPLIT_ROUTING_KEY,
+      order_sync: {
+        queueName: process.env.AMQP_ORDER_SYNC_QUEUE,
+      },
+      clicked_link: {
+        queueName: process.env.AMQP_CLICKED_LINK_QUEUE,
       },
     },
   },
   hermes: {
     url: process.env.HERMES_API_URL,
-    scope: process.env.HERMES_SCOPE,
+    use_queue: process.env.HERMES_USE_QUEUE === "true",
     generic: {
       sender: process.env.GENERIC_EMAIL_SENDER,
       sender_id: process.env.GENERIC_EMAIL_SENDER_ID,

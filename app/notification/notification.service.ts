@@ -1,21 +1,15 @@
-import * as OAuth2 from "konga-oauth2";
-import * as provide from "konga-accesstoken-provider";
-import * as Hermes from "konga-hermes";
-import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
-import { Cache } from "cache-manager";
+import { Injectable } from "@nestjs/common";
 import { config } from "../config/config";
+import { HttpService } from "@nestjs/axios";
+import { AxiosError } from "axios";
+import { catchError, firstValueFrom } from "rxjs";
 
 @Injectable()
 export class NotificationService {
-  hermesClient: Hermes;
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {
-    const oauth = new OAuth2(config.oauth.url, config.oauth.client_id, config.oauth.client_secret, cacheManager, config.oauth);
-    const provider = provide.create(oauth, config.hermes.scope, "hermes");
-    this.hermesClient = new Hermes(config.hermes.url, provider);
-  }
+  constructor(private readonly httpService: HttpService) {}
 
   async send(medium: string, template_name: string, recipient: string, subject: string, sender: string, sender_id: string, params: any) {
-    const data = {
+    const formData = {
       medium,
       name: template_name,
       recipient,
@@ -24,26 +18,15 @@ export class NotificationService {
       sender_id,
       params,
     };
-
-    return new Promise((resolve, reject) => {
-      this.hermesClient.sendNotification(data, (err) => {
-        /**
-         * Hermes client only returns data when there is an error while trying to send the notification.
-         * If the operation was successful, it does not return anything.
-         * The data return is just a string about the error, so it does not provide enough context to
-         * categorize the errors properly.
-         */
-        if (!err) {
-          resolve(true);
-        } else {
-          console.log(err);
-          if (/TemplateValidationError/.test(err)) {
-            reject(new Error("Unable to send notification due to invalid template."));
-          }
-
-          reject(new Error("Unable to send notification."));
-        }
-      });
-    });
+    let url = config.hermes.url;
+    if (!config.hermes.use_queue) url += "?no_queue=true";
+    const { data } = await firstValueFrom(
+      this.httpService.post(url, formData).pipe(
+        catchError((error: AxiosError) => {
+          throw error.response.data;
+        })
+      )
+    );
+    return data;
   }
 }

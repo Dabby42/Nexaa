@@ -1,9 +1,6 @@
-import { Module, CacheModule } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import type { ClientOpts } from "redis";
-import * as redisStore from "cache-manager-redis-store";
-import { config } from "app/config/config";
 import { UserModule } from "./user/user.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { dataSourceOptions } from "./db/data-source";
@@ -19,18 +16,11 @@ import { AffiliateOrdersModule } from "./affiliate_orders/affiliate_orders.modul
 import { RabbitmqModule } from "./rabbitmq/rabbitmq.module";
 import { MagentoModule } from "./magento/magento.module";
 import { ScheduleModule } from "@nestjs/schedule";
+import { CustomCacheModule } from "./cache/cache.module";
+import { StatsModule } from "./stats/stats.module";
 
 @Module({
   imports: [
-    CacheModule.register<ClientOpts>({
-      store: redisStore,
-      host: config.redis.host,
-      port: config.redis.port,
-      database: config.redis.db,
-      ttl: 172800,
-      max: 300000,
-      isGlobal: true,
-    }),
     TypeOrmModule.forRoot(dataSourceOptions),
     ScheduleModule.forRoot(),
     UserModule,
@@ -45,6 +35,8 @@ import { ScheduleModule } from "@nestjs/schedule";
     RabbitmqModule,
     MagentoModule,
     AffiliateOrdersModule,
+    CustomCacheModule,
+    StatsModule,
   ],
   controllers: [AppController],
   providers: [

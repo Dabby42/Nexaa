@@ -79,7 +79,7 @@ export class UserService {
       order: { created_at: "DESC" },
       skip: (page - 1) * limit,
       take: limit,
-      select: ["first_name", "last_name", "username", "verified_at", "created_at", "phone_number", "status"],
+      select: ["id", "first_name", "last_name", "username", "verified_at", "created_at", "phone_number", "status"],
     });
 
     const pages = Math.ceil(count / limit);
@@ -98,7 +98,7 @@ export class UserService {
       order: { created_at: "DESC" },
       skip: (+page - 1) * +limit,
       take: +limit,
-      select: ["first_name", "last_name", "username", "verified_at", "created_at", "phone_number", "status"],
+      select: ["id", "first_name", "last_name", "username", "verified_at", "created_at", "phone_number", "status"],
     };
 
     if (q) {
