@@ -7,6 +7,7 @@ import { Cron, CronExpression } from "@nestjs/schedule";
 import { MagentoRepository } from "../magento/magento.repository";
 import { parse } from "@fast-csv/parse";
 import { Readable } from "stream";
+import { OrderQueryDto } from "./dto/order-query.dto";
 
 @Injectable()
 export class OrdersService {
@@ -40,10 +41,6 @@ export class OrdersService {
       "Order Status Updated Successfully for orderIds: %ids",
       orderDetails.map((order) => order.entity_id)
     );
-  }
-
-  async findAllOrders() {
-    return await this.orderRepository.find();
   }
 
   async findSingleOrder(id: number) {
@@ -228,5 +225,28 @@ export class OrdersService {
     });
 
     return averages;
+  }
+
+  async getAllOrders(queryOrderDto: OrderQueryDto) {
+    const { page, limit, ...conditions } = queryOrderDto;
+
+    const query = this.orderRepository
+      .createQueryBuilder("order")
+      .select(["`order`.*", "affiliate.id", "affiliate.first_name", "affiliate.last_name"])
+      .leftJoin("order.affiliate_id", "affiliate")
+      .where(conditions)
+      .skip((+page - 1) * +limit)
+      .limit(+limit);
+
+    const orders = await query.getRawMany();
+    const count = await query.getCount();
+
+    const pages = Math.ceil(count / +limit);
+
+    return {
+      orders,
+      current_page: +page,
+      pages,
+    };
   }
 }

@@ -2,7 +2,7 @@ export const getAllOrdersResponseMock: any = {
   status: "success",
   message: "Orders retrieved successfully",
   data: {
-    Orders: [
+    orders: [
       {
         id: 1,
         link_id: 4,
@@ -13,6 +13,8 @@ export const getAllOrdersResponseMock: any = {
         created_at: new Date(),
       },
     ],
+    current_page: 1,
+    pages: 1,
   },
 };
 

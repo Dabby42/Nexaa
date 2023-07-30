@@ -1,31 +1,34 @@
-import { Controller, Get, Post, Body, Param, UseGuards, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Controller, Get, Post, Param, UseGuards, Query, UploadedFile, UseInterceptors, Req } from "@nestjs/common";
 import { OrdersService } from "./orders.service";
-import { CreateOrderDto } from "./dto/create-order.dto";
 import { sendSuccess } from "../utils/helpers/response.helpers";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { AdminGuard } from "../admin/admin.guard";
-import { JwtGuard } from "../auth/auth.jwt.guard";
+import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { AdminGuard } from "app/admin/admin.guard";
 import { FileFilterInterceptor } from "./file-upload.interceptor";
+import { OrderQueryDto } from "./dto/order-query.dto";
+import { RoleEnum } from "../user/entities/user.entity";
+import { GeneralGuard } from "../auth/general.jwt.guard";
 
-@ApiTags("Orders")
+@ApiTags("Commissions")
 @ApiBearerAuth("jwt")
-@Controller("orders")
+@Controller("commissions")
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @UseGuards(AdminGuard)
-  @Post()
-  async createOrder(@Body() createOrderDto: CreateOrderDto) {
-    await this.ordersService.createOrder(createOrderDto);
-    return sendSuccess(null, "Order created successfully");
-  }
-
+  @UseGuards(GeneralGuard)
   @Get()
-  async findAllOrders() {
-    const orders = await this.ordersService.findAllOrders();
+  @ApiQuery({ name: "limit", type: "number", required: false })
+  @ApiQuery({ name: "page", type: "number", required: false })
+  @ApiQuery({ name: "commission_payment_status", type: "string", required: false })
+  @ApiQuery({ name: "commission_status", type: "string", required: false })
+  @ApiQuery({ name: "affiliate_id", description: "This is for when admin wants to get commissions of a particular affiliate. ", type: "number", required: false })
+  async getAllOrders(@Query() orderQueryDto: OrderQueryDto, @Req() req: any) {
+    //if it is an affiliate calling this endpoint, ensure they only get their orders.
+    if (req.user.role === RoleEnum.AFFILIATE) orderQueryDto.affiliate_id = String(req.user.id);
+    const orders = await this.ordersService.getAllOrders(orderQueryDto);
     return sendSuccess(orders, "Orders retrieved successfully");
   }
 
+  @UseGuards(GeneralGuard)
   @Get(":id")
   async findSingleOrder(@Param("id") id: string) {
     const order = await this.ordersService.findSingleOrder(+id);
@@ -33,13 +36,6 @@ export class OrdersController {
   }
 
   @UseGuards(AdminGuard)
-  @Get("commission-stats/:id")
-  async getCommissionStats(@Param("id") id: string) {
-    const data = await this.ordersService.commissionsStats(+id);
-    return sendSuccess(data, "Commission statistics retrieved successfully");
-  }
-
-  @UseGuards(JwtGuard)
   @Post("file-upload")
   @UseInterceptors(FileFilterInterceptor)
   async importPaidRecords(@UploadedFile("file") file: any) {
