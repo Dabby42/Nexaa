@@ -79,3 +79,13 @@ export const affiliateApprovedCommissionDataResponse: any = {
     Jul: "0.00",
   },
 };
+
+export const campaignClicksCountResponse: any = {
+  status: "success",
+  message: "Campaigns clicks count fetched.",
+  data: {
+    clicksCount: "1344",
+    uniqueClicksCount: "60",
+    repeatedClicksCount: "1284",
+  },
+};
