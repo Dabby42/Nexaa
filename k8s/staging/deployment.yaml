@@ -146,3 +146,14 @@ spec:
               value: "hera.clicks"
             - name: AMQP_ORDER_SYNC_QUEUE
               value: "hera.orders"
+
+            #New Relic
+            - name: NEW_RELIC_ENABLED
+              value: "1"
+            - name: NEW_RELIC_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: konga-secret
+                  key: newrelic-licence
+            - name: NEW_RELIC_APP_NAME
+              value: Staging-Hera-BE

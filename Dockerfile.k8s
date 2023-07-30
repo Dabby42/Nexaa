@@ -10,15 +10,9 @@ RUN mkdir /src
 WORKDIR /src
 COPY . /src
 
-# Tell npm to use our registry
-RUN yarn config set registry http://npm.konga.com:4873
-
 # Install node dependencies
 
-RUN yarn global add typeorm  @nestjs/cli -y --ignore-engines
-
-# For development environment, we want to use forever to keep the code running
-RUN yarn global add pm2@4.4.1 -y --ignore-engines
+RUN yarn global add typeorm pm2 @nestjs/cli
 
 RUN yarn
 
@@ -30,4 +24,4 @@ VOLUME ["/src", "/var/log/applications/hera-be"]
 # Expose web service and nodejs debug port
 EXPOSE 80
 
-CMD ["pm2-docker", "pm2.json"]
+CMD ["pm2-runtime", "pm2.json"]

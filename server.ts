@@ -1,3 +1,12 @@
+if (process.env.NEW_RELIC_APP_NAME !== undefined && process.env.NEW_RELIC_LICENSE_KEY !== undefined) {
+  try {
+    require("newrelic");
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+  }
+}
+
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "app/app.module";
 import { NestFastifyApplication } from "@nestjs/platform-fastify";
