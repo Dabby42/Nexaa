@@ -150,4 +150,32 @@ export class LinksService {
       };
     return result;
   }
+
+  async getTotalClicksForCampaign(campaign_id: number, affiliate_id: number, start_date: string, end_date: string) {
+    const query = await this.clickRepository
+      .createQueryBuilder("click")
+      .leftJoin("click.link_id", "link")
+      .select("IFNULL(SUM(click.count), 0)", "clicksCount")
+      .addSelect("IFNULL(SUM(click.unique_count), 0)", "uniqueClicksCount")
+      .addSelect("IFNULL(SUM(click.count) - SUM(click.unique_count), 0)", "repeatedClicksCount");
+
+    if (campaign_id) {
+      query.where("link.banner_id = :campaign_id", { campaign_id });
+    } else {
+      query.where("link.banner_id IS NOT NULL");
+    }
+
+    if (affiliate_id) {
+      query.andWhere("link.user_id = :affiliate_id", { affiliate_id });
+    }
+
+    if (start_date && end_date) {
+      query.andWhere("DATE(click.created_at) >= :start_date AND DATE(click.created_at) <= :end_date", {
+        start_date,
+        end_date,
+      });
+    }
+
+    return query.getRawOne();
+  }
 }

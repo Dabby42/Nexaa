@@ -46,4 +46,8 @@ export class StatsService {
   async affiliateApprovedCommissions(affiliate_id: number) {
     return await this.orderService.getApprovedCommissions(affiliate_id);
   }
+
+  async clickCountForCampaigns(campaign_id: number, affiliate_id: number, start_date: string, end_date: string) {
+    return await this.linkService.getTotalClicksForCampaign(campaign_id, affiliate_id, start_date, end_date);
+  }
 }
