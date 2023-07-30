@@ -112,28 +112,11 @@ spec:
                   name: hera-be-secret
                   key: google-client-secret
 
-            #OAUTH
-            - name: OAUTH_URL
-              value: "http://auth.default.svc.cluster.local/v2/"
-            - name: OAUTH_CLIENT_ID
-              value: hera
-            - name: OAUTH_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: hera-be-secret
-                  key: oauth-client-secret
-            - name: OAUTH_REQUEST_TIMEOUT
-              value: "150000"
-            - name: OAUTH_RETRY_COUNT
-              value: "3"
-            - name: OAUTH_RETRY_DELAY
-              value: "100"
-
             #HERMES
             - name: HERMES_API_URL
-              value: "http://hermesapi.default.svc.cluster.local"
-            - name: HERMES_SCOPE
-              value: "private/hermes/send-notification"
+              value: "http://hermesapi.default.svc.cluster.local/v1/notifications"
+            - name: HERMES_USE_QUEUE
+              value: "true"
             - name: GENERIC_EMAIL_SENDER
               value: "affiliates@konga.com"
             - name: GENERIC_EMAIL_SENDER_ID
