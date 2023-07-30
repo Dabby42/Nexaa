@@ -7,12 +7,17 @@ import { Cron, CronExpression } from "@nestjs/schedule";
 import { MagentoRepository } from "../magento/magento.repository";
 import { parse } from "@fast-csv/parse";
 import { Readable } from "stream";
+import { PayoutService } from "../payout/payout.service";
 
 @Injectable()
 export class OrdersService {
   private readonly logger = new Logger("OrderService");
 
-  constructor(@InjectRepository(Orders) private orderRepository: Repository<Orders>, private readonly magentoRepository: MagentoRepository) {}
+  constructor(
+    @InjectRepository(Orders) private orderRepository: Repository<Orders>,
+    private readonly magentoRepository: MagentoRepository,
+    private readonly payoutService: PayoutService
+  ) {}
 
   async createOrder(createOrderDto: CreateOrderDto) {
     const newOrder = this.orderRepository.create(createOrderDto);
@@ -46,8 +51,8 @@ export class OrdersService {
     return await this.orderRepository.find();
   }
 
-  async findSingleOrder(id: number) {
-    return await this.orderRepository.findOne({ where: { id } });
+  async findSingleOrder(order_id: string) {
+    return await this.orderRepository.findOne({ where: { order_id }, relations: ["affiliate_id"] });
   }
 
   getMonthsFromNowTill9MonthsBack() {
@@ -115,12 +120,17 @@ export class OrdersService {
             reject(error);
           });
       });
+      for (const row of rows) {
+        const singleOrder = await this.findSingleOrder(row.id);
+        const affiliate_id = singleOrder.affiliate_id["id"];
+        await this.payoutService.createPayout({ order_id: Number(row.id), affiliate_id });
+      }
       return await this.orderRepository
         .createQueryBuilder()
         .update(Orders)
         .set(
           rows.reduce((acc, row) => {
-            acc["status"] = row.status;
+            acc["commission_payment_status"] = row.status;
             return acc;
           }, {})
         )

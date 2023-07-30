@@ -26,12 +26,6 @@ export class OrdersController {
     return sendSuccess(orders, "Orders retrieved successfully");
   }
 
-  @Get(":id")
-  async findSingleOrder(@Param("id") id: string) {
-    const order = await this.ordersService.findSingleOrder(+id);
-    return sendSuccess(order, "Order retrieved successfully");
-  }
-
   @UseGuards(AdminGuard)
   @Get("commission-stats/:id")
   async getCommissionStats(@Param("id") id: string) {

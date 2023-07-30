@@ -18,6 +18,7 @@ import { MagentoModule } from "./magento/magento.module";
 import { ScheduleModule } from "@nestjs/schedule";
 import { CustomCacheModule } from "./cache/cache.module";
 import { StatsModule } from "./stats/stats.module";
+import { PayoutModule } from "./payout/payout.module";
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { StatsModule } from "./stats/stats.module";
     AffiliateOrdersModule,
     CustomCacheModule,
     StatsModule,
+    PayoutModule,
   ],
   controllers: [AppController],
   providers: [
