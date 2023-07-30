@@ -53,4 +53,16 @@ export class StatsController {
     const data = await this.statsService.affiliateApprovedCommissions(req.user.id);
     return sendSuccess(data, "Affiliate approved commissions retrieved successfully");
   }
+
+  @Get("campaigns/clicks-count")
+  async totalClicksCountForCampaigns(@Query() dateRangeDto: DateRangeDto) {
+    const data = await this.statsService.clickCountForCampaigns(null, dateRangeDto.start_date, dateRangeDto.end_date);
+    return sendSuccess(data, "Campaigns clicks count fetched.");
+  }
+
+  @Get("campaigns/:campaign_id/clicks-count")
+  async totalClicksCountForCampaign(@Query() dateRangeDto: DateRangeDto, @Param("campaign_id") campaign_id: number) {
+    const data = await this.statsService.clickCountForCampaigns(campaign_id, dateRangeDto.start_date, dateRangeDto.end_date);
+    return sendSuccess(data, "Campaigns clicks count fetched.");
+  }
 }
