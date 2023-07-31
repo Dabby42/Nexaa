@@ -6,9 +6,10 @@ import { User } from "./entities/user.entity";
 import { Admin } from "./entities/admin.entity";
 import { LinksModule } from "../links/links.module";
 import { NotificationModule } from "../notification/notification.module";
+import { CustomCacheModule } from "../cache/cache.module";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Admin]), LinksModule, NotificationModule],
+  imports: [TypeOrmModule.forFeature([User, Admin]), LinksModule, NotificationModule, CustomCacheModule],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService, TypeOrmModule.forFeature([User, Admin])],

@@ -1,13 +1,14 @@
-import { Body, Controller, Put, Get, UseGuards, Request, Query } from "@nestjs/common";
+import { Body, Controller, Get, NotFoundException, Param, Put, Query, Request, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { JwtGuard } from "../auth/auth.jwt.guard";
 import { sendSuccess } from "../utils/helpers/response.helpers";
 import { UpdateBankDetailsDto } from "./dto/update-bank-details.dto";
-import { ApiBearerAuth, ApiTags, ApiQuery } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { AdminGuard } from "app/admin/admin.guard";
 import { SearchAndFilterAffiliateDto } from "./dto/searchAndFilterAffiliateDto";
 import { UpdateAffiliateStatusDto } from "./dto/update-affiliate-status.dto";
+import { RoleEnum } from "./entities/user.entity";
 
 @ApiBearerAuth("jwt")
 @ApiTags("User")
@@ -25,7 +26,8 @@ export class UserController {
   @UseGuards(JwtGuard)
   @Put("bank-details")
   async updateBankDetails(@Body() updateBankDetailsDto: UpdateBankDetailsDto, @Request() req) {
-    return await this.userService.updateBankDetails(req.user.id, updateBankDetailsDto);
+    await this.userService.updateBankDetails(req.user.id, updateBankDetailsDto);
+    return sendSuccess(null, "Bank Details Updated");
   }
 
   @UseGuards(AdminGuard)
@@ -35,6 +37,14 @@ export class UserController {
   async fetchAllAffiliates(@Query("page") page = 1, @Query("limit") limit = 20) {
     const data = await this.userService.fetchAllAffiliates(page, limit);
     return sendSuccess(data, "Affiliates retrieved successfully");
+  }
+
+  @UseGuards(AdminGuard)
+  @Get("affiliate/:affiliate_id")
+  async fetchAffiliateDetails(@Param("affiliate_id") affiliate_id: number) {
+    const data = await this.userService.loadUser(affiliate_id, RoleEnum.AFFILIATE);
+    if (!data) throw new NotFoundException("Affiliate not found.");
+    return sendSuccess(data, "Affiliate data fetch success.");
   }
 
   @UseGuards(AdminGuard)

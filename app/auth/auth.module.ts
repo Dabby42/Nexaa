@@ -13,11 +13,11 @@ import { CustomCacheModule } from "../cache/cache.module";
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, GoogleAuthService],
   imports: [
+    UserModule,
     JwtModule.register({
       secret: config.jwt.secret,
       signOptions: { expiresIn: config.jwt.expiry },
     }),
-    UserModule,
     NotificationModule,
     CustomCacheModule,
   ],
