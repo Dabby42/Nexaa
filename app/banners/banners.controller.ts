@@ -10,7 +10,7 @@ import { UpdateBannerDto } from "./dto/update-banner.dto";
 
 @ApiTags("Banners")
 @ApiBearerAuth("jwt")
-@Controller("banners")
+@Controller("v1/banners")
 export class BannersController {
   constructor(private readonly bannersService: BannersService) {}
 

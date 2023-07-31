@@ -11,7 +11,7 @@ export class Links {
   @JoinColumn({ name: "user_id" })
   public user_id: User;
 
-  @Column()
+  @Column({ nullable: true })
   public redirect_url: string;
 
   @Column({ default: false })

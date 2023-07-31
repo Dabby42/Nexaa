@@ -9,7 +9,7 @@ import { GeneralGuard } from "../auth/general.jwt.guard";
 
 @ApiTags("News")
 @ApiBearerAuth("jwt")
-@Controller("news")
+@Controller("v1/news")
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 

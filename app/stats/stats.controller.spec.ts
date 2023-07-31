@@ -8,6 +8,7 @@ import {
   affiliateCommissionsDataResponse,
   affiliateSalesAmountDataResponse,
   averageCommissionsRawManyMockData,
+  campaignClicksCountResponse,
 } from "./stats.mock";
 import { OrdersService } from "../orders/orders.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
@@ -140,6 +141,13 @@ describe("StatsController", () => {
   describe("Affiliate approved commissions", () => {
     it("should return affiliate approved commissions", async () => {
       expect(await controller.getAffiliateApprovedCommissions({ user: { id: 1 } })).toStrictEqual(affiliateApprovedCommissionDataResponse);
+    });
+  });
+
+  describe("Clicks count for campaigns", () => {
+    it("should return clicks count for campaigns (ADMIN)", async () => {
+      mockClicksRepository.getRawOne.mockResolvedValueOnce(campaignClicksCountResponse.data);
+      expect(await controller.totalClicksCountForCampaigns({ start_date: "2020-03-03", end_date: "2045-01-01" })).toStrictEqual(campaignClicksCountResponse);
     });
   });
 

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Res } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param, UseGuards, Query, Res, Req } from "@nestjs/common";
 import { PayoutService } from "./payout.service";
 import { CreatePayoutDto } from "./dto/create-payout.dto";
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
@@ -10,7 +10,7 @@ import * as fs from "fs";
 
 @ApiTags("Payout")
 @ApiBearerAuth("jwt")
-@Controller("payout")
+@Controller("v1/payout")
 export class PayoutController {
   constructor(private readonly payoutService: PayoutService) {}
 
@@ -37,12 +37,12 @@ export class PayoutController {
   }
 
   @UseGuards(JwtGuard)
-  @Get("generate-csv/:id")
+  @Get("generate-csv")
   @ApiQuery({ name: "limit", type: "number", required: false })
   @ApiQuery({ name: "page", type: "number", required: false })
-  async getPayoutHistoryCSV(@Param("id") id: number, @Query("page") page = 1, @Query("limit") limit = 20, @Res() res) {
+  async getPayoutHistoryCSV(@Query("page") page = 1, @Query("limit") limit = 20, @Res() res, @Req() req) {
+    const { id } = req.user;
     const payoutHistory: any = await this.payoutService.getAllPayouts(page, limit, id);
-    console.log(payoutHistory.payouts);
 
     const csvWriter = createObjectCsvWriter({
       path: `payout-history-${id}.csv`,
@@ -61,6 +61,7 @@ export class PayoutController {
         res.header("Content-Disposition", `attachment; filename=payout-history-${id}.csv`);
         res.type("text/csv");
         res.send(fileContent);
+        fs.unlinkSync(`payout-history-${id}.csv`);
       })
       .catch((err) => {
         sendError("Error generating CSV file.");

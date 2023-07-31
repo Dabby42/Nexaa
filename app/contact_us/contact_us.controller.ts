@@ -3,8 +3,10 @@ import { ContactUsDto } from "./dto/contact_us.dto";
 import { NotificationService } from "../notification/notification.service";
 import { sendSuccess } from "../utils/helpers/response.helpers";
 import { config } from "../config/config";
+import { ApiTags } from "@nestjs/swagger";
 
-@Controller("contact-us")
+@ApiTags("Contact")
+@Controller("v1/contact-us")
 export class ContactUsController {
   private readonly logger = new Logger("ContactUsService");
   constructor(private readonly notificationService: NotificationService) {}

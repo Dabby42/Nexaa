@@ -14,22 +14,21 @@ export class PayoutService {
   }
 
   async getAllPayouts(page: number, limit: number, affiliate_id?: number) {
-    const findOptions: FindManyOptions<Payout> = {
-      order: { created_at: "DESC" },
-      skip: (page - 1) * limit,
-      take: limit,
-      relations: ["affiliate_id", "order_id"],
-    };
-    if (affiliate_id)
-      findOptions.where = {
-        affiliate_id: Number(affiliate_id),
-      };
-    const [payoutList, count] = await this.payoutRepository.findAndCount(findOptions);
+    const query = this.payoutRepository
+      .createQueryBuilder("payout")
+      .select(["payout.created_at AS payment_date", "order.commission_payment_status AS payment_status", "order.commission AS commission", "order.order_id AS order_number"])
+      .leftJoin("payout.affiliate_id", "affiliate")
+      .leftJoin("payout.order_id", "order")
+      .orderBy("payout.created_at", "DESC")
+      .where({ affiliate_id })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const payoutList = await query.getRawMany();
+    const count = await query.getCount();
+
     const payouts = payoutList.map((payout) => {
-      payout["commission"] = payout.order_id["commission"];
-      payout["payment_status"] = payout.order_id["commission_payment_status"];
-      payout["order"] = payout.order_id["order_id"];
-      payout["payment_date"] = new Date(payout.updated_at).toLocaleString("en-US", {
+      payout["payment_date"] = new Date(payout.payment_date).toLocaleString("en-NG", {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -37,16 +36,9 @@ export class PayoutService {
         minute: "2-digit",
         hour12: true,
       });
-      delete payout.created_at;
-      delete payout.id;
-      delete payout.affiliate_id;
-      delete payout.updated_at;
-      delete payout.order_id;
       return payout;
     });
-
     const pages = Math.ceil(count / limit);
-
     return {
       payouts,
       count,

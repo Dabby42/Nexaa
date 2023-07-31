@@ -1,3 +1,12 @@
+if (process.env.NEW_RELIC_APP_NAME !== undefined && process.env.NEW_RELIC_LICENSE_KEY !== undefined) {
+  try {
+    require("newrelic");
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+  }
+}
+
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "app/app.module";
 import { NestFastifyApplication } from "@nestjs/platform-fastify";
@@ -9,7 +18,6 @@ import { FastifyMulterAdapter } from "./fastify-multer-adapter";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyMulterAdapter());
-  app.setGlobalPrefix("v1");
   if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "staging") {
     const documentOptions = new DocumentBuilder()
       .setTitle("Hera Docs")

@@ -1,10 +1,10 @@
 import { Module } from "@nestjs/common";
+import { HttpModule } from "@nestjs/axios";
 import { NotificationService } from "./notification.service";
-import { CustomCacheModule } from "../cache/cache.module";
 
 @Module({
   providers: [NotificationService],
   exports: [NotificationService],
-  imports: [CustomCacheModule],
+  imports: [HttpModule],
 })
 export class NotificationModule {}

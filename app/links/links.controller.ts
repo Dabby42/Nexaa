@@ -4,11 +4,10 @@ import { CreateCustomUrlDto } from "./dto/create-custom-url.dto";
 import { sendSuccess } from "../utils/helpers/response.helpers";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { JwtGuard } from "../auth/auth.jwt.guard";
-import { AdminGuard } from "../admin/admin.guard";
 
 @ApiBearerAuth("jwt")
 @ApiTags("Links")
-@Controller("links")
+@Controller("v1/links")
 export class LinksController {
   constructor(private readonly linksService: LinksService) {}
 

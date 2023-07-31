@@ -182,4 +182,8 @@ export class UserService {
       this.logger.log(e);
     }
   }
+
+  async findByUsername(username: string) {
+    return await this.userRepository.findOne({ where: { username } });
+  }
 }
