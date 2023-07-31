@@ -3,6 +3,7 @@ import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateCol
 export enum BannerStatusEnum {
   ACTIVE = 1,
   DISABLED = 2,
+  PAUSED = 3,
 }
 
 export interface BannerImagesAndSizes {
@@ -28,9 +29,6 @@ export class Banner {
   banner_link: string;
 
   @Column({ nullable: true })
-  banner_code: string;
-
-  @Column({ nullable: true })
   campaign_start_date: Date;
 
   @Column({ nullable: true })
@@ -45,9 +43,6 @@ export class Banner {
     default: BannerStatusEnum.ACTIVE,
   })
   status: number;
-
-  @Column()
-  commission: number;
 
   @CreateDateColumn()
   created_at: Date;

@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { User } from "../../user/entities/user.entity";
+import { Admin } from "../../user/entities/admin.entity";
 
 @Entity("news")
 export class News {
@@ -12,9 +12,9 @@ export class News {
   @Column({ length: 500 })
   body: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => Admin)
   @JoinColumn({ name: "publisher_id" })
-  publisher: User;
+  publisher: Admin;
 
   @CreateDateColumn()
   created_at: Date;

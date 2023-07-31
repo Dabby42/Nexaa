@@ -13,6 +13,7 @@ import { ApiTags } from "@nestjs/swagger";
 import { ChangePasswordDto } from "./dto/change-password.dto";
 import { CreateAdminDto } from "../user/dto/create-admin.dto";
 import { AdminGuard } from "../admin/admin.guard";
+import { GeneralGuard } from "./general.jwt.guard";
 
 @ApiTags("Auth")
 @Controller("v1/auth")
@@ -72,7 +73,7 @@ export class AuthController {
     return sendSuccess(null, "Password updated successfully");
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(GeneralGuard)
   @Get("me")
   async getMe(@Request() req) {
     return sendSuccess(req.user);

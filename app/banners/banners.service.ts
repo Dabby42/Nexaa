@@ -6,10 +6,14 @@ import { FindOptionsOrder, Like, Repository } from "typeorm";
 import { sendSuccess } from "app/utils/helpers/response.helpers";
 import { BannerSearchDto } from "./dto/banner-search.dto";
 import { UpdateBannerDto } from "./dto/update-banner.dto";
+import { CacheService } from "../cache/cache.service";
 
 @Injectable()
 export class BannersService {
-  constructor(@InjectRepository(Banner) private bannerRepository: Repository<Banner>) {}
+  private readonly cacheKeyBase: string;
+  constructor(@InjectRepository(Banner) private bannerRepository: Repository<Banner>, private cacheService: CacheService) {
+    this.cacheKeyBase = "BANNER_";
+  }
 
   async createBanner(createBannerDto: CreateBannerDto) {
     try {
@@ -18,6 +22,7 @@ export class BannersService {
       const banner = this.bannerRepository.create(newBanner);
 
       const data = await this.bannerRepository.save(banner);
+      this.cacheService.refresh(this.cacheKeyBase);
       return sendSuccess(data, "Banner Created");
     } catch (error) {
       throw new UnprocessableEntityException("An unknown error occurred");
@@ -25,31 +30,35 @@ export class BannersService {
   }
 
   async getBanner(id: number) {
-    const banner = await this.bannerRepository.findOne({
-      where: { id },
+    return this.cacheService.cachedData(`${this.cacheKeyBase}${id}`, async () => {
+      const banner = await this.bannerRepository.findOne({
+        where: { id },
+      });
+
+      if (!banner) throw new NotFoundException("Banner not found.");
+
+      return banner;
     });
-
-    if (!banner) throw new NotFoundException("Banner not found.");
-
-    return banner;
   }
 
   async loadBanners(page: number, limit: number) {
-    const [banners, count] = await this.bannerRepository.findAndCount({
-      where: { status: BannerStatusEnum.ACTIVE },
-      order: { created_at: "DESC" },
-      skip: (page - 1) * limit,
-      take: limit,
+    return this.cacheService.cachedData(`${this.cacheKeyBase}${page}_${limit}`, async () => {
+      const [banners, count] = await this.bannerRepository.findAndCount({
+        where: { status: BannerStatusEnum.ACTIVE },
+        order: { created_at: "DESC" },
+        skip: (page - 1) * limit,
+        take: limit,
+      });
+
+      const pages = Math.ceil(count / limit);
+
+      return {
+        banners,
+        count,
+        current_page: page,
+        pages,
+      };
     });
-
-    const pages = Math.ceil(count / limit);
-
-    return {
-      banners,
-      count,
-      current_page: page,
-      pages,
-    };
   }
 
   async searchBanners(searchDto: BannerSearchDto) {
@@ -89,6 +98,7 @@ export class BannersService {
       }
 
       await this.bannerRepository.update(id, updatedBanner);
+      this.cacheService.refresh(this.cacheKeyBase);
       return sendSuccess(null, "Banner Updated");
     } catch (error) {
       throw new UnprocessableEntityException("An unknown error occurred");
@@ -96,18 +106,20 @@ export class BannersService {
   }
 
   async loadAllBanners(page: number, limit: number) {
-    const [banners, count] = await this.bannerRepository.findAndCount({
-      order: { created_at: "DESC" },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    return this.cacheService.cachedData(`${this.cacheKeyBase}ALL_${page}_${limit}`, async () => {
+      const [banners, count] = await this.bannerRepository.findAndCount({
+        order: { created_at: "DESC" },
+        skip: (page - 1) * limit,
+        take: limit,
+      });
 
-    const pages = Math.ceil(count / limit);
-    return {
-      banners,
-      count,
-      current_page: page,
-      pages,
-    };
+      const pages = Math.ceil(count / limit);
+      return {
+        banners,
+        count,
+        current_page: page,
+        pages,
+      };
+    });
   }
 }

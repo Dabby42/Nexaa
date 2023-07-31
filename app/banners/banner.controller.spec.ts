@@ -12,6 +12,7 @@ import {
   getAllBannersResponseMock,
   getBannerResponseData,
 } from "./banner.mock";
+import { CacheService } from "../cache/cache.service";
 
 describe("BannersController", () => {
   let controller: BannersController;
@@ -31,6 +32,12 @@ describe("BannersController", () => {
     findAndCount: jest.fn().mockImplementation(() => Promise.resolve([])),
     update: jest.fn().mockImplementation((dto) => dto),
   };
+  const mockCacheService = {
+    get: jest.fn().mockImplementation(() => null),
+    set: jest.fn(),
+    refresh: jest.fn(),
+    cachedData: jest.fn().mockImplementation((_, callback) => callback()),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -40,6 +47,10 @@ describe("BannersController", () => {
         {
           provide: getRepositoryToken(Banner),
           useValue: mockBannerRepository,
+        },
+        {
+          provide: CacheService,
+          useValue: mockCacheService,
         },
       ],
     }).compile();

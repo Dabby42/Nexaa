@@ -5,6 +5,7 @@ import { newsData, createNewsMock, updateNewsMock, userMock, deleteNewsMock, fet
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { News } from "./entities/news.entity";
 import { BadRequestException, NotFoundException } from "@nestjs/common";
+import { CacheService } from "../cache/cache.service";
 
 describe("NewsController", () => {
   let controller: NewsController;
@@ -25,9 +26,20 @@ describe("NewsController", () => {
       if (id === 1) return { affected: 1 };
       return { affected: 0 };
     }),
-    findAndCount: jest.fn().mockImplementation(() => {
-      return [fetchNewsMock.data.news, 4];
-    }),
+    getRawMany: jest.fn().mockReturnValue(fetchNewsMock.data.news),
+    leftJoin: jest.fn().mockReturnThis(),
+    createQueryBuilder: jest.fn().mockReturnThis(),
+    orderBy: jest.fn().mockReturnThis(),
+    select: jest.fn().mockReturnThis(),
+    getCount: jest.fn().mockReturnValue(4),
+    skip: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockReturnThis(),
+  };
+  const mockCacheService = {
+    get: jest.fn().mockImplementation(() => null),
+    set: jest.fn(),
+    refresh: jest.fn(),
+    cachedData: jest.fn().mockImplementation((_, callback) => callback()),
   };
 
   beforeEach(async () => {
@@ -38,6 +50,10 @@ describe("NewsController", () => {
         {
           provide: getRepositoryToken(News),
           useValue: mockNewsRepository,
+        },
+        {
+          provide: CacheService,
+          useValue: mockCacheService,
         },
       ],
     }).compile();

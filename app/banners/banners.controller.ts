@@ -7,6 +7,7 @@ import { AdminGuard } from "app/admin/admin.guard";
 import { ApiBearerAuth, ApiTags, ApiQuery } from "@nestjs/swagger";
 import { BannerSearchDto } from "./dto/banner-search.dto";
 import { UpdateBannerDto } from "./dto/update-banner.dto";
+import { GeneralGuard } from "../auth/general.jwt.guard";
 
 @ApiTags("Banners")
 @ApiBearerAuth("jwt")
@@ -53,7 +54,7 @@ export class BannersController {
     return sendSuccess(data);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(GeneralGuard)
   @Get(":id")
   async getBanner(@Param("id") id: number) {
     const data = await this.bannersService.getBanner(id);

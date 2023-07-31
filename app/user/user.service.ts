@@ -2,26 +2,32 @@ import { BadRequestException, ConflictException, Injectable, Logger, NotFoundExc
 import { CreateUserDto } from "./dto/create-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Like, Repository } from "typeorm";
-import { User, UserStatusEnum } from "./entities/user.entity";
+import { RoleEnum, User, UserStatusEnum } from "./entities/user.entity";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UpdateBankDetailsDto } from "./dto/update-bank-details.dto";
-import { sendSuccess } from "app/utils/helpers/response.helpers";
 import { Admin } from "./entities/admin.entity";
 import { CreateAdminDto } from "./dto/create-admin.dto";
 import { LinksService } from "../links/links.service";
 import { SearchAndFilterAffiliateDto } from "./dto/searchAndFilterAffiliateDto";
 import { NotificationService } from "../notification/notification.service";
 import { config } from "../config/config";
+import { CacheService } from "../cache/cache.service";
 
 @Injectable()
 export class UserService {
   private readonly logger = new Logger("UserService");
+  private readonly affiliateCacheKeyBase: string;
+  private readonly adminCacheKeyBase: string;
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Admin) private adminRepository: Repository<Admin>,
     private readonly linksService: LinksService,
-    private readonly notificationService: NotificationService
-  ) {}
+    private readonly notificationService: NotificationService,
+    private cacheService: CacheService
+  ) {
+    this.affiliateCacheKeyBase = "AFFILIATE_";
+    this.adminCacheKeyBase = "ADMIN_";
+  }
 
   async createUser(createUserDto: CreateUserDto) {
     const user = await this.userRepository.findOne({
@@ -63,12 +69,13 @@ export class UserService {
       if (user) throw new ConflictException("Username already in use.");
     }
     await this.userRepository.update(id, updateUserDto);
+    this.cacheService.refresh(this.affiliateCacheKeyBase + id);
   }
 
   async updateBankDetails(id: number, updateBankDetailsDto: UpdateBankDetailsDto) {
     try {
       await this.userRepository.update(id, updateBankDetailsDto);
-      return sendSuccess(null, "Bank Details Updated");
+      this.cacheService.refresh(this.affiliateCacheKeyBase + id);
     } catch (error) {
       throw new UnprocessableEntityException("An unknown error occurred");
     }
@@ -139,6 +146,7 @@ export class UserService {
       affiliate.verified_by = admin;
       affiliate.verified_at = new Date();
     }
+    this.cacheService.refresh(this.affiliateCacheKeyBase + affiliate_id);
     return await this.userRepository.save(affiliate);
   }
 
@@ -185,5 +193,21 @@ export class UserService {
 
   async findByUsername(username: string) {
     return await this.userRepository.findOne({ where: { username } });
+  }
+
+  async loadUser(id: number, role: RoleEnum) {
+    let key = role === RoleEnum.AFFILIATE ? this.affiliateCacheKeyBase : this.adminCacheKeyBase;
+    key += id;
+    return this.cacheService.cachedData(key, async () => {
+      let user;
+      if (role === RoleEnum.AFFILIATE) {
+        user = await this.userRepository.findOne({ where: { id } });
+      } else {
+        user = await this.adminRepository.findOne({ where: { id } });
+      }
+      if (!user) return null;
+      delete user.password;
+      return user;
+    });
   }
 }

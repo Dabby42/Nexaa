@@ -18,6 +18,7 @@ import { BadRequestException, ConflictException } from "@nestjs/common";
 import { Admin } from "./entities/admin.entity";
 import { LinksService } from "../links/links.service";
 import { NotificationService } from "../notification/notification.service";
+import { CacheService } from "../cache/cache.service";
 
 describe("UserController", () => {
   let controller: UserController;
@@ -33,6 +34,12 @@ describe("UserController", () => {
     findAndCount: jest.fn().mockImplementation(() => Promise.resolve([])),
     findOne: jest.fn(() => null),
     save: jest.fn(() => userRepositoryMock),
+  };
+  const mockCacheService = {
+    get: jest.fn().mockImplementation(() => null),
+    set: jest.fn(),
+    refresh: jest.fn(),
+    cachedData: jest.fn().mockImplementation((_, callback) => callback()),
   };
 
   beforeEach(async () => {
@@ -55,6 +62,10 @@ describe("UserController", () => {
         {
           provide: NotificationService,
           useValue: {},
+        },
+        {
+          provide: CacheService,
+          useValue: mockCacheService,
         },
       ],
     }).compile();
