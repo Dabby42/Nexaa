@@ -1,6 +1,7 @@
 import { IsNotEmpty, IsOptional, IsUrl } from "class-validator";
 
 export class CreateCustomUrlDto {
+  @IsOptional()
   @IsNotEmpty()
   @IsUrl(
     { host_whitelist: ["konga.com", "www.konga.com"] },
@@ -8,7 +9,7 @@ export class CreateCustomUrlDto {
       message: "Only konga.com links are accepted",
     }
   )
-  readonly redirect_url: string;
+  readonly redirect_url?: string;
 
   @IsOptional()
   readonly banner_id?: number;

@@ -1,23 +1,32 @@
 import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Orders } from "./entities/order.entity";
+import { CommissionPaymentStatusEnum, CommissionStatusEnum, Orders } from "./entities/order.entity";
 import { Repository } from "typeorm";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { MagentoRepository } from "../magento/magento.repository";
 import { parse } from "@fast-csv/parse";
 import { Readable } from "stream";
+import { PayoutService } from "../payout/payout.service";
 import { OrderQueryDto } from "./dto/order-query.dto";
 
 @Injectable()
 export class OrdersService {
   private readonly logger = new Logger("OrderService");
 
-  constructor(@InjectRepository(Orders) private orderRepository: Repository<Orders>, private readonly magentoRepository: MagentoRepository) {}
+  constructor(
+    @InjectRepository(Orders) private orderRepository: Repository<Orders>,
+    private readonly magentoRepository: MagentoRepository,
+    private readonly payoutService: PayoutService
+  ) {}
 
   async createOrder(createOrderDto: CreateOrderDto) {
     const newOrder = this.orderRepository.create(createOrderDto);
     return await this.orderRepository.save(newOrder);
+  }
+
+  async findSingleOrder(order_id: string) {
+    return await this.orderRepository.createQueryBuilder("order").select(["`order`.*"]).where({ order_id }).getRawOne();
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
@@ -43,8 +52,8 @@ export class OrdersService {
     );
   }
 
-  async findSingleOrder(id: number) {
-    return await this.orderRepository.findOne({ where: { id } });
+  async findAllOrders() {
+    return await this.orderRepository.find();
   }
 
   getMonthsFromNowTill9MonthsBack() {
@@ -112,16 +121,22 @@ export class OrdersService {
             reject(error);
           });
       });
+      for (const row of rows) {
+        const singleOrder = await this.findSingleOrder(row["Order Number"]);
+        if (singleOrder && singleOrder.commission_status === CommissionStatusEnum.APPROVED && singleOrder.commission_payment_status === CommissionPaymentStatusEnum.UNPAID) {
+          await this.payoutService.createPayout({ order_id: singleOrder.id, affiliate_id: singleOrder.affiliate_id });
+        }
+      }
       return await this.orderRepository
         .createQueryBuilder()
         .update(Orders)
         .set(
           rows.reduce((acc, row) => {
-            acc["status"] = row.status;
+            acc["commission_payment_status"] = CommissionPaymentStatusEnum.PAID;
             return acc;
           }, {})
         )
-        .where("order_id IN (:orderIds)", { orderIds: rows.map((row) => row.id) })
+        .where(`order_id IN (:orderIds) AND commission_status = "${CommissionStatusEnum.APPROVED}"`, { orderIds: rows.map((row) => row["Order Number"]) })
         .execute();
     } catch (error) {
       throw new InternalServerErrorException(error.message);

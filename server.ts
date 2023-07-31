@@ -18,7 +18,6 @@ import { FastifyMulterAdapter } from "./fastify-multer-adapter";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyMulterAdapter());
-  app.setGlobalPrefix("v1");
   if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "staging") {
     const documentOptions = new DocumentBuilder()
       .setTitle("Hera Docs")

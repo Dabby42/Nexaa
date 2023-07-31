@@ -9,7 +9,7 @@ export class AffiliateOrders {
   public affiliate_id: number;
 
   @Column()
-  public order_id: number;
+  public order_id: string;
 
   @CreateDateColumn()
   created_at: Date;

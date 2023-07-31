@@ -5,6 +5,6 @@ export const createAffiliateOrderData: any = {
 };
 
 export const createAffiliateOrderResponseData: any = {
-  affiliate_id: 12345,
-  order_id: 67890,
+  affiliate_id: "konga",
+  order_id: "R25635663",
 };

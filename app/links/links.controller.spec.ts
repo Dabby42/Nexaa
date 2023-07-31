@@ -7,7 +7,6 @@ import { Links } from "./entities/link.entity";
 import { Ips } from "./entities/ip.entity";
 import { UnprocessableEntityException } from "@nestjs/common";
 import { createCustomUrlData, getClickResponseMock, getIpResponseMock, getLinkResponseMock, recordClickResponseData, recordClicksData, userRequestMock } from "./link.mock";
-import { userRepositoryMock } from "../auth/auth.mock";
 import { CacheService } from "../cache/cache.service";
 import { RabbitmqService } from "../rabbitmq/rabbitmq.service";
 
@@ -43,6 +42,15 @@ describe("LinksController", () => {
         ...linkData,
       })
     ),
+    createQueryBuilder: jest.fn().mockReturnThis(),
+    select: jest.fn().mockReturnThis(),
+    addSelect: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    andWhere: jest.fn().mockReturnThis(),
+    leftJoin: jest.fn().mockReturnThis(),
+    groupBy: jest.fn().mockReturnThis(),
+    getRawOne: jest.fn().mockResolvedValue(getLinkResponseMock.data),
+    getRawMany: jest.fn().mockResolvedValue([]),
     findOne: jest.fn().mockImplementation(() => Promise.resolve(getLinkResponseMock.data)),
     update: jest.fn(),
   };
@@ -106,13 +114,13 @@ describe("LinksController", () => {
 
   describe("Generate a custom url", () => {
     it("should generate a custom url successfully", async () => {
-      linkRepository.findOne.mockImplementationOnce(() => null);
+      linkRepository.getRawOne.mockImplementationOnce(() => null);
       await controller.generateCustomUrl(createCustomUrlData, userRequestMock);
       expect(linkRepository.save).toHaveBeenCalled();
     });
 
     it("should return an error if save method throws ", async () => {
-      linkRepository.findOne.mockImplementationOnce(() => null);
+      linkRepository.getRawOne.mockImplementationOnce(() => null);
       linkRepository.save.mockImplementationOnce(() => {
         throw new Error();
       });

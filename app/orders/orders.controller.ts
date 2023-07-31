@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Param, UseGuards, Query, UploadedFile, UseInterceptors, Req } from "@nestjs/common";
 import { OrdersService } from "./orders.service";
 import { sendSuccess } from "../utils/helpers/response.helpers";
-import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiProperty, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { AdminGuard } from "app/admin/admin.guard";
 import { FileFilterInterceptor } from "./file-upload.interceptor";
 import { OrderQueryDto } from "./dto/order-query.dto";
@@ -10,7 +10,7 @@ import { GeneralGuard } from "../auth/general.jwt.guard";
 
 @ApiTags("Commissions")
 @ApiBearerAuth("jwt")
-@Controller("commissions")
+@Controller("v1/commissions")
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
@@ -28,15 +28,21 @@ export class OrdersController {
     return sendSuccess(orders, "Orders retrieved successfully");
   }
 
-  @UseGuards(GeneralGuard)
-  @Get(":id")
-  async findSingleOrder(@Param("id") id: string) {
-    const order = await this.ordersService.findSingleOrder(+id);
-    return sendSuccess(order, "Order retrieved successfully");
-  }
-
-  @UseGuards(AdminGuard)
+  // @UseGuards(AdminGuard)
   @Post("file-upload")
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({
+    schema: {
+      type: "object",
+      properties: {
+        file: {
+          // 👈 this property
+          type: "string",
+          format: "binary",
+        },
+      },
+    },
+  })
   @UseInterceptors(FileFilterInterceptor)
   async importPaidRecords(@UploadedFile("file") file: any) {
     await this.ordersService.importPaidRecords(file);

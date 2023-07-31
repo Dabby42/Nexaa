@@ -22,16 +22,30 @@ export class LinksService {
   ) {}
 
   async generateCustomUrl(createCustomUrlDto: CreateCustomUrlDto, req) {
-    const { redirect_url, is_default = false } = createCustomUrlDto;
     const userId: number = req.user.id;
+    const { redirect_url, banner_id, is_default = false } = createCustomUrlDto;
+    if (!banner_id && !redirect_url) throw new BadRequestException("Please provide a url or banner id.");
+    const existingCondition: any = { user_id: userId };
+    if (banner_id) {
+      existingCondition.banner_id = banner_id;
+    } else {
+      existingCondition.redirect_url = redirect_url;
+    }
     const uuid = randomUUID();
-    const existingLink = await this.linkRepository.findOne({ where: { redirect_url, user_id: { id: userId } } });
+    // const existingLink = await this.linkRepository.find({ where: existingCondition });
+
+    const existingLink = await this.linkRepository.createQueryBuilder("link").select("k_id").where(existingCondition).getRawOne();
     if (existingLink) {
       return {
-        custom_url: `${config.baseUrl}/v1/${existingLink.k_id}`,
+        custom_url: `${config.baseUrl}/${existingLink.k_id}`,
       };
     }
-    const newLink: DeepPartial<Links> = { redirect_url, user_id: { id: userId }, k_id: uuid, is_default };
+    const newLink: DeepPartial<Links> = { user_id: { id: userId }, k_id: uuid, is_default };
+    if (banner_id) {
+      newLink.banner_id = { id: banner_id };
+    } else {
+      newLink.redirect_url = redirect_url;
+    }
 
     const newLinkEntityInstance = this.linkRepository.create(newLink);
 
@@ -39,7 +53,7 @@ export class LinksService {
       await this.linkRepository.save(newLinkEntityInstance);
 
       return {
-        custom_url: `${config.baseUrl}/v1/${uuid}`,
+        custom_url: `${config.baseUrl}/${uuid}`,
       };
     } catch (e) {
       throw new UnprocessableEntityException("An unknown error occurred");
@@ -51,11 +65,18 @@ export class LinksService {
     const cacheKey = "link_" + k_id;
     let data = await this.cacheService.get(cacheKey);
     if (!data) {
-      const foundLinkModel = await this.linkRepository.findOne({ where: { k_id }, relations: ["user_id"] });
+      const foundLinkModel = await this.linkRepository
+        .createQueryBuilder("link")
+        .select(["link.id AS link_id", "IFNULL(banner.banner_link , link.redirect_url) AS redirect_url", "user.id AS user_id", "user.username AS username"])
+        .leftJoin("link.user_id", "user")
+        .leftJoin("link.banner_id", "banner")
+        .where({ k_id })
+        .getRawOne();
+
       if (!foundLinkModel) {
         throw new BadRequestException();
       }
-      data = { id: foundLinkModel.id, username: foundLinkModel.user_id.username, redirect_url: foundLinkModel.redirect_url };
+      data = { id: foundLinkModel.link_id, username: foundLinkModel.username, userId: foundLinkModel.user_id, redirect_url: foundLinkModel.redirect_url };
       await this.cacheService.set(cacheKey, data, 60 * 60);
     }
 

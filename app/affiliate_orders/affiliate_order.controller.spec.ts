@@ -4,10 +4,14 @@ import { AffiliateOrdersService } from "./affiliate_orders.service";
 import { AffiliateOrders } from "./entities/affiliate_order.entity";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { createAffiliateOrderData, createAffiliateOrderResponseData } from "./affiliate_order.mock";
+import { UserService } from "../user/user.service";
 
 describe("AffiliateOrderController", () => {
   let controller: AffiliateOrderController;
   let AffiliateOrderRepository;
+  const mockUserService = {
+    findByUsername: jest.fn().mockImplementation((data) => data),
+  };
   const mockAffiliateOrderRepository = {
     create: jest.fn().mockImplementation((dto) => dto),
     save: jest.fn().mockImplementation(() =>
@@ -27,6 +31,10 @@ describe("AffiliateOrderController", () => {
         {
           provide: getRepositoryToken(AffiliateOrders),
           useValue: mockAffiliateOrderRepository,
+        },
+        {
+          provide: UserService,
+          useValue: mockUserService,
         },
       ],
     }).compile();

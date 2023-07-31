@@ -9,6 +9,7 @@ export const dataSourceOptions: DataSourceOptions = {
   database: config.mysql.connection.database,
   entities: ["dist/**/*.entity.js"],
   migrations: ["dist/app/db/migrations/*.js"],
+  logging: true,
 };
 
 const dataSource = new DataSource(dataSourceOptions);

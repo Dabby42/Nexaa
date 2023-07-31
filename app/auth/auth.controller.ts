@@ -15,7 +15,7 @@ import { CreateAdminDto } from "../user/dto/create-admin.dto";
 import { AdminGuard } from "../admin/admin.guard";
 
 @ApiTags("Auth")
-@Controller("auth")
+@Controller("v1/auth")
 export class AuthController {
   constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
 

@@ -6,7 +6,7 @@ import { DateRangeDto } from "./dto/date-range.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { AdminGuard } from "../admin/admin.guard";
 
-@Controller("stats")
+@Controller("v1/stats")
 @ApiBearerAuth("jwt")
 @ApiTags("Stats")
 export class StatsController {
