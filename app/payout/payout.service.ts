@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { CreatePayoutDto } from "./dto/create-payout.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FindManyOptions, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { Payout } from "./entities/payout.entity";
 
 @Injectable()

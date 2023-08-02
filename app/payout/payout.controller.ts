@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Query, Res, Req } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param, UseGuards, Query, Res, Req, Logger } from "@nestjs/common";
 import { PayoutService } from "./payout.service";
 import { CreatePayoutDto } from "./dto/create-payout.dto";
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
@@ -12,6 +12,7 @@ import * as fs from "fs";
 @ApiBearerAuth("jwt")
 @Controller("v1/payout")
 export class PayoutController {
+  private readonly logger = new Logger("PayoutService");
   constructor(private readonly payoutService: PayoutService) {}
 
   @Post()
@@ -25,7 +26,8 @@ export class PayoutController {
   @ApiQuery({ name: "limit", type: "number", required: false })
   @ApiQuery({ name: "page", type: "number", required: false })
   async getAllPayouts(@Query("page") page = 1, @Query("limit") limit = 20) {
-    return await this.payoutService.getAllPayouts(page, limit);
+    const data = await this.payoutService.getAllPayouts(page, limit);
+    return sendSuccess(data, "Payout retrieved successfully");
   }
 
   @UseGuards(JwtGuard)
@@ -33,7 +35,8 @@ export class PayoutController {
   @ApiQuery({ name: "limit", type: "number", required: false })
   @ApiQuery({ name: "page", type: "number", required: false })
   async getAllAffiliatePayouts(@Param("id") id: number, @Query("page") page = 1, @Query("limit") limit = 20) {
-    return await this.payoutService.getAllPayouts(page, limit, id);
+    const data = await this.payoutService.getAllPayouts(page, limit, id);
+    return sendSuccess(data, "Affiliate payout retrieved successfully");
   }
 
   @UseGuards(JwtGuard)
@@ -43,7 +46,6 @@ export class PayoutController {
   async getPayoutHistoryCSV(@Query("page") page = 1, @Query("limit") limit = 20, @Res() res, @Req() req) {
     const { id } = req.user;
     const payoutHistory: any = await this.payoutService.getAllPayouts(page, limit, id);
-
     const csvWriter = createObjectCsvWriter({
       path: `payout-history-${id}.csv`,
       header: [
@@ -63,8 +65,9 @@ export class PayoutController {
         res.send(fileContent);
         fs.unlinkSync(`payout-history-${id}.csv`);
       })
-      .catch((err) => {
-        sendError("Error generating CSV file.");
+      .catch((error) => {
+        this.logger.log(`Error generating CSV: ${error}`);
+        res.status(500).send(sendError("Error generating CSV file."));
       });
   }
 }
