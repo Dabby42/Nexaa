@@ -1,8 +1,7 @@
-import { Controller, Get, Post, Param, UseGuards, Query, UploadedFile, UseInterceptors, Req } from "@nestjs/common";
+import { Controller, Get, Post, UseGuards, Query, UploadedFile, UseInterceptors, Req } from "@nestjs/common";
 import { OrdersService } from "./orders.service";
 import { sendSuccess } from "../utils/helpers/response.helpers";
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiProperty, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { AdminGuard } from "app/admin/admin.guard";
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { FileFilterInterceptor } from "./file-upload.interceptor";
 import { OrderQueryDto } from "./dto/order-query.dto";
 import { RoleEnum } from "../user/entities/user.entity";
@@ -36,7 +35,6 @@ export class OrdersController {
       type: "object",
       properties: {
         file: {
-          // 👈 this property
           type: "string",
           format: "binary",
         },

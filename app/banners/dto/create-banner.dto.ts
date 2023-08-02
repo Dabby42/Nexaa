@@ -13,7 +13,4 @@ export class CreateBannerDto {
 
   @IsOptional()
   readonly tracking_tag: string;
-
-  @IsNotEmpty()
-  readonly commission: number;
 }

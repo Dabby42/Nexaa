@@ -1,9 +1,9 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, AfterLoad } from "typeorm";
 
 export enum BannerStatusEnum {
-  ACTIVE = 1,
-  DISABLED = 2,
-  PAUSED = 3,
+  ACTIVE = "active",
+  DISABLED = "disabled",
+  PAUSED = "paused",
 }
 
 export interface BannerImagesAndSizes {
@@ -42,7 +42,7 @@ export class Banner {
     enum: BannerStatusEnum,
     default: BannerStatusEnum.ACTIVE,
   })
-  status: number;
+  status: string;
 
   @CreateDateColumn()
   created_at: Date;

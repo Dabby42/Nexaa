@@ -89,3 +89,25 @@ export const getClickResponseMock: any = {
     ],
   },
 };
+
+export const getAllCampaignsResponseDataMock = {
+  status: "success",
+  message: "Campaigns retrieved successfully",
+  data: [
+    {
+      date_created: "30 Mar 2023, 10:07 am",
+      campaign_name: "Electronics",
+      campaign_status: "disabled",
+    },
+    {
+      date_created: "3 Apr 2023, 11:58 am",
+      campaign_name: "Soap",
+      campaign_status: "disabled",
+    },
+    {
+      date_created: "30 Mar 2023, 10:07 am",
+      campaign_name: "Electronics",
+      campaign_status: "disabled",
+    },
+  ],
+};
