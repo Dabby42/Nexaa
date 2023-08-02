@@ -1,31 +1,35 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { createConnection } from "typeorm";
+import { EntityManager } from "typeorm";
+import magentoDB from "../db/magento-source";
 
 @Injectable()
 export class MagentoRepository {
-  private static connection;
+  private conn: EntityManager;
 
-  private async magentoDataBaseConnection() {
-    if (!MagentoRepository.connection) {
-      MagentoRepository.connection = await createConnection("magento");
-    }
-    return MagentoRepository.connection;
+  async connection() {
+    const connection = await magentoDB.initialize();
+
+    return connection.manager;
   }
 
   async getOrder(orderIds: any[]) {
     let orderDetails: any;
 
     try {
-      await this.magentoDataBaseConnection();
-      const parameters: string = orderIds.join(",");
-      const queryString = `SELECT entity_id, status FROM sales_flat_order WHERE entity_id IN (${parameters})`;
-      const entityManager = MagentoRepository.connection.manager;
-      orderDetails = await entityManager.query(queryString);
+      // console.log(this.connection);
+      // const parameters: string = orderIds.join(",");
+      const queryString = `SELECT increment_id, status FROM sales_flat_order WHERE increment_id IN (${orderIds})`;
+      if (!this.conn) {
+        this.conn = await this.connection();
+      }
+      orderDetails = await this.conn.query(queryString);
+      console.log(orderDetails);
       if (orderDetails.length === 0) {
         throw new NotFoundException(`Order Not found`);
       }
       return orderDetails;
     } catch (error) {
+      console.log(error.message);
       throw new BadRequestException(error.message);
     }
   }

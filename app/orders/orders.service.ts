@@ -29,27 +29,34 @@ export class OrdersService {
     return await this.orderRepository.createQueryBuilder("order").select(["`order`.*"]).where({ order_id }).getRawOne();
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async updateOrderStatus() {
     const statusArr = ["cancelled", "new"];
-    const orderIds = await this.orderRepository.createQueryBuilder().select("order_id").where("status IS IN (:...statusArr)", { statusArr }).getMany();
-    const orderDetails = await this.magentoRepository.getOrder(orderIds);
-    await this.orderRepository
+    const data = await this.orderRepository
       .createQueryBuilder()
-      .update(Orders)
-      .set(
-        orderDetails.reduce((acc, order) => {
-          acc["status"] = order.status;
-          return acc;
-        }, {})
-      )
-      .whereInIds(orderDetails.map((order) => order.entity_id))
-      .execute();
+      .select('GROUP_CONCAT(CONCAT("\'",order_id, "\'")) AS order_ids')
+      .where("`status` IN (:...statusArr)", { statusArr })
+      .getRawOne();
+    console.log(data);
+    if (data.order_ids) {
+      const orderDetails = await this.magentoRepository.getOrder(data.order_ids);
+      await this.orderRepository
+        .createQueryBuilder()
+        .update(Orders)
+        .set(
+          orderDetails.reduce((acc, order) => {
+            acc["status"] = order.status;
+            return acc;
+          }, {})
+        )
+        .where('order_id IN (":order_ids")', { order_ids: orderDetails.map((order) => order.increment_id).join('","') })
+        .execute();
 
-    this.logger.log(
-      "Order Status Updated Successfully for orderIds: %ids",
-      orderDetails.map((order) => order.entity_id)
-    );
+      this.logger.log(
+        "Order Status Updated Successfully for orderIds: %ids",
+        orderDetails.map((order) => order.increment_id)
+      );
+    }
   }
 
   async findAllOrders() {

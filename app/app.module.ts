@@ -19,10 +19,12 @@ import { ScheduleModule } from "@nestjs/schedule";
 import { CustomCacheModule } from "./cache/cache.module";
 import { StatsModule } from "./stats/stats.module";
 import { PayoutModule } from "./payout/payout.module";
+import { magentoDataSourceOptions } from "./db/magento-source";
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(dataSourceOptions),
+    // TypeOrmModule.forRoot(magentoDataSourceOptions),
     ScheduleModule.forRoot(),
     UserModule,
     AuthModule,

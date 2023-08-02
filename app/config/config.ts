@@ -28,17 +28,17 @@ export const config = {
       min: process.env.DATABASE_POOL_MIN ? Number(process.env.DATABASE_POOL_MIN) : 2,
       max: process.env.DATABASE_POOL_MAX ? Number(process.env.DATABASE_POOL_MAX) : 2,
     },
-  },
-  magento: {
-    connection: {
-      host: process.env.MAGENTO_DATABASE_HOST,
-      database: process.env.MAGENTO_DATABASE_NAME,
-      user: process.env.MAGENTO_DATABASE_USERNAME,
-      password: process.env.MAGENTO_DATABASE_PASSWORD,
-    },
-    pool: {
-      min: Number(process.env.MAGENTO_DATABASE_POOL_MIN) || 2,
-      max: Number(process.env.MAGENTO_DATABASE_POOL_MAX) || 5,
+    magento: {
+      connection: {
+        host: process.env.MAGENTO_DATABASE_HOST || "20.31.123.79",
+        database: process.env.MAGENTO_DATABASE_NAME || "x1960",
+        user: process.env.MAGENTO_DATABASE_USERNAME || "magentuser307",
+        password: process.env.MAGENTO_DATABASE_PASSWORD || "v*6^L@Ht?p768",
+      },
+      pool: {
+        min: Number(process.env.MAGENTO_DATABASE_POOL_MIN) || 2,
+        max: Number(process.env.MAGENTO_DATABASE_POOL_MAX) || 5,
+      },
     },
   },
   redis: {
