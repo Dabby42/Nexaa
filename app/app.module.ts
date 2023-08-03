@@ -41,12 +41,6 @@ import { PayoutModule } from "./payout/payout.module";
     PayoutModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    // {
-    //   provide: APP_INTERCEPTOR,
-    //   useClass: CacheInterceptor,
-    // },
-  ],
+  providers: [AppService],
 })
 export class AppModule {}

@@ -31,25 +31,40 @@ export class OrdersService {
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async updateOrderStatus() {
-    const statusArr = ["cancelled", "new"];
-    const orderIds = await this.orderRepository.createQueryBuilder().select("order_id").where("status IS IN (:...statusArr)", { statusArr }).getMany();
-    const orderDetails = await this.magentoRepository.getOrder(orderIds);
-    await this.orderRepository
+    const statusArr = ["processing", "new"];
+    const data = await this.orderRepository
       .createQueryBuilder()
-      .update(Orders)
-      .set(
-        orderDetails.reduce((acc, order) => {
-          acc["status"] = order.status;
-          return acc;
-        }, {})
-      )
-      .whereInIds(orderDetails.map((order) => order.entity_id))
-      .execute();
+      .select('GROUP_CONCAT(CONCAT("\'",order_id, "\'")) AS order_ids')
+      .where("`status` IN (:...statusArr)", { statusArr })
+      .getRawOne();
 
-    this.logger.log(
-      "Order Status Updated Successfully for orderIds: %ids",
-      orderDetails.map((order) => order.entity_id)
-    );
+    if (data.order_ids) {
+      const orderDetails = await this.magentoRepository.getOrder(data.order_ids);
+      if (orderDetails.length) {
+        const increment_ids = orderDetails.map((order) => order.increment_id).join('","');
+        const obj = {};
+        for (const ord of orderDetails) {
+          if (!obj[ord.state]) {
+            obj[ord.state] = [];
+          }
+          obj[ord.state].push(ord.increment_id);
+        }
+        let case_statement = "";
+        for (const key in obj) {
+          case_statement += `WHEN order_id IN ("${obj[key].join('","')}") THEN "${key}"`;
+        }
+
+        await this.orderRepository.query(`UPDATE orders SET status = CASE ${case_statement} ELSE status END WHERE order_id IN ( "${increment_ids}")`);
+
+        this.logger.log(`Order Status Updated Successfully for orderIds: ${increment_ids} `);
+      } else {
+        this.logger.log("No orders match from Magento.");
+      }
+
+      return;
+    }
+
+    this.logger.log(`No orders to update.`);
   }
 
   async findAllOrders() {
