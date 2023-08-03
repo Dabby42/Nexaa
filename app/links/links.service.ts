@@ -32,7 +32,6 @@ export class LinksService {
       existingCondition.redirect_url = redirect_url;
     }
     const uuid = randomUUID();
-    // const existingLink = await this.linkRepository.find({ where: existingCondition });
 
     const existingLink = await this.linkRepository.createQueryBuilder("link").select("k_id").where(existingCondition).getRawOne();
     if (existingLink) {

@@ -157,3 +157,7 @@ spec:
                   key: newrelic-licence
             - name: NEW_RELIC_APP_NAME
               value: Staging-Hera-BE
+
+
+            - name: CUSTOM_LINK_ALLOWED_HOSTS
+              value: "www.az-staging.konga.com,az-staging.konga.com"

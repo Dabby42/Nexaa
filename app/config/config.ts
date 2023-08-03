@@ -30,10 +30,10 @@ export const config = {
     },
     magento: {
       connection: {
-        host: process.env.MAGENTO_DATABASE_HOST || "20.31.123.79",
-        database: process.env.MAGENTO_DATABASE_NAME || "x1960",
-        user: process.env.MAGENTO_DATABASE_USERNAME || "magentuser307",
-        password: process.env.MAGENTO_DATABASE_PASSWORD || "v*6^L@Ht?p768",
+        host: process.env.MAGENTO_DATABASE_HOST,
+        database: process.env.MAGENTO_DATABASE_NAME,
+        user: process.env.MAGENTO_DATABASE_USERNAME,
+        password: process.env.MAGENTO_DATABASE_PASSWORD,
       },
       pool: {
         min: Number(process.env.MAGENTO_DATABASE_POOL_MIN) || 2,
@@ -96,5 +96,8 @@ export const config = {
       sender: process.env.FORGOT_PASSWORD_SENDER,
       sender_id: process.env.FORGOT_PASSWORD_SENDER_ID,
     },
+  },
+  custom_link: {
+    allowed_hosts: process.env.CUSTOM_LINK_ALLOWED_HOSTS || "",
   },
 };
