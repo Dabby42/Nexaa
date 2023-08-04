@@ -211,7 +211,7 @@ export class LinksService {
         "banners.banner_description AS campaign_description",
       ])
       .leftJoin("links.banner_id", "banners")
-      .where("links.user_id = :affiliate_id", { affiliate_id })
+      .where("links.user_id = :affiliate_id AND links.banner_id IS NOT NULL", { affiliate_id })
       .skip((page - 1) * limit)
       .orderBy("links.created_at", "DESC")
       .limit(limit);
