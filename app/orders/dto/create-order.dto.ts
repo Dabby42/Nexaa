@@ -19,11 +19,11 @@ export class CreateOrderDto {
   readonly category: string;
 
   @IsNotEmpty()
-  readonly return_id: string;
+  readonly return_id?: string;
 
   @IsNotEmpty()
   @IsNumberString()
-  readonly commission_payment_status: string;
+  readonly commission_payment_status?: string;
 
   @IsNotEmpty()
   readonly commission: number;

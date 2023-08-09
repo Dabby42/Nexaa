@@ -27,6 +27,9 @@ export class Category {
   })
   status: number;
 
+  @Column({ nullable: true })
+  magento_id: number;
+
   @CreateDateColumn()
   public created_at: Date;
 

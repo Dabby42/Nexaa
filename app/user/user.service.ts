@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from "@nestjs/common";
+import { BadRequestException, ConflictException, forwardRef, Inject, Injectable, Logger, NotFoundException, UnprocessableEntityException } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Like, Repository } from "typeorm";
@@ -21,7 +21,7 @@ export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Admin) private adminRepository: Repository<Admin>,
-    private readonly linksService: LinksService,
+    @Inject(forwardRef(() => LinksService)) private readonly linksService: LinksService,
     private readonly notificationService: NotificationService,
     private cacheService: CacheService
   ) {
