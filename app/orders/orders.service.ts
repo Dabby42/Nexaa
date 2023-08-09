@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
+import { ConflictException, Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CommissionPaymentStatusEnum, CommissionStatusEnum, Orders } from "./entities/order.entity";
@@ -21,6 +21,8 @@ export class OrdersService {
   ) {}
 
   async createOrder(createOrderDto: CreateOrderDto) {
+    const orderExists = await this.orderRepository.findOne({ where: { order_id: createOrderDto.order_id } });
+    if (orderExists) throw new ConflictException("Order already exists.");
     const newOrder = this.orderRepository.create(createOrderDto);
     return await this.orderRepository.save(newOrder);
   }
