@@ -61,7 +61,7 @@ export class LinksService {
   }
 
   async recordClicks(k_id: string, req) {
-    const ipAddress = req.ip || req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+    const ipAddress = req.headers["x-original-forwarded-for"] || req.headers["x-forwarded-for"] || req.socket.remoteAddress || req.ip;
     const cacheKey = "link_" + k_id;
     let data = await this.cacheService.get(cacheKey);
     if (!data) {
