@@ -76,7 +76,7 @@ export class OrdersService {
   getMonthsFromNowTill9MonthsBack() {
     const today = new Date();
     const nineMonthsAgo = new Date();
-    nineMonthsAgo.setMonth(today.getMonth() - 8);
+    nineMonthsAgo.setMonth(today.getMonth() - 9);
 
     const months = [];
     while (nineMonthsAgo <= today) {
@@ -95,7 +95,7 @@ export class OrdersService {
       .select('DATE_FORMAT(order.created_at, "%Y-%m")', "month")
       .addSelect("SUM(order.commission)", "total_commission")
       .where("order.affiliate_id = :affiliate_id", { affiliate_id })
-      .andWhere("order.created_at >= DATE_SUB(NOW(), INTERVAL 9 MONTH)")
+      .andWhere("order.created_at >= DATE_SUB(NOW(), INTERVAL 10 MONTH)")
       .groupBy("month")
       .getRawMany();
     const monthsInRange = this.getMonthsFromNowTill9MonthsBack();

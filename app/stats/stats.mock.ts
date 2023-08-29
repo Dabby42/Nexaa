@@ -51,7 +51,7 @@ export const affiliateClicksSalesAndCommissionsDataResponse: any = {
       approved: 0,
     },
     clicks: {
-      total: "0",
+      all: "0",
       repeated: "0",
       unique: "0",
     },
