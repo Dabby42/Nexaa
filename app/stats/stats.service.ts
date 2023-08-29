@@ -30,7 +30,7 @@ export class StatsService {
         approved: totalSalesCount.approved,
       },
       clicks: {
-        total: totalClicksCount.clicksCount,
+        all: totalClicksCount.clicksCount,
         repeated: Math.abs(parseInt(totalClicksCount.clicksCount) - parseInt(totalClicksCount.uniqueClicksCount)).toString(),
         unique: totalClicksCount.uniqueClicksCount,
       },
