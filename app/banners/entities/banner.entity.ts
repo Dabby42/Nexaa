@@ -22,6 +22,9 @@ export class Banner {
   @Column({ nullable: true })
   banner_description: string;
 
+  @Column({ nullable: true })
+  cover_image: string;
+
   @Column({ type: "text" })
   banner_images_and_sizes: string;
 
