@@ -12,6 +12,9 @@ export class UpdateBannerDto {
   readonly banner_link?: string;
 
   @IsOptional()
+  readonly cover_image?: string;
+
+  @IsOptional()
   readonly tracking_tag?: string;
 
   @IsOptional()
