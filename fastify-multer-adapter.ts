@@ -36,7 +36,7 @@ export class FastifyMulterAdapter extends FastifyAdapter {
 
   private addLogger() {
     this.getInstance().addHook("onRequest", (request, reply, done) => {
-      this.logger.log(`${request.method} ${request.url}`);
+      this.logger.log(`${request.method} ${request.url} ${request.headers["x-original-forwarded-for"]}`);
       done();
     });
   }
