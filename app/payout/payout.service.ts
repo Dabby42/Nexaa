@@ -21,8 +21,8 @@ export class PayoutService {
       .leftJoin("payout.order_id", "order")
       .orderBy("payout.created_at", "DESC")
       .where({ affiliate_id })
-      .skip((page - 1) * limit)
-      .limit(limit);
+      .skip((+page - 1) * limit)
+      .limit(+limit);
 
     const payoutList = await query.getRawMany();
     const count = await query.getCount();
@@ -38,7 +38,7 @@ export class PayoutService {
       });
       return payout;
     });
-    const pages = Math.ceil(count / limit);
+    const pages = Math.ceil(count / +limit);
     return {
       payouts,
       count,
