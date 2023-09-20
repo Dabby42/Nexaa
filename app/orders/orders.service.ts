@@ -277,6 +277,7 @@ export class OrdersService {
 
     return {
       orders,
+      count,
       current_page: +page,
       pages,
     };
