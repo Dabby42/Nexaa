@@ -55,7 +55,7 @@ export class PayoutService {
     return {
       payouts,
       count,
-      current_page: page,
+      current_page: +page,
       pages,
     };
   }

@@ -3,6 +3,8 @@ import { RabbitmqService } from "./rabbitmq.service";
 import { OrdersModule } from "../orders/orders.module";
 import { LinksModule } from "../links/links.module";
 import { config } from "../config/config";
+import { CategoriesModule } from "../categories/categories.module";
+import { UserModule } from "../user/user.module";
 
 @Module({
   providers: [
@@ -20,7 +22,7 @@ import { config } from "../config/config";
     },
     RabbitmqService,
   ],
-  imports: [OrdersModule, forwardRef(() => LinksModule)],
+  imports: [OrdersModule, forwardRef(() => LinksModule), CategoriesModule, forwardRef(() => UserModule)],
   exports: [RabbitmqService],
 })
 export class RabbitmqModule {}

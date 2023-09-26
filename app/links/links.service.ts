@@ -10,6 +10,7 @@ import { Clicks } from "./entities/click.entity";
 import { Ips } from "./entities/ip.entity";
 import { RabbitmqService } from "../rabbitmq/rabbitmq.service";
 import { CacheService } from "../cache/cache.service";
+import { BannerStatusEnum } from "../banners/entities/banner.entity";
 
 @Injectable()
 export class LinksService {
@@ -32,7 +33,6 @@ export class LinksService {
       existingCondition.redirect_url = redirect_url;
     }
     const uuid = randomUUID();
-    // const existingLink = await this.linkRepository.find({ where: existingCondition });
 
     const existingLink = await this.linkRepository.createQueryBuilder("link").select("k_id").where(existingCondition).getRawOne();
     if (existingLink) {
@@ -61,7 +61,7 @@ export class LinksService {
   }
 
   async recordClicks(k_id: string, req) {
-    const ipAddress = req.ip || req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+    const ipAddress = req.headers["x-original-forwarded-for"] || req.headers["x-forwarded-for"] || req.socket.remoteAddress || req.ip;
     const cacheKey = "link_" + k_id;
     let data = await this.cacheService.get(cacheKey);
     if (!data) {
@@ -198,5 +198,41 @@ export class LinksService {
     }
 
     return query.getRawOne();
+  }
+
+  async getAllCampaigns(affiliate_id: number, page: number, limit: number, filter?: string) {
+    const query = this.linkRepository
+      .createQueryBuilder("links")
+      .select([
+        "links.created_at AS date_created",
+        "links.k_id AS link_uuid",
+        "banners.banner_name AS campaign_name",
+        "banners.status AS campaign_status",
+        "banners.banner_description AS campaign_description",
+      ])
+      .leftJoin("links.banner_id", "banners")
+      .where("links.user_id = :affiliate_id AND links.banner_id IS NOT NULL", { affiliate_id })
+      .skip((page - 1) * limit)
+      .orderBy("links.created_at", "DESC")
+      .limit(limit);
+
+    if (filter && (filter == BannerStatusEnum.ACTIVE || filter == BannerStatusEnum.PAUSED || filter == BannerStatusEnum.DISABLED)) {
+      query.where("banners.status = :filter", { filter });
+    }
+
+    const campaigns = await query.getRawMany();
+    return campaigns.map((campaign) => {
+      campaign["campaign_link"] = `${config.baseUrl}/${campaign.link_uuid}`;
+      campaign["date_created"] = new Date(campaign.date_created).toLocaleString("en-NG", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+      delete campaign.link_uuid;
+      return campaign;
+    });
   }
 }

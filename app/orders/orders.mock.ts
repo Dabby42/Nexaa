@@ -15,6 +15,7 @@ export const getAllOrdersResponseMock: any = {
     ],
     current_page: 1,
     pages: 1,
+    count: 1,
   },
 };
 

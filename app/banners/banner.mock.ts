@@ -3,6 +3,7 @@ export const createBannerResponseData: any = {
   message: "Banner Created",
   data: {
     banner_name: "Yakata",
+    cover_image: "https://www-konga-com-res.cloudinary.com/image/upload/v1693393621/affiliate/banner-cover-sample.png",
     banner_images_and_sizes: '[{"banner_size":"300 x 200","banner_image_url":"https://test.com"},{"banner_size":"100 x 200","banner_image_url":"https://test2.com"}]',
     banner_link: "https://test.com",
     tracking_tag: "lmao",
@@ -17,6 +18,7 @@ export const getBannerResponseData: any = {
   message: "Data fetched successfully",
   data: {
     banner_name: "Yakata",
+    cover_image: "https://www-konga-com-res.cloudinary.com/image/upload/v1693393621/affiliate/banner-cover-sample.png",
     banner_images_and_sizes: [
       { banner_size: "300 x 200", banner_image_url: "https://test.com" },
       { banner_size: "100 x 200", banner_image_url: "https://test2.com" },
@@ -42,6 +44,7 @@ export const createBannerData: any = {
     },
   ],
   banner_link: "https://test.com",
+  cover_image: "https://www-konga-com-res.cloudinary.com/image/upload/v1693393621/affiliate/banner-cover-sample.png",
   tracking_tag: "lmao",
   commission: 14,
 };
@@ -66,6 +69,7 @@ export const getActiveBannersResponseMock: any = {
       {
         id: 1,
         banner_name: "string",
+        cover_image: "https://www-konga-com-res.cloudinary.com/image/upload/v1693393621/affiliate/banner-cover-sample.png",
         banner_images_and_sizes: [{}],
         banner_link: "string",
         tracking_tag: "string",
@@ -114,6 +118,7 @@ export const getAllBannersResponseMock: any = {
         banner_name: "string",
         banner_images_and_sizes: [{}],
         banner_link: "string",
+        cover_image: "https://www-konga-com-res.cloudinary.com/image/upload/v1693393621/affiliate/banner-cover-sample.png",
         tracking_tag: "string",
         status: 1,
         commission: 0,

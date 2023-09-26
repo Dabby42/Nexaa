@@ -28,7 +28,8 @@ export class PayoutController {
   @ApiQuery({ name: "start_date", type: "string", example: "2021-01-10 12:00:00", required: false })
   @ApiQuery({ name: "end_date", type: "string", example: "2021-05-10 12:00:00", required: false })
   async getAllPayouts(@Query() payoutQueryDto: PayoutQueryDto) {
-    return await this.payoutService.getAllPayouts(payoutQueryDto);
+    const data = await this.payoutService.getAllPayouts(payoutQueryDto);
+    return sendSuccess(data, "Payout retrieved successfully");
   }
 
   @UseGuards(JwtGuard)
@@ -38,7 +39,8 @@ export class PayoutController {
   @ApiQuery({ name: "start_date", type: "string", example: "2021-01-10 12:00:00", required: false })
   @ApiQuery({ name: "end_date", type: "string", example: "2021-05-10 12:00:00", required: false })
   async getAllAffiliatePayouts(@Param("id") id: number, @Query() payoutQueryDto: PayoutQueryDto) {
-    return await this.payoutService.getAllPayouts(payoutQueryDto, id);
+    const data = await this.payoutService.getAllPayouts(payoutQueryDto, id);
+    return sendSuccess(data, "Affiliate payout retrieved successfully");
   }
 
   @UseGuards(JwtGuard)

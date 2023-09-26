@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
+import { ConflictException, Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CommissionPaymentStatusEnum, CommissionStatusEnum, Orders } from "./entities/order.entity";
@@ -21,6 +21,8 @@ export class OrdersService {
   ) {}
 
   async createOrder(createOrderDto: CreateOrderDto) {
+    const orderExists = await this.orderRepository.findOne({ where: { order_id: createOrderDto.order_id } });
+    if (orderExists) throw new ConflictException("Order already exists.");
     const newOrder = this.orderRepository.create(createOrderDto);
     return await this.orderRepository.save(newOrder);
   }
@@ -29,34 +31,42 @@ export class OrdersService {
     return await this.orderRepository.createQueryBuilder("order").select(["`order`.*"]).where({ order_id }).getRawOne();
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async updateOrderStatus() {
-    const statusArr = ["cancelled", "new"];
+    const statusArr = ["processing", "new"];
     const data = await this.orderRepository
       .createQueryBuilder()
       .select('GROUP_CONCAT(CONCAT("\'",order_id, "\'")) AS order_ids')
       .where("`status` IN (:...statusArr)", { statusArr })
       .getRawOne();
-    console.log(data);
+
     if (data.order_ids) {
       const orderDetails = await this.magentoRepository.getOrder(data.order_ids);
-      await this.orderRepository
-        .createQueryBuilder()
-        .update(Orders)
-        .set(
-          orderDetails.reduce((acc, order) => {
-            acc["status"] = order.status;
-            return acc;
-          }, {})
-        )
-        .where('order_id IN (":order_ids")', { order_ids: orderDetails.map((order) => order.increment_id).join('","') })
-        .execute();
+      if (orderDetails.length) {
+        const increment_ids = orderDetails.map((order) => order.increment_id).join('","');
+        const obj = {};
+        for (const ord of orderDetails) {
+          if (!obj[ord.state]) {
+            obj[ord.state] = [];
+          }
+          obj[ord.state].push(ord.increment_id);
+        }
+        let case_statement = "";
+        for (const key in obj) {
+          case_statement += `WHEN order_id IN ("${obj[key].join('","')}") THEN "${key}"`;
+        }
 
-      this.logger.log(
-        "Order Status Updated Successfully for orderIds: %ids",
-        orderDetails.map((order) => order.increment_id)
-      );
+        await this.orderRepository.query(`UPDATE orders SET status = CASE ${case_statement} ELSE status END WHERE order_id IN ( "${increment_ids}")`);
+
+        this.logger.log(`Order Status Updated Successfully for orderIds: ${increment_ids} `);
+      } else {
+        this.logger.log("No orders match from Magento.");
+      }
+
+      return;
     }
+
+    this.logger.log(`No orders to update.`);
   }
 
   async findAllOrders() {
@@ -66,7 +76,7 @@ export class OrdersService {
   getMonthsFromNowTill9MonthsBack() {
     const today = new Date();
     const nineMonthsAgo = new Date();
-    nineMonthsAgo.setMonth(today.getMonth() - 8);
+    nineMonthsAgo.setMonth(today.getMonth() - 9);
 
     const months = [];
     while (nineMonthsAgo <= today) {
@@ -85,7 +95,7 @@ export class OrdersService {
       .select('DATE_FORMAT(order.created_at, "%Y-%m")', "month")
       .addSelect("SUM(order.commission)", "total_commission")
       .where("order.affiliate_id = :affiliate_id", { affiliate_id })
-      .andWhere("order.created_at >= DATE_SUB(NOW(), INTERVAL 9 MONTH)")
+      .andWhere("order.created_at >= DATE_SUB(NOW(), INTERVAL 10 MONTH)")
       .groupBy("month")
       .getRawMany();
     const monthsInRange = this.getMonthsFromNowTill9MonthsBack();
@@ -274,6 +284,7 @@ export class OrdersService {
 
     return {
       orders,
+      count,
       current_page: +page,
       pages,
     };

@@ -37,7 +37,6 @@ export class OrdersController {
       type: "object",
       properties: {
         file: {
-          // 👈 this property
           type: "string",
           format: "binary",
         },

@@ -5,6 +5,9 @@ export class CreateBannerDto {
   @IsNotEmpty()
   readonly banner_name: string;
 
+  @IsNotEmpty()
+  readonly cover_image: string;
+
   @ArrayNotEmpty()
   readonly banner_images_and_sizes: Array<BannerImagesAndSizes>;
 
@@ -13,7 +16,4 @@ export class CreateBannerDto {
 
   @IsOptional()
   readonly tracking_tag: string;
-
-  @IsNotEmpty()
-  readonly commission: number;
 }

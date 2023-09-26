@@ -7,7 +7,6 @@ export const magentoDataSourceOptions: DataSourceOptions = {
   username: config.mysql.magento.connection.user,
   password: config.mysql.magento.connection.password,
   database: config.mysql.magento.connection.database,
-  logging: true,
 };
 const dataSource = new DataSource(magentoDataSourceOptions);
 

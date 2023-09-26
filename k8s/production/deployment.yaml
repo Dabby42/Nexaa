@@ -172,3 +172,6 @@ spec:
                   key: newrelic-licence
             - name: NEW_RELIC_APP_NAME
               value: Live-Hera-BE
+
+            - name: CUSTOM_LINK_ALLOWED_HOSTS
+              value: "www.konga.com,konga.com"

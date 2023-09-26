@@ -6,15 +6,22 @@ import { Clicks } from "./entities/click.entity";
 import { Links } from "./entities/link.entity";
 import { Ips } from "./entities/ip.entity";
 import { UnprocessableEntityException } from "@nestjs/common";
-import { createCustomUrlData, getClickResponseMock, getIpResponseMock, getLinkResponseMock, recordClickResponseData, recordClicksData, userRequestMock } from "./link.mock";
+import {
+  createCustomUrlData,
+  getAllCampaignsResponseDataMock,
+  getClickResponseMock,
+  getIpResponseMock,
+  getLinkResponseMock,
+  recordClickResponseData,
+  recordClicksData,
+  userRequestMock,
+} from "./link.mock";
 import { CacheService } from "../cache/cache.service";
 import { RabbitmqService } from "../rabbitmq/rabbitmq.service";
 
 describe("LinksController", () => {
   let controller: LinksController;
   let linkRepository;
-  let clickRepository;
-  let ipRepository;
 
   const mockClickRepository = {
     create: jest.fn().mockImplementation((dto) => dto),
@@ -49,6 +56,9 @@ describe("LinksController", () => {
     andWhere: jest.fn().mockReturnThis(),
     leftJoin: jest.fn().mockReturnThis(),
     groupBy: jest.fn().mockReturnThis(),
+    skip: jest.fn().mockReturnThis(),
+    orderBy: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockReturnThis(),
     getRawOne: jest.fn().mockResolvedValue(getLinkResponseMock.data),
     getRawMany: jest.fn().mockResolvedValue([]),
     findOne: jest.fn().mockImplementation(() => Promise.resolve(getLinkResponseMock.data)),
@@ -104,8 +114,6 @@ describe("LinksController", () => {
 
     controller = module.get<LinksController>(LinksController);
     linkRepository = module.get(getRepositoryToken(Links));
-    clickRepository = module.get(getRepositoryToken(Clicks));
-    ipRepository = module.get(getRepositoryToken(Ips));
   });
 
   it("should be defined", () => {
@@ -132,6 +140,13 @@ describe("LinksController", () => {
   describe("Record a click", () => {
     it("should record a click successfully", async () => {
       expect(await controller.recordClicks(recordClicksData, userRequestMock)).toStrictEqual(recordClickResponseData);
+    });
+  });
+
+  describe("Get affiliate campaigns", () => {
+    it("should retrieve all affiliate campaigns successfully", async () => {
+      linkRepository.getRawMany.mockImplementationOnce(() => getAllCampaignsResponseDataMock.data);
+      expect(await controller.getAllCampaigns({ user: { id: 2 } })).toStrictEqual(getAllCampaignsResponseDataMock);
     });
   });
 });

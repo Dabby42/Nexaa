@@ -2,7 +2,7 @@ import { Controller, Post, Body, Req, UseGuards, Query, Get } from "@nestjs/comm
 import { LinksService } from "./links.service";
 import { CreateCustomUrlDto } from "./dto/create-custom-url.dto";
 import { sendSuccess } from "../utils/helpers/response.helpers";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { JwtGuard } from "../auth/auth.jwt.guard";
 
 @ApiBearerAuth("jwt")
@@ -28,5 +28,15 @@ export class LinksController {
   async getClicksByDays(@Req() req: Request, @Query("days") days = 7) {
     const result = await this.linksService.getClicksByDays(req, days);
     return sendSuccess(result, "Clicks retrieved successfully");
+  }
+
+  @UseGuards(JwtGuard)
+  @Get("affiliate/campaigns")
+  @ApiQuery({ name: "limit", type: "number", required: false })
+  @ApiQuery({ name: "page", type: "number", required: false })
+  @ApiQuery({ name: "filter", type: "string", required: false })
+  async getAllCampaigns(@Req() req, @Query("page") page = 1, @Query("limit") limit = 20, @Query("filter") filter?: string) {
+    const data = await this.linksService.getAllCampaigns(req.user.id, page, limit, filter);
+    return sendSuccess(data, "Campaigns retrieved successfully");
   }
 }
