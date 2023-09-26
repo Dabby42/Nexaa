@@ -250,7 +250,7 @@ export class OrdersService {
   }
 
   async getAllOrders(queryOrderDto: OrderQueryDto) {
-    const { page, limit, ...conditions } = queryOrderDto;
+    const { page, limit, start_date, end_date, ...conditions } = queryOrderDto;
 
     const query = this.orderRepository
       .createQueryBuilder("order")
@@ -259,6 +259,13 @@ export class OrdersService {
       .where(conditions)
       .skip((+page - 1) * +limit)
       .limit(+limit);
+
+    if (start_date && end_date) {
+      query.andWhere("DATE(order.created_at) >= :start_date AND DATE(order.created_at) <= :end_date", {
+        start_date,
+        end_date,
+      });
+    }
 
     const orders = await query.getRawMany();
     const count = await query.getCount();
