@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Query, Res, Req, Logger } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param, UseGuards, Query, Res, Req } from "@nestjs/common";
 import { PayoutService } from "./payout.service";
 import { CreatePayoutDto } from "./dto/create-payout.dto";
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
@@ -7,12 +7,12 @@ import { JwtGuard } from "../auth/auth.jwt.guard";
 import { createObjectCsvWriter } from "csv-writer";
 import { sendError, sendSuccess } from "../utils/helpers/response.helpers";
 import * as fs from "fs";
+import { PayoutQueryDto } from "./dto/payout-query.dto";
 
 @ApiTags("Payout")
 @ApiBearerAuth("jwt")
 @Controller("v1/payout")
 export class PayoutController {
-  private readonly logger = new Logger("PayoutService");
   constructor(private readonly payoutService: PayoutService) {}
 
   @Post()
@@ -25,8 +25,10 @@ export class PayoutController {
   @Get()
   @ApiQuery({ name: "limit", type: "number", required: false })
   @ApiQuery({ name: "page", type: "number", required: false })
-  async getAllPayouts(@Query("page") page = 1, @Query("limit") limit = 20) {
-    const data = await this.payoutService.getAllPayouts(page, limit);
+  @ApiQuery({ name: "start_date", type: "string", example: "2021-01-10 12:00:00", required: false })
+  @ApiQuery({ name: "end_date", type: "string", example: "2021-05-10 12:00:00", required: false })
+  async getAllPayouts(@Query() payoutQueryDto: PayoutQueryDto) {
+    const data = await this.payoutService.getAllPayouts(payoutQueryDto);
     return sendSuccess(data, "Payout retrieved successfully");
   }
 
@@ -34,8 +36,10 @@ export class PayoutController {
   @Get("affiliates/:id")
   @ApiQuery({ name: "limit", type: "number", required: false })
   @ApiQuery({ name: "page", type: "number", required: false })
-  async getAllAffiliatePayouts(@Param("id") id: number, @Query("page") page = 1, @Query("limit") limit = 20) {
-    const data = await this.payoutService.getAllPayouts(page, limit, id);
+  @ApiQuery({ name: "start_date", type: "string", example: "2021-01-10 12:00:00", required: false })
+  @ApiQuery({ name: "end_date", type: "string", example: "2021-05-10 12:00:00", required: false })
+  async getAllAffiliatePayouts(@Param("id") id: number, @Query() payoutQueryDto: PayoutQueryDto) {
+    const data = await this.payoutService.getAllPayouts(payoutQueryDto, id);
     return sendSuccess(data, "Affiliate payout retrieved successfully");
   }
 
@@ -43,15 +47,18 @@ export class PayoutController {
   @Get("generate-csv")
   @ApiQuery({ name: "limit", type: "number", required: false })
   @ApiQuery({ name: "page", type: "number", required: false })
-  async getPayoutHistoryCSV(@Query("page") page = 1, @Query("limit") limit = 20, @Res() res, @Req() req) {
+  @ApiQuery({ name: "start_date", type: "string", example: "2021-01-10 12:00:00", required: false })
+  @ApiQuery({ name: "end_date", type: "string", example: "2021-05-10 12:00:00", required: false })
+  async getPayoutHistoryCSV(@Query() payoutQueryDto: PayoutQueryDto, @Res() res, @Req() req) {
     const { id } = req.user;
-    const payoutHistory: any = await this.payoutService.getAllPayouts(page, limit, id);
+    const payoutHistory: any = await this.payoutService.getAllPayouts(payoutQueryDto, id);
+
     const csvWriter = createObjectCsvWriter({
       path: `payout-history-${id}.csv`,
       header: [
         { id: "commission", title: "Commission" },
         { id: "payment_status", title: "Payment_status" },
-        { id: "order", title: "Order" },
+        { id: "order_number", title: "Order" },
         { id: "payment_date", title: "Payment_date" },
       ],
     });
@@ -65,9 +72,8 @@ export class PayoutController {
         res.send(fileContent);
         fs.unlinkSync(`payout-history-${id}.csv`);
       })
-      .catch((error) => {
-        this.logger.log(`Error generating CSV: ${error}`);
-        res.status(500).send(sendError("Error generating CSV file."));
+      .catch((err) => {
+        sendError("Error generating CSV file.");
       });
   }
 }

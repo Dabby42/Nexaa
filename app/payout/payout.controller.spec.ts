@@ -56,11 +56,14 @@ describe("PayoutController", () => {
 
   describe("Get all payouts", () => {
     it("Admin should retrieve all affiliate payout successfully", async () => {
-      expect(await controller.getAllPayouts()).toStrictEqual(getAllPayoutResponseMock);
+      expect(await controller.getAllPayouts({ page: "1", limit: "20" })).toStrictEqual(getAllPayoutResponseMock);
     });
     it("Affiliates should retrieve their payout successfully", async () => {
       getAllPayoutResponseMock.message = "Affiliate payout retrieved successfully";
-      expect(await controller.getAllAffiliatePayouts(1)).toStrictEqual(getAllPayoutResponseMock);
+      expect(await controller.getAllAffiliatePayouts(1, { page: "1", limit: "20" })).toStrictEqual({
+        message: "Affiliate payout retrieved successfully",
+        ...getAllPayoutResponseMock,
+      });
     });
   });
 });

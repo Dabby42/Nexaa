@@ -19,6 +19,8 @@ export class OrdersController {
   @ApiQuery({ name: "page", type: "number", required: false })
   @ApiQuery({ name: "commission_payment_status", type: "string", required: false })
   @ApiQuery({ name: "commission_status", type: "string", required: false })
+  @ApiQuery({ name: "start_date", type: "string", example: "2021-01-10 12:00:00", required: false })
+  @ApiQuery({ name: "end_date", type: "string", example: "2021-05-10 12:00:00", required: false })
   @ApiQuery({ name: "affiliate_id", description: "This is for when admin wants to get commissions of a particular affiliate. ", type: "number", required: false })
   async getAllOrders(@Query() orderQueryDto: OrderQueryDto, @Req() req: any) {
     //if it is an affiliate calling this endpoint, ensure they only get their orders.

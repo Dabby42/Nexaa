@@ -1,4 +1,4 @@
-import { IsEnum, IsNumberString, IsOptional } from "class-validator";
+import { IsDateString, IsEnum, IsNumberString, IsOptional } from "class-validator";
 import { CommissionPaymentStatusEnum, CommissionStatusEnum } from "../entities/order.entity";
 
 export class OrderQueryDto {
@@ -21,4 +21,12 @@ export class OrderQueryDto {
   @IsOptional()
   @IsNumberString()
   affiliate_id?: string;
+
+  @IsDateString()
+  @IsOptional()
+  readonly start_date?: string;
+
+  @IsDateString()
+  @IsOptional()
+  readonly end_date?: string;
 }
