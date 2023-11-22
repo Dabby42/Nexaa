@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnprocessableEntityException } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, UnprocessableEntityException } from "@nestjs/common";
 import { CreateBannerDto } from "./dto/create-banner.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Banner, BannerStatusEnum } from "./entities/banner.entity";
@@ -10,6 +10,7 @@ import { CacheService } from "../cache/cache.service";
 
 @Injectable()
 export class BannersService {
+  private readonly logger = new Logger("BannerService");
   private readonly cacheKeyBase: string;
   constructor(@InjectRepository(Banner) private bannerRepository: Repository<Banner>, private cacheService: CacheService) {
     this.cacheKeyBase = "BANNER_";
@@ -25,6 +26,7 @@ export class BannersService {
       this.cacheService.refresh(this.cacheKeyBase);
       return sendSuccess(data, "Banner Created");
     } catch (error) {
+      this.logger.error(error);
       throw new UnprocessableEntityException("An unknown error occurred");
     }
   }
