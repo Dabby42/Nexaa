@@ -14,6 +14,15 @@ export class CreateBannerDto {
   @IsNotEmpty()
   readonly banner_link: string;
 
+  @IsNotEmpty()
+  readonly banner_description: string;
+
+  @IsNotEmpty()
+  readonly campaign_start_date: Date;
+
+  @IsNotEmpty()
+  readonly campaign_end_date: Date;
+
   @IsOptional()
   readonly tracking_tag: string;
 }
