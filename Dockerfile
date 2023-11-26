@@ -2,7 +2,7 @@
 FROM node:18.13.0
 
 # create the log directory
-RUN mkdir -p /var/log/applications/hera-be
+RUN mkdir -p /var/log/applications/nexaa
 
 # Creating base "src" directory where the source repo will reside in our container.
 # Code is copied from the host machine to this "src" folder in the container as a last step.

@@ -18,19 +18,4 @@ export class CreateUserDto {
   @IsNotEmpty()
   readonly username: string;
 
-  @IsNotEmpty()
-  readonly address: string;
-
-  @IsNotEmpty()
-  readonly state: string;
-
-  @IsNotEmpty()
-  readonly country: string;
-
-  @IsPhoneNumber("NG")
-  readonly phone_number: string;
-
-  @IsNotEmpty()
-  @IsOptional()
-  readonly website_url: string;
 }

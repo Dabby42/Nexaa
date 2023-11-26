@@ -1,72 +1,40 @@
-import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
-import { BaseUser } from "./base-user.entity";
-import { Admin } from "./admin.entity";
-
-export enum UserStatusEnum {
-  PENDING = 0,
-  APPROVED = 1,
-  DISABLED = 2,
-}
+import * as bcrypt from "bcryptjs";
+import { config } from "../../config/config";
+import { Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 export enum RoleEnum {
-  AFFILIATE = 1,
-  ADMIN = 3,
+  BRAND = 1,
+  CREATOR = 2,
 }
 
-@Entity()
-export class User extends BaseUser {
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  first_name: string;
+
+  @Column()
+  last_name: string;
+
+  @Column({ unique: true })
+  email: string;
+
   @Column({ unique: true })
   username: string;
 
-  @Column()
-  address: string;
+  static async comparePasswords(password: string, hashedPassword: string) {
+    return await bcrypt.compare(password, hashedPassword);
+  }
 
-  @Column()
-  state: string;
+  static async hashPassword(password) {
+    const salt = await bcrypt.genSalt(config.salt);
+    return await bcrypt.hash(password, salt);
+  }
 
-  @Column()
-  country: string;
+  @CreateDateColumn()
+  created_at: Date;
 
-  @Column({ unique: true })
-  phone_number: string;
-
-  @Column({ nullable: true })
-  website_url: string;
-
-  @Column({ nullable: true })
-  account_number: string;
-
-  @Column({
-    type: "enum",
-    enum: UserStatusEnum,
-    default: UserStatusEnum.PENDING,
-  })
-  status: number;
-
-  @Column({
-    type: "enum",
-    enum: RoleEnum,
-    default: RoleEnum.AFFILIATE,
-  })
-  role: number;
-
-  @Column({ type: "timestamp", nullable: true })
-  public verified_at: Date;
-
-  @ManyToOne(() => Admin, { nullable: true })
-  @JoinColumn({ name: "verified_by" })
-  public verified_by: Admin;
-
-  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-  public created_at: Date;
-
-  @Column({
-    type: "timestamp",
-    default: () => "CURRENT_TIMESTAMP",
-    onUpdate: "CURRENT_TIMESTAMP",
-  })
-  public updated_at: Date;
-
-  @Column({ type: "text", nullable: true })
-  disable_reason: string;
+  @UpdateDateColumn()
+  updated_at: Date;
 }

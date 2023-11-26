@@ -3,7 +3,7 @@
 # This script will stop and remove all docker containers that were started from the service image.
 # It will clean up "exited" and "stopped" images as well.
 # Finally, it will remove the images built from the Dockerfiles in this repo.
-IMAGE_NAME="hera-be"
+IMAGE_NAME="nexaa"
 
 echo " ----- Stopping Docker Containers Started From Image -----"
 

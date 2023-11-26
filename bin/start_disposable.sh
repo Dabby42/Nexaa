@@ -2,7 +2,7 @@
 
 # This script will start a single "disposable" instance and connect the caller to it.
 # The instance will link to all infrastructure, including the service containers (if it exists)
-IMAGE_NAME="hera-be_web_app"
+IMAGE_NAME="nexaa_web_app"
 
 # Unfortunately, because we are mapping our current source code over the docker images source code, we will lose
 # the node_modules. Run npm install locally before we try anything else. This will install the node modules and ensure
@@ -25,7 +25,7 @@ else
     echo " ----- Web App Image Available for Use. -----"
 fi
 
-PROJECT_NAME="hera-be"
+PROJECT_NAME="nexaa-be"
 
 CURRENT_DOCKER_COMPOSE_VERSION=$( docker-compose -v | grep -o '[0-9]*[.][0-9]*[.][0-9]' | sed -e 's/[.]//g' )
 BREAKING_DOCKER_COMPOSE_VERSION=1210
@@ -49,11 +49,11 @@ echo " ----- Run Web application Disposable Container -----"
 docker run \
     -i \
     -t \
-    -p 12345:8000 \
+    -p 4000:8000 \
     -p 5858 \
     -v ${ROOT}:/src \
     --env-file=${ROOT}/.env \
-    --network=hera-be_main_network \
+    --network=nexaa_main_network \
     ${IMAGE_NAME} \
     bash
 

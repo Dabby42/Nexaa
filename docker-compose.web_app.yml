@@ -7,7 +7,7 @@ version: "2"
 services:
   web_app:
     build: .
-    container_name: hera-be_web_app
+    container_name: nexaa_web_app
 
     # Expose the internal 8080 port, but do not specify host port mapping. Docker will map it as it pleases and
     # prevent clashes to existing ports.
@@ -21,7 +21,7 @@ services:
     # Map the exposed folder volumes to the directories within our repos.
     volumes:
       - .:/src
-      - ./docker_logs/hera-be:/var/log/applications/hera-be
+      - ./docker_logs/hera-be:/var/log/applications/nexaa
 
     networks:
       - main_network

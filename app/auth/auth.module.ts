@@ -6,7 +6,6 @@ import { config } from "app/config/config";
 import { JwtStrategy } from "./auth.jwt.strategy";
 import { UserModule } from "../user/user.module";
 import { GoogleAuthService } from "./google-auth.service";
-import { NotificationModule } from "../notification/notification.module";
 import { CustomCacheModule } from "../cache/cache.module";
 
 @Module({
@@ -18,7 +17,6 @@ import { CustomCacheModule } from "../cache/cache.module";
       secret: config.jwt.secret,
       signOptions: { expiresIn: config.jwt.expiry },
     }),
-    NotificationModule,
     CustomCacheModule,
   ],
 })
