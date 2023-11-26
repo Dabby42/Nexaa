@@ -17,5 +17,4 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   readonly username: string;
-
 }

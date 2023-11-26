@@ -36,7 +36,6 @@ export class AuthService {
 
     if (!isSocial) {
       //const isMatch = await User.comparePasswords(loginUserDto.password, user.password);
-
       // if (!isMatch) {
       //   throw new UnauthorizedException("Invalid email or password");
       // }
