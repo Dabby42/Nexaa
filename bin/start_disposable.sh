@@ -25,7 +25,7 @@ else
     echo " ----- Web App Image Available for Use. -----"
 fi
 
-PROJECT_NAME="nexaa-be"
+PROJECT_NAME="nexaa"
 
 CURRENT_DOCKER_COMPOSE_VERSION=$( docker-compose -v | grep -o '[0-9]*[.][0-9]*[.][0-9]' | sed -e 's/[.]//g' )
 BREAKING_DOCKER_COMPOSE_VERSION=1210

@@ -11,7 +11,7 @@ export class Start1700961122442 implements MigrationInterface {
       `CREATE TABLE \`basic_auth\` (\`id\` int NOT NULL AUTO_INCREMENT, \`user_id\` varchar(255) NOT NULL, \`password\` varchar(255) NOT NULL ,PRIMARY KEY (\`id\`)) ENGINE=InnoDB`
     );
     await queryRunner.query(
-        'ALTER TABLE `basic_auth` ADD CONSTRAINT `FK_45fdef50616d8364be025a09b1d` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION',
+      "ALTER TABLE `basic_auth` ADD CONSTRAINT `FK_45fdef50616d8364be025a09b1d` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION"
     );
   }
 

@@ -17,7 +17,7 @@ services:
     environment:
       MYSQL_USER: "nexaa"
       MYSQL_PASSWORD: "nexaa"
-      MYSQL_DATABASE: "nexaa"
+      MYSQL_DATABASE: "nexaa1"
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     networks:
       - main_network

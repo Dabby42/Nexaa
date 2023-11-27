@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -13,6 +13,7 @@ import { ConfirmResetPasswordTokenDto } from "./dto/confirm-reset-password-token
 import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { ChangePasswordDto } from "./dto/change-password.dto";
 import { CacheService } from "../cache/cache.service";
+import { BasicAuth } from "./entities/basic-auth.entity";
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,7 @@ export class AuthService {
 
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(BasicAuth) private basicAuthRepository: Repository<BasicAuth>,
     private jwtService: JwtService,
     private googleAuthService: GoogleAuthService,
     private cacheService: CacheService
@@ -49,9 +51,14 @@ export class AuthService {
     };
     const token = this.jwtService.sign(payload);
 
-    //delete user.password;
+    const fullUserDetails = await this.basicAuthRepository
+      .createQueryBuilder("basicAuth")
+      .select("basicAuth.*")
+      .leftJoin("basicAuth.user_id", "user")
+      .where("basicAuth.user_id = :user_id", { user_id: user.id })
+      .getRawOne();
 
-    return sendSuccess({ token, user }, "Login Success");
+    return sendSuccess({ token, fullUserDetails }, "Login Success");
   }
 
   async loginWithGoogle(googleLoginDto: GoogleLoginDto) {
@@ -103,16 +110,17 @@ export class AuthService {
     }
 
     const user = await this.userRepository.findOneBy({ id: userId });
+    const userAuthDetails = await this.basicAuthRepository.findOne({ where: { user_id: { id: user.id } } });
 
-    //const isMatch = await User.comparePasswords(newPassword, user.password);
+    const isMatch = await User.comparePasswords(newPassword, userAuthDetails.password);
 
-    // if (isMatch) {
-    //   throw new ConflictException("Password used before");
-    // }
+    if (isMatch) {
+      throw new ConflictException("Password used before");
+    }
 
-    //user.password = await User.hashPassword(newPassword);
+    userAuthDetails.password = await User.hashPassword(newPassword);
 
-    await this.userRepository.save(user);
+    await this.basicAuthRepository.save(userAuthDetails);
 
     await this.cacheService.delete(token);
 
@@ -120,16 +128,19 @@ export class AuthService {
   }
 
   async changePassword(user, changePasswordDto: ChangePasswordDto) {
-    const foundUser = await this.userRepository.findOne({ where: { id: user.id } });
-    //const isMatch = await User.comparePasswords(changePasswordDto.oldPassword, foundUser.password);
+    // const foundUser = await this.userRepository.findOne({ where: { id: user.id } });
+    const userAuthDetails = await this.basicAuthRepository.findOne({ where: { user_id: { id: user.id } } });
 
-    // if (!isMatch) {
-    //   throw new BadRequestException("Invalid password");
-    // }
+    const isMatch = await User.comparePasswords(changePasswordDto.oldPassword, userAuthDetails.password);
 
-    //foundUser.password = await User.hashPassword(changePasswordDto.newPassword);
-    await this.userRepository.save(foundUser);
+    if (!isMatch) {
+      throw new BadRequestException("Invalid password");
+    }
+    const newPasssword = await User.hashPassword(changePasswordDto.newPassword);
+    userAuthDetails.password = newPasssword;
+    await this.basicAuthRepository.save(userAuthDetails);
 
-    return foundUser;
+    user.password = newPasssword;
+    return user;
   }
 }
