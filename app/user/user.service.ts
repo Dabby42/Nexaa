@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, Logger, UnprocessableEntityException } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { RoleEnum, User } from "./entities/user.entity";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { CacheService } from "../cache/cache.service";
@@ -13,6 +13,7 @@ export class UserService {
   private readonly brandCacheKeyBase: string;
   private readonly creatorCacheKeyBase: string;
   constructor(
+    private dataSource: DataSource,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(BasicAuth) private basicAuthRepository: Repository<BasicAuth>,
     private cacheService: CacheService
@@ -30,24 +31,29 @@ export class UserService {
       else if (createUserDto.email === user.email) throw new ConflictException("A user with this email already exist");
     }
 
-    const newUser = this.userRepository.create({
-      username: createUserDto.username,
-      email: createUserDto.email,
-      first_name: createUserDto.first_name,
-      last_name: createUserDto.last_name,
-    });
+    const userEntity = new User();
 
+    for (const key in createUserDto) {
+      if (createUserDto.hasOwnProperty(key) && key !== "password") {
+        userEntity[key] = createUserDto[key];
+      }
+    }
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
-      const saveUser = await this.userRepository.save(newUser);
-
+      const saveUser = await queryRunner.manager.save(User, userEntity);
       const password = await User.hashPassword(createUserDto.password);
-      await this.basicAuthRepository.save({
+      await queryRunner.manager.save(BasicAuth, {
         user_id: { id: saveUser.id },
         password,
       });
     } catch (err) {
+      await queryRunner.rollbackTransaction();
       this.logger.error(err);
       throw new UnprocessableEntityException("An unknown error occurred");
+    } finally {
+      await queryRunner.commitTransaction();
     }
   }
 

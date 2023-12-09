@@ -20,10 +20,10 @@ export class UserController {
   }
 
   @UseGuards(JwtGuard)
-  @Get("affiliate/:affiliate_id")
-  async fetchUserDetails(@Param("affiliate_id") affiliate_id: number) {
-    const data = await this.userService.loadUser(affiliate_id, RoleEnum.CREATOR);
-    if (!data) throw new NotFoundException("Affiliate not found.");
-    return sendSuccess(data, "Affiliate data fetch success.");
+  @Get(":id")
+  async fetchUserDetails(@Param("id") user_id: number) {
+    const data = await this.userService.loadUser(user_id, RoleEnum.CREATOR);
+    if (!data) throw new NotFoundException("User not found.");
+    return sendSuccess(data, "User data fetch success.");
   }
 }

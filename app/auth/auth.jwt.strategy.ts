@@ -8,7 +8,7 @@ import { UserService } from "../user/user.service";
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(@Inject(UserService) private userService: UserService) {
     super({
-      secretOrKey: config.jwt.secret,
+      secretOrKey: config.jwt.secret || "SECRET",
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
     });

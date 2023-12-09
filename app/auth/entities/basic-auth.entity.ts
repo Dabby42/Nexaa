@@ -1,13 +1,14 @@
-import { Column, CreateDateColumn, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "../../user/entities/user.entity";
 
+@Entity()
 export class BasicAuth {
   @PrimaryGeneratedColumn()
   id: number;
 
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: "user_id" })
-  public user_id: User;
+  user_id: User;
 
   @Column()
   password: string;

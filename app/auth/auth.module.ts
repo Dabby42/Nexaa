@@ -7,9 +7,6 @@ import { JwtStrategy } from "./auth.jwt.strategy";
 import { UserModule } from "../user/user.module";
 import { GoogleAuthService } from "./google-auth.service";
 import { CustomCacheModule } from "../cache/cache.module";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { User } from "../user/entities/user.entity";
-import { BasicAuth } from "./entities/basic-auth.entity";
 
 @Module({
   controllers: [AuthController],
@@ -17,11 +14,10 @@ import { BasicAuth } from "./entities/basic-auth.entity";
   imports: [
     UserModule,
     JwtModule.register({
-      secret: config.jwt.secret,
-      signOptions: { expiresIn: config.jwt.expiry },
+      secret: config.jwt.secret || "SECRET",
+      signOptions: { expiresIn: config.jwt.expiry || "1h" },
     }),
     CustomCacheModule,
-    TypeOrmModule.forFeature([User, BasicAuth]),
   ],
 })
 export class AuthModule {}

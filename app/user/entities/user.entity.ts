@@ -1,12 +1,13 @@
 import * as bcrypt from "bcryptjs";
 import { config } from "../../config/config";
-import { Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 export enum RoleEnum {
-  BRAND = 1,
-  CREATOR = 2,
+  BRAND = "brand",
+  CREATOR = "creator",
 }
 
+@Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -22,6 +23,28 @@ export class User {
 
   @Column({ unique: true })
   username: string;
+
+  @Column()
+  avatar: string;
+
+  @Column({
+    type: "enum",
+    enum: RoleEnum,
+    default: RoleEnum.CREATOR,
+  })
+  account_type: string;
+
+  @Column()
+  city: string;
+
+  @Column()
+  country: string;
+
+  @Column()
+  description: string;
+
+  @Column()
+  gender: string;
 
   static async comparePasswords(password: string, hashedPassword: string) {
     return await bcrypt.compare(password, hashedPassword);

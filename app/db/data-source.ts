@@ -3,10 +3,10 @@ import { DataSource, DataSourceOptions } from "typeorm";
 
 export const dataSourceOptions: DataSourceOptions = {
   type: "mysql",
-  host: config.mysql.connection.host,
-  username: config.mysql.connection.user,
-  password: config.mysql.connection.password,
-  database: config.mysql.connection.database,
+  host: config.mysql.connection.host || "127.0.0.1",
+  username: config.mysql.connection.user || "root",
+  password: config.mysql.connection.password || "Daberechukwu42$",
+  database: config.mysql.connection.database || "hera",
   entities: ["dist/**/*.entity.js"],
   migrations: ["dist/app/db/migrations/*.js"],
 };
