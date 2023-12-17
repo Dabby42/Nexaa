@@ -7,6 +7,7 @@ export const dataSourceOptions: DataSourceOptions = {
   username: config.mysql.connection.user || "root",
   password: config.mysql.connection.password || "Daberechukwu42$",
   database: config.mysql.connection.database || "hera",
+  port: config.mysql.connection.port,
   entities: ["dist/**/*.entity.js"],
   migrations: ["dist/app/db/migrations/*.js"],
 };
