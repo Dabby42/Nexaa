@@ -1,12 +1,12 @@
-# Affiliate Platform API
+# Nexaa Platform API
 
 ## Description
 
-This application is responsible for managing konga's affiliate data.
+This application is responsible for managing creators and influencers.
 
 ## Running the application
 
-This application depends on a couple of services to run fully. The command below would build and start all dependent containers and take you into the bash temrinal of the main (`hera-be`) container:
+This application depends on a couple of services to run fully. The command below would build and start all dependent containers and take you into the bash temrinal of the main container:
 
 $ ./bin/start_disposable.sh
 
