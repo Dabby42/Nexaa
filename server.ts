@@ -11,8 +11,8 @@ async function bootstrap() {
   //
   // }
   const documentOptions = new DocumentBuilder()
-    .setTitle("Hera Docs")
-    .setDescription("Konga Hera service for Affiliate")
+    .setTitle("Nexaa Docs")
+    .setDescription("Service for creators")
     .setVersion("v1")
     .addBearerAuth(
       {
