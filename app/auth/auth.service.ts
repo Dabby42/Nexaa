@@ -53,7 +53,7 @@ export class AuthService {
 
     const fullUserDetails = await this.basicAuthRepository
       .createQueryBuilder("basicAuth")
-      .select("basicAuth.*")
+      .select("user.*")
       .leftJoin("basicAuth.user_id", "user")
       .where("basicAuth.user_id = :user_id", { user_id: user.id })
       .getRawOne();
