@@ -6,6 +6,8 @@ import { RoleEnum, User } from "./entities/user.entity";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { CacheService } from "../cache/cache.service";
 import { BasicAuth } from "../auth/entities/basic-auth.entity";
+import { AddPreferenceDto } from "./dto/add-preference.dto";
+import { UserPreference } from "./entities/user-preference.entity";
 
 @Injectable()
 export class UserService {
@@ -16,6 +18,7 @@ export class UserService {
     private dataSource: DataSource,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(BasicAuth) private basicAuthRepository: Repository<BasicAuth>,
+    @InjectRepository(UserPreference) private userPreferenceRepository: Repository<UserPreference>,
     private cacheService: CacheService
   ) {
     this.brandCacheKeyBase = "BRAND_";
@@ -78,5 +81,15 @@ export class UserService {
       if (!user) return null;
       return user;
     });
+  }
+
+  async addPreference(id: number, addPreferenceDto: AddPreferenceDto) {
+    const userPreference = await this.userPreferenceRepository.findOne({ where: { user_id: { id } } });
+    if (userPreference) {
+      await this.userPreferenceRepository.update(userPreference.id, addPreferenceDto);
+    } else {
+      const newUserPreference = this.userPreferenceRepository.create({ ...addPreferenceDto, user_id: { id } });
+      await this.userPreferenceRepository.save(newUserPreference);
+    }
   }
 }
