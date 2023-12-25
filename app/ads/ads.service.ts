@@ -11,7 +11,9 @@ import { AdQueryDto } from "./dto/ad-query.dto";
 export class AdsService {
   private readonly cacheKeyBase: string;
 
-  constructor(@InjectRepository(Ad) private adsRepository: Repository<Ad>, private cacheService: CacheService) {}
+  constructor(@InjectRepository(Ad) private adsRepository: Repository<Ad>, private cacheService: CacheService) {
+    this.cacheKeyBase = "ADS_";
+  }
 
   async createAd(id: number, createAdDto: CreateAdDto) {
     const newAd = this.adsRepository.create({ ...createAdDto, user_id: { id } });
