@@ -10,6 +10,7 @@ export const dataSourceOptions: DataSourceOptions = {
   port: config.mysql.connection.port,
   entities: ["dist/**/*.entity.js"],
   migrations: ["dist/app/db/migrations/*.js"],
+  timezone: "Africa/Lagos",
 };
 
 const dataSource = new DataSource(dataSourceOptions);

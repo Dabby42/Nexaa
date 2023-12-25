@@ -7,9 +7,10 @@ import { dataSourceOptions } from "./db/data-source";
 import { AuthModule } from "./auth/auth.module";
 import { WorkModule } from "./work/work.module";
 import { AdsModule } from "./ads/ads.module";
+import { PostModule } from "./post/post.module";
 
 @Module({
-  imports: [TypeOrmModule.forRoot(dataSourceOptions), UserModule, AuthModule, WorkModule, AdsModule],
+  imports: [TypeOrmModule.forRoot(dataSourceOptions), UserModule, AuthModule, WorkModule, AdsModule, PostModule],
   controllers: [AppController],
   providers: [AppService],
 })
