@@ -12,20 +12,23 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   first_name: string;
 
-  @Column()
+  @Column({ nullable: true })
   last_name: string;
 
   @Column({ unique: true })
   email: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: true })
   username: string;
 
-  @Column()
+  @Column({ nullable: true })
   avatar: string;
+
+  @Column({ nullable: true })
+  tag: string;
 
   @Column({
     type: "enum",
@@ -34,16 +37,16 @@ export class User {
   })
   account_type: string;
 
-  @Column()
+  @Column({ nullable: true })
   city: string;
 
-  @Column()
+  @Column({ nullable: true })
   country: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
-  @Column()
+  @Column({ nullable: true })
   gender: string;
 
   static async comparePasswords(password: string, hashedPassword: string) {
