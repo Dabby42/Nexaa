@@ -27,11 +27,10 @@ export class UserService {
 
   async createUser(createUserDto: CreateUserDto) {
     const user = await this.userRepository.findOne({
-      where: [{ email: createUserDto.email }, { username: createUserDto.username }],
+      where: [{ email: createUserDto.email }],
     });
-    if (user) {
-      if (createUserDto.username === user.username) throw new ConflictException("A user with this username already exist");
-      else if (createUserDto.email === user.email) throw new ConflictException("A user with this email already exist");
+    if (user && createUserDto.email === user.email) {
+      throw new ConflictException("A user with this email already exist");
     }
 
     const userEntity = new User();
@@ -58,6 +57,10 @@ export class UserService {
     } finally {
       await queryRunner.commitTransaction();
     }
+  }
+
+  async getIncompleteProfiles(): Promise<User[]> {
+    return this.userRepository.createQueryBuilder("user").where("user.first_name IS NULL OR user.description IS NULL").getMany();
   }
 
   async updateUser(id: number, updateUserDto: UpdateUserDto) {
